@@ -45,6 +45,7 @@ export interface DropSignOptions {
   messages?: DropSignMessages;
   signature?: DropSignSignatureOptions;
   classNamePrefix?: string;
+  afterConfirm?: 'persist' | 'capture' | 'both';  // default: 'capture'
   capture?: {
     pixelRatio?: number;
     backgroundColor?: string;
@@ -65,12 +66,31 @@ export interface SignaturePlacement {
   scrollY: number;
 }
 
-export interface DropSignResult {
-  imageBlob: Blob;
+interface DropSignResultBase {
   signatureBlob: Blob;
   signatureDataUrl: string;
   placement: SignaturePlacement;
 }
+
+export interface PersistResult extends DropSignResultBase {
+  afterConfirm: 'persist';
+  persistedEl: HTMLElement;
+  removePersisted: () => void;
+}
+
+export interface CaptureResult extends DropSignResultBase {
+  afterConfirm: 'capture';
+  imageBlob: Blob;
+}
+
+export interface BothResult extends DropSignResultBase {
+  afterConfirm: 'both';
+  imageBlob: Blob;
+  persistedEl: HTMLElement;
+  removePersisted: () => void;
+}
+
+export type DropSignResult = PersistResult | CaptureResult | BothResult;
 
 export interface DropSignWidget {
   destroy(): void;
