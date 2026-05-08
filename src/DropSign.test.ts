@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { DropSign } from './DropSign.js';
-import { captureResult } from './capture.js';
+import { captureResult, persistResult } from './capture.js';
 import { mergeMessages, mergeSignatureOptions } from './messages.js';
 
 // Must be hoisted — mocks html-to-image for capture unit tests
@@ -345,6 +345,63 @@ describe('captureResult', () => {
 
     expect(targetEl.querySelectorAll('img').length).toBe(0);
     expect(targetEl.style.position).toBe('');
+
+    targetEl.remove();
+  });
+});
+
+describe('persistResult', () => {
+  const fakeSigDataUrl = 'data:image/png;base64,signature';
+  const placement = {
+    x: 10,
+    y: 20,
+    width: 100,
+    height: 50,
+    targetWidth: 400,
+    targetHeight: 300,
+    scrollX: 0,
+    scrollY: 0,
+  };
+
+  beforeEach(() => {
+    vi.stubGlobal('fetch', vi.fn(async () => ({
+      blob: async () => new Blob(['fake']),
+    })));
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('injects a permanent signature img into targetEl', () => {
+    const targetEl = document.createElement('div');
+    targetEl.style.position = 'relative';
+    document.body.appendChild(targetEl);
+
+    const { persistedEl } = persistResult(targetEl, fakeSigDataUrl, placement);
+
+    expect(targetEl.contains(persistedEl)).toBe(true);
+    expect((persistedEl as HTMLImageElement).src).toContain(fakeSigDataUrl);
+    expect(persistedEl.style.position).toBe('absolute');
+    expect(persistedEl.style.left).toBe('10px');
+    expect(persistedEl.style.top).toBe('20px');
+    expect(persistedEl.style.width).toBe('100px');
+    expect(persistedEl.style.height).toBe('50px');
+
+    targetEl.remove();
+  });
+
+  it('removePersisted() removes the img from the DOM', () => {
+    const targetEl = document.createElement('div');
+    targetEl.style.position = 'relative';
+    document.body.appendChild(targetEl);
+
+    const { removePersisted } = persistResult(targetEl, fakeSigDataUrl, placement);
+    expect(targetEl.querySelectorAll('img').length).toBe(1);
+
+    removePersisted();
+
+    expect(targetEl.querySelectorAll('img').length).toBe(0);
 
     targetEl.remove();
   });
