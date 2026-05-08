@@ -8,11 +8,14 @@ const widget = DropSign.init({
     if (!output) return;
 
     const heading = document.createElement('h3');
-    heading.textContent = 'Signed document:';
+    heading.textContent = 'Signed document (signature included):';
 
     const img = document.createElement('img');
     img.src = URL.createObjectURL(result.imageBlob);
-    img.alt = 'Signed document';
+    img.alt = 'Signed document with signature';
+    img.style.maxWidth = '100%';
+    img.style.border = '1px solid #ccc';
+    img.style.marginTop = '8px';
 
     const pre = document.createElement('pre');
     pre.textContent = JSON.stringify(result.placement, null, 2);

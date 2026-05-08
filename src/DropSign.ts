@@ -68,11 +68,7 @@ export class DropSign {
         async () => {
           if (!placementBox) return;
           const placement = placementBox.getPlacement();
-          placementBox.destroy();
-          placementBox = null;
-          overlayContainer?.destroy();
-          overlayContainer = null;
-
+          // Capture first — overlay must still be in DOM for correct layout context
           try {
             const result = await captureResult(
               targetEl,
@@ -80,8 +76,18 @@ export class DropSign {
               placement,
               captureOptions,
             );
+            // Destroy overlay only after successful capture
+            placementBox?.destroy();
+            placementBox = null;
+            overlayContainer?.destroy();
+            overlayContainer = null;
             await onComplete?.(result);
           } catch (err) {
+            // On error, still clean up
+            placementBox?.destroy();
+            placementBox = null;
+            overlayContainer?.destroy();
+            overlayContainer = null;
             onError?.(err);
           }
         },
