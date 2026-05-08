@@ -73,11 +73,9 @@ export class DropSign {
     let triggerHandle: TriggerHandle;
     try {
       if (!trigger || trigger.type === 'global') {
-        triggerHandle = createGlobalTrigger(
-          { type: 'global', ...trigger },
-          label,
-          () => modal.open(),
-        );
+        const globalTrigger: Extract<DropSignTrigger, { type: 'global' }> =
+          trigger?.type === 'global' ? trigger : { type: 'global' };
+        triggerHandle = createGlobalTrigger(globalTrigger, label, () => modal.open());
       } else if (trigger.type === 'custom') {
         triggerHandle = attachCustomTrigger(trigger, () => modal.open());
       } else {
