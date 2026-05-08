@@ -91,6 +91,20 @@ describe('DropSign.init', () => {
     expect(typeof widget.destroy).toBe('function');
     widget.destroy();
   });
+
+  it('onComplete receives signatureDataUrl, signatureBlob, and placement', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => ({ blob: async () => new Blob(['sig']) })));
+
+    const onComplete = vi.fn();
+    const widget = DropSign.init({ onComplete });  // no target
+
+    const btn = document.querySelector('.ds-button') as HTMLElement;
+    expect(btn).toBeTruthy();
+    expect(onComplete).not.toHaveBeenCalled();
+
+    widget.destroy();
+    vi.unstubAllGlobals();
+  });
 });
 
 describe('trigger modes', () => {
@@ -213,11 +227,10 @@ describe('createPlacementBox — getPlacement', () => {
       () => {}, () => {},
       { confirm: 'Confirm', delete: 'Delete' },
     );
-    // box is at viewport (300, 100) → target-relative: (300-100)/400=0.5, (100-50)/300=0.167
     box.element.style.left = '300px';
     box.element.style.top = '100px';
-    box.element.style.width = '80px';   // 80/400 = 0.2
-    box.element.style.height = '40px';  // 40/300 ≈ 0.133
+    box.element.style.width = '80px';
+    box.element.style.height = '40px';
 
     const p = box.getPlacement();
     expect(p.x).toBeCloseTo(0.5);
@@ -241,7 +254,6 @@ describe('createPlacementBox — getPlacement', () => {
       () => {}, () => {},
       { confirm: 'Confirm', delete: 'Delete' },
     );
-    // box at viewport (0,50) → x = (0-100)/400 = -0.25 (outside target)
     box.element.style.left = '0px';
     box.element.style.top = '50px';
     box.element.style.width = '80px';
@@ -262,11 +274,10 @@ describe('createPlacementBox — getPlacement', () => {
       () => {}, () => {},
       { confirm: 'Confirm', delete: 'Delete' },
     );
-    // 512/1024 = 0.5, 384/768 = 0.5
     box.element.style.left = '512px';
     box.element.style.top = '384px';
-    box.element.style.width = '204.8px';  // 204.8/1024 = 0.2
-    box.element.style.height = '76.8px';  // 76.8/768 = 0.1
+    box.element.style.width = '204.8px';
+    box.element.style.height = '76.8px';
 
     const p = box.getPlacement();
     expect(p.x).toBeCloseTo(0.5);
@@ -296,23 +307,3 @@ describe('createPlacementBox — getPlacement', () => {
     box.destroy();
   });
 });
-
-describe('DropSign.init', () => {
-  it('onComplete receives signatureDataUrl, signatureBlob, and placement', async () => {
-    vi.stubGlobal('fetch', vi.fn(async () => ({ blob: async () => new Blob(['sig']) })));
-
-    const onComplete = vi.fn();
-    const widget = DropSign.init({ onComplete });  // no target
-
-    // The global button should be appended to body
-    const btn = document.querySelector('.ds-button') as HTMLElement;
-    expect(btn).toBeTruthy();
-
-    // onComplete is not called until the user signs — just verify no crash on init
-    expect(onComplete).not.toHaveBeenCalled();
-
-    widget.destroy();
-    vi.unstubAllGlobals();
-  });
-});
-
