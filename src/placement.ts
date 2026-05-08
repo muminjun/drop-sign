@@ -50,11 +50,14 @@ export function createPlacementBox(
   box.style.width = `${initW}px`;
   box.style.height = `${initH}px`;
 
-  setupDrag(box);
-  setupResize(box, seHandle, 1, 1);
-  setupResize(box, swHandle, -1, 1);
-  setupResize(box, neHandle, 1, -1);
-  setupResize(box, nwHandle, -1, -1);
+  const ac = new AbortController();
+  const { signal } = ac;
+
+  setupDrag(box, signal);
+  setupResize(box, seHandle, 1, 1, signal);
+  setupResize(box, swHandle, -1, 1, signal);
+  setupResize(box, neHandle, 1, -1, signal);
+  setupResize(box, nwHandle, -1, -1, signal);
 
   deleteBtn.addEventListener('click', () => {
     destroy();
@@ -99,6 +102,7 @@ export function createPlacementBox(
 
   function destroy() {
     document.removeEventListener('keydown', handleKeydown);
+    ac.abort();
     box.remove();
   }
 
@@ -111,14 +115,14 @@ function resizeHandle(cls: string): HTMLElement {
   return el;
 }
 
-function setupDrag(box: HTMLElement) {
+function setupDrag(box: HTMLElement, signal: AbortSignal) {
   let dragging = false;
   let startX = 0, startY = 0, startLeft = 0, startTop = 0;
 
   box.addEventListener('pointerdown', (e) => {
     const target = e.target as HTMLElement;
     if (
-      target.classList.contains('ds-resize-handle') ||
+      target.closest('.ds-resize-handle') ||
       target.tagName === 'BUTTON' ||
       target.tagName === 'IMG'
     ) return;
@@ -129,7 +133,7 @@ function setupDrag(box: HTMLElement) {
     startLeft = parseFloat(box.style.left) || 0;
     startTop = parseFloat(box.style.top) || 0;
     e.preventDefault();
-  });
+  }, { signal });
 
   box.addEventListener('pointermove', (e) => {
     if (!dragging) return;
@@ -139,10 +143,10 @@ function setupDrag(box: HTMLElement) {
     const newTop  = Math.max(0, Math.min(window.innerHeight - boxH, startTop  + e.clientY - startY));
     box.style.left = `${newLeft}px`;
     box.style.top  = `${newTop}px`;
-  });
+  }, { signal });
 
-  box.addEventListener('pointerup', () => { dragging = false; });
-  box.addEventListener('pointercancel', () => { dragging = false; });
+  box.addEventListener('pointerup', () => { dragging = false; }, { signal });
+  box.addEventListener('pointercancel', () => { dragging = false; }, { signal });
 }
 
 function setupResize(
@@ -150,6 +154,7 @@ function setupResize(
   handle: HTMLElement,
   dirX: number,
   dirY: number,
+  signal: AbortSignal,
 ) {
   let resizing = false;
   let startX = 0, startY = 0;
@@ -166,7 +171,7 @@ function setupResize(
     startTop = parseFloat(box.style.top) || 0;
     e.preventDefault();
     e.stopPropagation();
-  });
+  }, { signal });
 
   handle.addEventListener('pointermove', (e) => {
     if (!resizing) return;
@@ -196,8 +201,8 @@ function setupResize(
     box.style.height = `${newH}px`;
     box.style.left   = `${newLeft}px`;
     box.style.top    = `${newTop}px`;
-  });
+  }, { signal });
 
-  handle.addEventListener('pointerup', () => { resizing = false; });
-  handle.addEventListener('pointercancel', () => { resizing = false; });
+  handle.addEventListener('pointerup', () => { resizing = false; }, { signal });
+  handle.addEventListener('pointercancel', () => { resizing = false; }, { signal });
 }
