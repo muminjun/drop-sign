@@ -3,47 +3,205 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DropSign Basic Example</title>
+    <title>DropSign | Professional Web Signature SDK</title>
     <style>
-      body { font-family: system-ui, sans-serif; max-width: 800px; margin: 60px auto; padding: 0 24px; }
-      h1 { font-size: 24px; margin-bottom: 8px; }
-      p { color: #555; margin-bottom: 24px; }
+      :root {
+        --slate-50: #f8fafc;
+        --slate-100: #f1f5f9;
+        --slate-200: #e2e8f0;
+        --slate-300: #cbd5e1;
+        --slate-500: #64748b;
+        --slate-600: #475569;
+        --slate-700: #334155;
+        --slate-800: #1e293b;
+        --slate-900: #0f172a;
+        --indigo-600: #4f46e5;
+      }
+
+      body {
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        background-color: var(--slate-50);
+        color: var(--slate-900);
+        margin: 0;
+        padding: 60px 24px;
+        line-height: 1.5;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      header {
+        text-align: center;
+        margin-bottom: 48px;
+      }
+
+      h1 {
+        font-size: 32px;
+        font-weight: 800;
+        letter-spacing: -0.025em;
+        margin-bottom: 12px;
+        color: var(--slate-900);
+      }
+
+      .subtitle {
+        font-size: 16px;
+        color: var(--slate-600);
+        max-width: 500px;
+        margin: 0 auto;
+      }
+
       #contract-area {
-        border: 2px solid #d1d5db;
-        border-radius: 10px;
-        padding: 32px;
-        min-height: 400px;
-        background: #f9fafb;
+        background: #fff;
+        border: 1px solid var(--slate-200);
+        border-radius: 12px;
+        padding: 64px;
+        min-height: 500px;
         position: relative;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
       }
-      #contract-area h2 { margin-top: 0; }
-      #output { margin-top: 24px; }
-      #output img { max-width: 100%; border: 1px solid #e5e7eb; border-radius: 8px; }
-      #output pre {
-        background: #111;
-        color: #a3e635;
-        padding: 16px;
+
+      .document-header {
+        text-align: center;
+        margin-bottom: 48px;
+        border-bottom: 2px solid var(--slate-900);
+        padding-bottom: 24px;
+      }
+
+      .document-header h2 {
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-size: 20px;
+      }
+
+      .document-content p {
+        margin-bottom: 20px;
+        color: var(--slate-800);
+        text-align: justify;
+      }
+
+      .signature-section {
+        margin-top: 80px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+      }
+
+      .signature-line {
+        border-top: 1px solid var(--slate-300);
+        padding-top: 8px;
+        font-size: 13px;
+        color: var(--slate-600);
+        font-weight: 500;
+      }
+
+      #output {
+        margin-top: 60px;
+        border-top: 1px solid var(--slate-200);
+        padding-top: 40px;
+      }
+
+      .result-card {
+        background: #fff;
+        border: 1px solid var(--slate-200);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      }
+
+      .result-header {
+        padding: 16px 24px;
+        background: var(--slate-50);
+        border-bottom: 1px solid var(--slate-200);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .result-header h3 {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--slate-700);
+      }
+
+      .result-body {
+        padding: 24px;
+      }
+
+      #output img {
+        display: block;
+        max-width: 100%;
+        height: auto;
+        border: 1px solid var(--slate-200);
         border-radius: 8px;
-        font-size: 12px;
-        overflow: auto;
       }
+
+      .metadata-container {
+        margin-top: 24px;
+      }
+
+      .metadata-label {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--slate-500);
+        margin-bottom: 8px;
+        display: block;
+      }
+
+      #output pre {
+        background: var(--slate-900);
+        color: #94a3b8;
+        padding: 20px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-family: 'JetBrains Mono', 'Fira Code', monospace;
+        overflow: auto;
+        margin: 0;
+      }
+
+      .metadata-key { color: #f472b6; }
+      .metadata-string { color: #34d399; }
+      .metadata-number { color: #fbbf24; }
     </style>
   </head>
   <body>
-    <h1>DropSign Demo</h1>
-    <p>Click the <strong>Sign</strong> button inside the contract area, draw your signature, position it, and click Confirm.</p>
+    <div class="container">
+      <header>
+        <h1>DropSign</h1>
+        <p class="subtitle">A lightweight, professional signature SDK for modern web applications. Draw, place, and capture with ease.</p>
+      </header>
 
-    <div id="contract-area">
-      <h2>Service Agreement</h2>
-      <p>This agreement is entered into between <strong>Acme Corp</strong> and the undersigned party.</p>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante.</p>
-      <p>Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo. Quisque sit amet est et sapien ullamcorper pharetra.</p>
-      <br />
-      <p>Signature: ___________________________</p>
-      <p>Date: ___________________________</p>
+      <div id="contract-area">
+        <div class="document-header">
+          <h2>Service Agreement</h2>
+        </div>
+        
+        <div class="document-content">
+          <p>This Service Agreement ("Agreement") is made and effective as of this day, between <strong>Acme Global Solutions</strong> ("Company") and the undersigned <strong>Contractor</strong>.</p>
+          
+          <p><strong>1. Scope of Work:</strong> The Contractor agrees to perform professional services as outlined in Exhibit A. The Company shall provide necessary access and information to facilitate the timely completion of such services.</p>
+          
+          <p><strong>2. Compensation:</strong> Company shall pay Contractor the agreed-upon fees within thirty (30) days of receipt of a valid invoice. All expenses must be pre-approved in writing by the Company.</p>
+          
+          <p><strong>3. Confidentiality:</strong> Contractor acknowledges that during the term of this Agreement, they may have access to confidential and proprietary information. Contractor agrees to maintain the strict confidentiality of all such information.</p>
+        </div>
+
+        <div class="signature-section">
+          <div>
+            <div class="signature-line">Contractor Signature</div>
+          </div>
+          <div>
+            <div class="signature-line">Date</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="output"></div>
     </div>
-
-    <div id="output"></div>
 
     <script type="module" src="./src/main.ts"></script>
   </body>
