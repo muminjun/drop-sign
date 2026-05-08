@@ -32,6 +32,7 @@ export function createSignaturePadModal(
 
     const canvas = document.createElement('canvas') as HTMLCanvasElement;
     canvas.className = 'ds-canvas';
+    canvas.style.touchAction = 'none';
     canvas.width = 480;
     canvas.height = 200;
 
