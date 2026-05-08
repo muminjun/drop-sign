@@ -1,7 +1,7 @@
 import { DropSign } from 'drop-sign';
 import type { DropSignResult, DropSignWidget } from 'drop-sign';
 
-type Mode = 'floating-target' | 'floating-viewport' | 'inline-text' | 'custom';
+type Mode = 'global-br' | 'global-tl' | 'custom';
 
 let currentWidget: DropSignWidget | null = null;
 
@@ -12,9 +12,8 @@ const WEIGHT_PRESETS = {
 } as const;
 
 const MODE_DESCRIPTIONS: Record<Mode, string> = {
-  'floating-target': 'Mode: Floating button (target-relative, default)',
-  'floating-viewport': 'Mode: Floating button (fixed to viewport corner)',
-  'inline-text': 'Mode: Inline text trigger 「서명」 with Korean labels',
+  'global-br': 'Mode: Global trigger — fixed button at bottom-right',
+  'global-tl': 'Mode: Global trigger — fixed button at top-left, Korean labels',
   'custom': 'Mode: Custom trigger — user-provided #custom-sign-btn',
 };
 
@@ -35,18 +34,19 @@ function onComplete(result: DropSignResult) {
 
   const header = document.createElement('div');
   header.className = 'result-header';
-  header.innerHTML = '<h3>Signed document (exported preview)</h3>';
+  header.innerHTML = '<h3>Signature captured</h3>';
 
   const body = document.createElement('div');
   body.className = 'result-body';
 
   const img = document.createElement('img');
-  img.src = URL.createObjectURL(result.imageBlob);
-  img.alt = 'Signed document';
+  img.src = result.signatureDataUrl;
+  img.alt = 'Signature';
+  img.style.maxHeight = '80px';
 
   const metaContainer = document.createElement('div');
   metaContainer.className = 'metadata-container';
-  metaContainer.innerHTML = '<span class="metadata-label">Placement Metadata</span>';
+  metaContainer.innerHTML = '<span class="metadata-label">Placement (normalized)</span>';
   const pre = document.createElement('pre');
   pre.textContent = JSON.stringify(result.placement, null, 2);
   metaContainer.appendChild(pre);
@@ -61,9 +61,7 @@ function initMode(mode: Mode) {
   currentWidget?.destroy();
   currentWidget = null;
 
-  const inlineTriggerArea = document.getElementById('inline-trigger-area') as HTMLElement;
   const customTriggerArea = document.getElementById('custom-trigger-area') as HTMLElement;
-  inlineTriggerArea.style.display = 'none';
   customTriggerArea.style.display = 'none';
 
   const weight = getLineWeight();
@@ -71,32 +69,18 @@ function initMode(mode: Mode) {
   const descEl = document.getElementById('mode-description')!;
   descEl.textContent = MODE_DESCRIPTIONS[mode];
 
-  if (mode === 'floating-target') {
+  if (mode === 'global-br') {
     currentWidget = DropSign.init({
       target: '#contract-area',
-      trigger: { type: 'floating', positionAnchor: 'target', position: 'bottom-right' },
+      trigger: { type: 'global', position: 'bottom-right' },
       signature,
       onComplete,
       onError: (err) => console.error('[DropSign]', err),
     });
-  } else if (mode === 'floating-viewport') {
+  } else if (mode === 'global-tl') {
     currentWidget = DropSign.init({
       target: '#contract-area',
-      trigger: { type: 'floating', positionAnchor: 'viewport', position: 'bottom-right' },
-      signature,
-      onComplete,
-      onError: (err) => console.error('[DropSign]', err),
-    });
-  } else if (mode === 'inline-text') {
-    inlineTriggerArea.style.display = 'flex';
-    currentWidget = DropSign.init({
-      target: '#contract-area',
-      trigger: {
-        type: 'inline',
-        container: '#inline-trigger-area',
-        label: '(서명)',
-        variant: 'text',
-      },
+      trigger: { type: 'global', position: 'top-left', label: '서명' },
       messages: {
         sign: '서명',
         clear: '지우기',
@@ -140,6 +124,6 @@ document.getElementById('line-weight')!.addEventListener('change', () => {
   initMode(active.dataset.mode as Mode);
 });
 
-initMode('floating-target');
+initMode('global-br');
 
 window.addEventListener('beforeunload', () => currentWidget?.destroy());

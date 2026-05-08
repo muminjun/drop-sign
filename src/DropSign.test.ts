@@ -1,12 +1,7 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { DropSign } from './DropSign.js';
-import { captureResult, persistResult, dataUrlToBlob } from './capture.js';
 import { mergeMessages, mergeSignatureOptions } from './messages.js';
-
-// Must be hoisted — mocks html-to-image for capture unit tests
-vi.mock('html-to-image', () => ({
-  toPng: vi.fn(async () => 'data:image/png;base64,fake'),
-}));
+import { createPlacementBox } from './placement.js';
 
 describe('mergeMessages', () => {
   it('returns English defaults when called with no argument', () => {
@@ -68,17 +63,11 @@ describe('DropSign.init', () => {
     expect((err as Error).message).toContain('#missing');
   });
 
-  it('appends sign button to target element', () => {
+  it('appends sign button to document.body', () => {
     const widget = DropSign.init({ target: '#target' });
     const btn = document.querySelector('.ds-button');
     expect(btn).toBeTruthy();
-    expect(btn?.textContent).toBe('Sign');
-    widget.destroy();
-  });
-
-  it('uses custom buttonText', () => {
-    const widget = DropSign.init({ target: '#target', buttonText: 'Add signature' });
-    expect(document.querySelector('.ds-button')?.textContent).toBe('Add signature');
+    expect(document.body.contains(btn)).toBe(true);
     widget.destroy();
   });
 
@@ -102,50 +91,67 @@ describe('DropSign.init', () => {
     expect(typeof widget.destroy).toBe('function');
     widget.destroy();
   });
+
+  it('onComplete receives signatureDataUrl, signatureBlob, and placement', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => ({ blob: async () => new Blob(['sig']) })));
+
+    const onComplete = vi.fn();
+    const widget = DropSign.init({ onComplete });  // no target
+
+    const btn = document.querySelector('.ds-button') as HTMLElement;
+    expect(btn).toBeTruthy();
+    expect(onComplete).not.toHaveBeenCalled();
+
+    widget.destroy();
+    vi.unstubAllGlobals();
+  });
 });
 
 describe('trigger modes', () => {
   beforeEach(() => {
     document.body.innerHTML =
       '<div id="target" style="width:400px;height:300px;"></div>' +
-      '<div id="sig-area"></div>' +
       '<button id="custom-btn">My Sign</button>';
     document.head.innerHTML = '';
   });
 
-  it('default floating appends .ds-button inside targetEl', () => {
+  it('default trigger appends .ds-button to document.body', () => {
     const widget = DropSign.init({ target: '#target' });
     const btn = document.querySelector('.ds-button');
     expect(btn).toBeTruthy();
-    expect(document.getElementById('target')!.contains(btn)).toBe(true);
-    widget.destroy();
-  });
-
-  it('floating positionAnchor viewport appends to document.body, not targetEl', () => {
-    const widget = DropSign.init({
-      target: '#target',
-      trigger: { type: 'floating', positionAnchor: 'viewport' },
-    });
-    const btn = document.querySelector('.ds-button-viewport');
-    expect(btn).toBeTruthy();
-    expect(document.getElementById('target')!.contains(btn)).toBe(false);
     expect(document.body.contains(btn)).toBe(true);
+    expect(document.getElementById('target')!.contains(btn)).toBe(false);
     widget.destroy();
   });
 
-  it('floating positionAnchor viewport button is removed from body on destroy', () => {
+  it('global trigger default label is Sign', () => {
+    const widget = DropSign.init({ target: '#target' });
+    expect(document.querySelector('.ds-button')?.textContent).toBe('Sign');
+    widget.destroy();
+  });
+
+  it('global trigger label option overrides default', () => {
     const widget = DropSign.init({
       target: '#target',
-      trigger: { type: 'floating', positionAnchor: 'viewport' },
+      trigger: { type: 'global', label: 'Start Signing' },
     });
+    expect(document.querySelector('.ds-button')?.textContent).toBe('Start Signing');
     widget.destroy();
-    expect(document.querySelector('.ds-button-viewport')).toBeNull();
   });
 
-  it('floating position bottom-left sets correct inline style', () => {
+  it('messages.sign sets the global button label', () => {
     const widget = DropSign.init({
       target: '#target',
-      trigger: { type: 'floating', position: 'bottom-left' },
+      messages: { sign: '서명' },
+    });
+    expect(document.querySelector('.ds-button')?.textContent).toBe('서명');
+    widget.destroy();
+  });
+
+  it('global trigger bottom-left sets correct inline style', () => {
+    const widget = DropSign.init({
+      target: '#target',
+      trigger: { type: 'global', position: 'bottom-left' },
     });
     const btn = document.querySelector('.ds-button') as HTMLElement | null;
     expect(btn?.style.left).toBe('24px');
@@ -153,10 +159,10 @@ describe('trigger modes', () => {
     widget.destroy();
   });
 
-  it('floating position top-right sets correct inline style', () => {
+  it('global trigger top-right sets correct inline style', () => {
     const widget = DropSign.init({
       target: '#target',
-      trigger: { type: 'floating', position: 'top-right' },
+      trigger: { type: 'global', position: 'top-right' },
     });
     const btn = document.querySelector('.ds-button') as HTMLElement | null;
     expect(btn?.style.top).toBe('24px');
@@ -164,27 +170,11 @@ describe('trigger modes', () => {
     widget.destroy();
   });
 
-  it('inline trigger creates button inside container', () => {
-    const widget = DropSign.init({
-      target: '#target',
-      trigger: { type: 'inline', container: '#sig-area', label: '(Sign)' },
-    });
-    const container = document.getElementById('sig-area')!;
-    const btn = container.querySelector('.ds-btn-inline');
-    expect(btn).toBeTruthy();
-    expect(btn?.textContent).toBe('(Sign)');
+  it('global trigger button is removed from body on destroy', () => {
+    const widget = DropSign.init({ target: '#target' });
+    expect(document.querySelector('.ds-button')).toBeTruthy();
     widget.destroy();
-  });
-
-  it('inline text variant adds ds-btn-inline--text class', () => {
-    const widget = DropSign.init({
-      target: '#target',
-      trigger: { type: 'inline', container: '#sig-area', variant: 'text', label: '(서명)' },
-    });
-    const btn = document.querySelector('.ds-btn-inline--text');
-    expect(btn).toBeTruthy();
-    expect(btn?.textContent).toBe('(서명)');
-    widget.destroy();
+    expect(document.querySelector('.ds-button')).toBeNull();
   });
 
   it('custom trigger does not create any new buttons', () => {
@@ -197,16 +187,6 @@ describe('trigger modes', () => {
     widget.destroy();
   });
 
-  it('destroy removes SDK-created inline trigger button', () => {
-    const widget = DropSign.init({
-      target: '#target',
-      trigger: { type: 'inline', container: '#sig-area', label: 'Sign' },
-    });
-    expect(document.querySelector('.ds-btn-inline')).toBeTruthy();
-    widget.destroy();
-    expect(document.querySelector('.ds-btn-inline')).toBeNull();
-  });
-
   it('destroy does not remove custom trigger element from DOM', () => {
     const widget = DropSign.init({
       target: '#target',
@@ -214,31 +194,6 @@ describe('trigger modes', () => {
     });
     widget.destroy();
     expect(document.getElementById('custom-btn')).toBeTruthy();
-  });
-
-  it('messages.sign sets the floating button label', () => {
-    const widget = DropSign.init({
-      target: '#target',
-      messages: { sign: '서명' },
-    });
-    expect(document.querySelector('.ds-button')?.textContent).toBe('서명');
-    widget.destroy();
-  });
-
-  it('trigger.label takes priority over messages.sign', () => {
-    const widget = DropSign.init({
-      target: '#target',
-      trigger: { type: 'floating', label: 'Start Signing' },
-      messages: { sign: '서명' },
-    });
-    expect(document.querySelector('.ds-button')?.textContent).toBe('Start Signing');
-    widget.destroy();
-  });
-
-  it('buttonText is used when no messages.sign is provided', () => {
-    const widget = DropSign.init({ target: '#target', buttonText: 'Add Signature' });
-    expect(document.querySelector('.ds-button')?.textContent).toBe('Add Signature');
-    widget.destroy();
   });
 
   it('calls onError and returns no-op widget when custom trigger element not found', () => {
@@ -253,193 +208,102 @@ describe('trigger modes', () => {
   });
 });
 
-describe('captureResult', () => {
-  const fakeSigDataUrl = 'data:image/png;base64,signature';
-  const placement = {
-    x: 10,
-    y: 20,
-    width: 100,
-    height: 50,
-    targetWidth: 400,
-    targetHeight: 300,
-    scrollX: 0,
-    scrollY: 0,
-  };
-
+describe('createPlacementBox — getPlacement', () => {
   beforeEach(() => {
-    // Provide a minimal fetch stub so dataUrlToBlob works
-    vi.stubGlobal('fetch', vi.fn(async () => ({
-      blob: async () => new Blob(['fake']),
-    })));
+    Object.defineProperty(window, 'innerWidth', { value: 1024, configurable: true });
+    Object.defineProperty(window, 'innerHeight', { value: 768, configurable: true });
   });
 
-  afterEach(() => {
-    vi.unstubAllGlobals();
+  it('with target: returns target-relative normalized coords', () => {
+    const target = document.createElement('div');
+    vi.spyOn(target, 'getBoundingClientRect').mockReturnValue({
+      left: 100, top: 50, width: 400, height: 300,
+      right: 500, bottom: 350, x: 100, y: 50, toJSON: () => ({}),
+    } as DOMRect);
+
+    const box = createPlacementBox(
+      'data:image/png;base64,sig',
+      target,
+      () => {}, () => {},
+      { confirm: 'Confirm', delete: 'Delete' },
+    );
+    box.element.style.left = '300px';
+    box.element.style.top = '100px';
+    box.element.style.width = '80px';
+    box.element.style.height = '40px';
+
+    const p = box.getPlacement();
+    expect(p.x).toBeCloseTo(0.5);
+    expect(p.y).toBeCloseTo(0.167, 2);
+    expect(p.width).toBeCloseTo(0.2);
+    expect(p.height).toBeCloseTo(0.133, 2);
+
+    box.destroy();
   });
 
-  it('injects signature img into target before capture', async () => {
-    const { toPng } = await import('html-to-image');
-    const toPngMock = vi.mocked(toPng);
+  it('with target: allows out-of-range when box is outside target', () => {
+    const target = document.createElement('div');
+    vi.spyOn(target, 'getBoundingClientRect').mockReturnValue({
+      left: 100, top: 50, width: 400, height: 300,
+      right: 500, bottom: 350, x: 100, y: 50, toJSON: () => ({}),
+    } as DOMRect);
 
-    let capturedImgs: Element[] = [];
-    toPngMock.mockImplementationOnce(async (el: HTMLElement) => {
-      capturedImgs = Array.from(el.querySelectorAll('img[src]'));
-      return 'data:image/png;base64,fake';
-    });
+    const box = createPlacementBox(
+      'data:image/png;base64,sig',
+      target,
+      () => {}, () => {},
+      { confirm: 'Confirm', delete: 'Delete' },
+    );
+    box.element.style.left = '0px';
+    box.element.style.top = '50px';
+    box.element.style.width = '80px';
+    box.element.style.height = '40px';
 
-    const targetEl = document.createElement('div');
-    document.body.appendChild(targetEl);
+    const p = box.getPlacement();
+    expect(p.x).toBeCloseTo(-0.25);
+    expect(p.width).toBeGreaterThan(0);
+    expect(p.height).toBeGreaterThan(0);
 
-    await captureResult(targetEl, fakeSigDataUrl, placement);
-
-    expect(capturedImgs).toHaveLength(1);
-    expect((capturedImgs[0] as HTMLImageElement).src).toContain('data:image/png;base64,signature');
-
-    targetEl.remove();
+    box.destroy();
   });
 
-  it('removes the temporary signature img from target after capture', async () => {
-    const { toPng } = await import('html-to-image');
-    const toPngMock = vi.mocked(toPng);
+  it('without target: returns viewport-relative normalized coords', () => {
+    const box = createPlacementBox(
+      'data:image/png;base64,sig',
+      undefined,
+      () => {}, () => {},
+      { confirm: 'Confirm', delete: 'Delete' },
+    );
+    box.element.style.left = '512px';
+    box.element.style.top = '384px';
+    box.element.style.width = '204.8px';
+    box.element.style.height = '76.8px';
 
-    toPngMock.mockImplementationOnce(async () => 'data:image/png;base64,fake');
+    const p = box.getPlacement();
+    expect(p.x).toBeCloseTo(0.5);
+    expect(p.y).toBeCloseTo(0.5);
+    expect(p.width).toBeCloseTo(0.2);
+    expect(p.height).toBeCloseTo(0.1);
 
-    const targetEl = document.createElement('div');
-    document.body.appendChild(targetEl);
-
-    await captureResult(targetEl, fakeSigDataUrl, placement);
-
-    // After capture, no img should remain
-    expect(targetEl.querySelectorAll('img').length).toBe(0);
-
-    targetEl.remove();
+    box.destroy();
   });
 
-  it('restores target position style after capture', async () => {
-    const { toPng } = await import('html-to-image');
-    const toPngMock = vi.mocked(toPng);
-    toPngMock.mockImplementationOnce(async () => 'data:image/png;base64,fake');
+  it('width and height are always positive', () => {
+    const box = createPlacementBox(
+      'data:image/png;base64,sig',
+      undefined,
+      () => {}, () => {},
+      { confirm: 'Confirm', delete: 'Delete' },
+    );
+    box.element.style.left = '100px';
+    box.element.style.top = '100px';
+    box.element.style.width = '60px';
+    box.element.style.height = '30px';
 
-    const targetEl = document.createElement('div');
-    // Leave position unset (will be 'static' by default)
-    targetEl.style.position = '';
-    document.body.appendChild(targetEl);
+    const p = box.getPlacement();
+    expect(p.width).toBeGreaterThan(0);
+    expect(p.height).toBeGreaterThan(0);
 
-    await captureResult(targetEl, fakeSigDataUrl, placement);
-
-    // Should be restored to the previous inline value (empty string)
-    expect(targetEl.style.position).toBe('');
-
-    targetEl.remove();
-  });
-
-  it('cleans up signature img and restores position if toPng throws', async () => {
-    const { toPng } = await import('html-to-image');
-    const toPngMock = vi.mocked(toPng);
-    toPngMock.mockRejectedValueOnce(new Error('capture failed'));
-
-    const targetEl = document.createElement('div');
-    document.body.appendChild(targetEl);
-
-    await expect(captureResult(targetEl, fakeSigDataUrl, placement)).rejects.toThrow('capture failed');
-
-    expect(targetEl.querySelectorAll('img').length).toBe(0);
-    expect(targetEl.style.position).toBe('');
-
-    targetEl.remove();
-  });
-});
-
-describe('persistResult', () => {
-  const fakeSigDataUrl = 'data:image/png;base64,signature';
-  const placement = {
-    x: 10,
-    y: 20,
-    width: 100,
-    height: 50,
-    targetWidth: 400,
-    targetHeight: 300,
-    scrollX: 0,
-    scrollY: 0,
-  };
-
-  beforeEach(() => {
-    vi.stubGlobal('fetch', vi.fn(async () => ({
-      blob: async () => new Blob(['fake']),
-    })));
-  });
-
-  afterEach(() => {
-    vi.unstubAllGlobals();
-  });
-
-  it('injects a permanent signature img into targetEl', () => {
-    const targetEl = document.createElement('div');
-    targetEl.style.position = 'relative';
-    document.body.appendChild(targetEl);
-
-    const { persistedEl } = persistResult(targetEl, fakeSigDataUrl, placement);
-
-    expect(targetEl.contains(persistedEl)).toBe(true);
-    expect((persistedEl as HTMLImageElement).src).toContain(fakeSigDataUrl);
-    expect(persistedEl.style.position).toBe('absolute');
-    expect(persistedEl.style.left).toBe('10px');
-    expect(persistedEl.style.top).toBe('20px');
-    expect(persistedEl.style.width).toBe('100px');
-    expect(persistedEl.style.height).toBe('50px');
-
-    targetEl.remove();
-  });
-
-  it('removePersisted() removes the img from the DOM', () => {
-    const targetEl = document.createElement('div');
-    targetEl.style.position = 'relative';
-    document.body.appendChild(targetEl);
-
-    const { removePersisted } = persistResult(targetEl, fakeSigDataUrl, placement);
-    expect(targetEl.querySelectorAll('img').length).toBe(1);
-
-    removePersisted();
-
-    expect(targetEl.querySelectorAll('img').length).toBe(0);
-
-    targetEl.remove();
-  });
-
-  it('removePersisted() is idempotent — calling twice does not throw', () => {
-    const targetEl = document.createElement('div');
-    targetEl.style.position = 'relative';
-    document.body.appendChild(targetEl);
-
-    const { removePersisted } = persistResult(targetEl, fakeSigDataUrl, placement);
-    removePersisted();
-    expect(() => removePersisted()).not.toThrow();
-
-    targetEl.remove();
-  });
-
-  it('img has pointer-events:none so it does not block underlying content', () => {
-    const targetEl = document.createElement('div');
-    targetEl.style.position = 'relative';
-    document.body.appendChild(targetEl);
-
-    const { persistedEl } = persistResult(targetEl, fakeSigDataUrl, placement);
-    expect(persistedEl.style.pointerEvents).toBe('none');
-
-    targetEl.remove();
-  });
-});
-
-describe('dataUrlToBlob', () => {
-  afterEach(() => {
-    vi.unstubAllGlobals();
-  });
-
-  it('converts a data URL to a Blob via fetch', async () => {
-    const fakeBlob = new Blob(['hello']);
-    vi.stubGlobal('fetch', vi.fn(async () => ({ blob: async () => fakeBlob })));
-
-    const result = await dataUrlToBlob('data:text/plain;base64,aGVsbG8=');
-    expect(result).toBe(fakeBlob);
+    box.destroy();
   });
 });

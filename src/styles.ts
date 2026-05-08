@@ -1,6 +1,6 @@
 export const STYLES = `
   .ds-button {
-    position: absolute;
+    position: fixed;
     padding: 10px 22px;
     background: #0f172a;
     color: #fff;
@@ -29,49 +29,6 @@ export const STYLES = `
     transform: none;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
-  .ds-button.ds-button-viewport {
-    position: fixed;
-  }
-
-  .ds-btn-inline {
-    padding: 8px 16px;
-    background: #0f172a;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 500;
-    font-family: system-ui, -apple-system, sans-serif;
-    cursor: pointer;
-    min-height: 44px;
-    min-width: 44px;
-    transition: background 0.15s ease, transform 0.1s ease;
-  }
-  .ds-btn-inline:hover {
-    background: #1e293b;
-  }
-  .ds-btn-inline:active {
-    transform: scale(0.96);
-  }
-  .ds-btn-inline[data-no-press]:active {
-    transform: none;
-  }
-  .ds-btn-inline--text {
-    background: transparent;
-    color: #0f172a;
-    border: none;
-    padding: 4px 2px;
-    text-decoration: underline;
-    text-underline-offset: 2px;
-    font-weight: 500;
-    min-height: 44px;
-    min-width: 44px;
-  }
-  .ds-btn-inline--text:hover {
-    background: transparent;
-    color: #1e293b;
-  }
-
   .ds-modal-backdrop {
     position: fixed;
     inset: 0;
@@ -175,10 +132,9 @@ export const STYLES = `
   }
 
   .ds-placement-overlay {
-    position: absolute;
+    position: fixed;
     inset: 0;
     z-index: 9998;
-    overflow: hidden;
     pointer-events: none;
   }
 

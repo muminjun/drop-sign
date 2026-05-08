@@ -1,14 +1,14 @@
-import type { SignaturePlacement } from './types.js';
+import type { NormalizedPlacement } from './types.js';
 
 export interface PlacementBox {
   element: HTMLElement;
-  getPlacement(): SignaturePlacement;
+  getPlacement(): NormalizedPlacement;
   destroy(): void;
 }
 
 export function createPlacementBox(
   signatureDataUrl: string,
-  targetEl: HTMLElement,
+  targetEl: HTMLElement | undefined,
   onConfirm: () => void,
   onDelete: () => void,
   messages: { confirm: string; delete: string },
@@ -43,23 +43,24 @@ export function createPlacementBox(
 
   box.append(controls, img, seHandle, swHandle, neHandle, nwHandle);
 
-  const targetRect = targetEl.getBoundingClientRect();
-  const initW = Math.min(200, targetRect.width * 0.4);
+  const initW = Math.min(200, window.innerWidth * 0.25);
   const initH = 80;
-
-  box.style.left = `${(targetRect.width - initW) / 2}px`;
-  box.style.top = `${(targetRect.height - initH) / 2}px`;
+  box.style.left = `${(window.innerWidth - initW) / 2}px`;
+  box.style.top = `${(window.innerHeight - initH) / 2}px`;
   box.style.width = `${initW}px`;
   box.style.height = `${initH}px`;
 
-  setupDrag(box, targetEl);
-  setupResize(box, seHandle, targetEl, 1, 1);
-  setupResize(box, swHandle, targetEl, -1, 1);
-  setupResize(box, neHandle, targetEl, 1, -1);
-  setupResize(box, nwHandle, targetEl, -1, -1);
+  const ac = new AbortController();
+  const { signal } = ac;
+
+  setupDrag(box, signal);
+  setupResize(box, seHandle, 1, 1, signal);
+  setupResize(box, swHandle, -1, 1, signal);
+  setupResize(box, neHandle, 1, -1, signal);
+  setupResize(box, nwHandle, -1, -1, signal);
 
   deleteBtn.addEventListener('click', () => {
-    box.remove();
+    destroy();
     onDelete();
   });
 
@@ -70,27 +71,38 @@ export function createPlacementBox(
   function handleKeydown(e: KeyboardEvent) {
     if (e.key === 'Enter') onConfirm();
     if (e.key === 'Escape') {
-      box.remove();
+      destroy();
       onDelete();
     }
   }
 
-  function getPlacement(): SignaturePlacement {
-    const rect = targetEl.getBoundingClientRect();
+  function getPlacement(): NormalizedPlacement {
+    const boxLeft = parseFloat(box.style.left);
+    const boxTop  = parseFloat(box.style.top);
+    const boxW    = parseFloat(box.style.width);
+    const boxH    = parseFloat(box.style.height);
+
+    if (targetEl) {
+      const rect = targetEl.getBoundingClientRect();
+      return {
+        x:      (boxLeft - rect.left) / rect.width,
+        y:      (boxTop  - rect.top)  / rect.height,
+        width:  boxW / rect.width,
+        height: boxH / rect.height,
+      };
+    }
+
     return {
-      x: parseFloat(box.style.left),
-      y: parseFloat(box.style.top),
-      width: parseFloat(box.style.width),
-      height: parseFloat(box.style.height),
-      targetWidth: rect.width,
-      targetHeight: rect.height,
-      scrollX: window.scrollX,
-      scrollY: window.scrollY,
+      x:      boxLeft / window.innerWidth,
+      y:      boxTop  / window.innerHeight,
+      width:  boxW    / window.innerWidth,
+      height: boxH    / window.innerHeight,
     };
   }
 
   function destroy() {
     document.removeEventListener('keydown', handleKeydown);
+    ac.abort();
     box.remove();
   }
 
@@ -103,14 +115,14 @@ function resizeHandle(cls: string): HTMLElement {
   return el;
 }
 
-function setupDrag(box: HTMLElement, container: HTMLElement) {
+function setupDrag(box: HTMLElement, signal: AbortSignal) {
   let dragging = false;
   let startX = 0, startY = 0, startLeft = 0, startTop = 0;
 
   box.addEventListener('pointerdown', (e) => {
     const target = e.target as HTMLElement;
     if (
-      target.classList.contains('ds-resize-handle') ||
+      target.closest('.ds-resize-handle') ||
       target.tagName === 'BUTTON' ||
       target.tagName === 'IMG'
     ) return;
@@ -121,29 +133,28 @@ function setupDrag(box: HTMLElement, container: HTMLElement) {
     startLeft = parseFloat(box.style.left) || 0;
     startTop = parseFloat(box.style.top) || 0;
     e.preventDefault();
-  });
+  }, { signal });
 
   box.addEventListener('pointermove', (e) => {
     if (!dragging) return;
-    const containerRect = container.getBoundingClientRect();
     const boxW = parseFloat(box.style.width) || 0;
     const boxH = parseFloat(box.style.height) || 0;
-    const newLeft = Math.max(0, Math.min(containerRect.width - boxW, startLeft + e.clientX - startX));
-    const newTop = Math.max(0, Math.min(containerRect.height - boxH, startTop + e.clientY - startY));
+    const newLeft = Math.max(0, Math.min(window.innerWidth  - boxW, startLeft + e.clientX - startX));
+    const newTop  = Math.max(0, Math.min(window.innerHeight - boxH, startTop  + e.clientY - startY));
     box.style.left = `${newLeft}px`;
-    box.style.top = `${newTop}px`;
-  });
+    box.style.top  = `${newTop}px`;
+  }, { signal });
 
-  box.addEventListener('pointerup', () => { dragging = false; });
-  box.addEventListener('pointercancel', () => { dragging = false; });
+  box.addEventListener('pointerup', () => { dragging = false; }, { signal });
+  box.addEventListener('pointercancel', () => { dragging = false; }, { signal });
 }
 
 function setupResize(
   box: HTMLElement,
   handle: HTMLElement,
-  container: HTMLElement,
   dirX: number,
   dirY: number,
+  signal: AbortSignal,
 ) {
   let resizing = false;
   let startX = 0, startY = 0;
@@ -160,11 +171,10 @@ function setupResize(
     startTop = parseFloat(box.style.top) || 0;
     e.preventDefault();
     e.stopPropagation();
-  });
+  }, { signal });
 
   handle.addEventListener('pointermove', (e) => {
     if (!resizing) return;
-    const containerRect = container.getBoundingClientRect();
     const dx = (e.clientX - startX) * dirX;
     const dy = (e.clientY - startY) * dirY;
 
@@ -184,15 +194,15 @@ function setupResize(
       newH = startTop + startH - newTop;
     }
 
-    newW = Math.min(newW, containerRect.width - newLeft);
-    newH = Math.min(newH, containerRect.height - newTop);
+    newW = Math.min(newW, window.innerWidth  - newLeft);
+    newH = Math.min(newH, window.innerHeight - newTop);
 
-    box.style.width = `${newW}px`;
+    box.style.width  = `${newW}px`;
     box.style.height = `${newH}px`;
-    box.style.left = `${newLeft}px`;
-    box.style.top = `${newTop}px`;
-  });
+    box.style.left   = `${newLeft}px`;
+    box.style.top    = `${newTop}px`;
+  }, { signal });
 
-  handle.addEventListener('pointerup', () => { resizing = false; });
-  handle.addEventListener('pointercancel', () => { resizing = false; });
+  handle.addEventListener('pointerup', () => { resizing = false; }, { signal });
+  handle.addEventListener('pointercancel', () => { resizing = false; }, { signal });
 }

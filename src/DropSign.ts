@@ -4,16 +4,12 @@ import type {
   DropSignWidget,
   DropSignTrigger,
   DropSignMessages,
-  PersistResult,
-  CaptureResult,
-  BothResult,
 } from './types.js';
 import { injectStyles, removeStyles, createOverlayContainer } from './overlay.js';
 import { createSignaturePadModal } from './signature-pad.js';
 import { createPlacementBox } from './placement.js';
-import { captureResult, persistResult, dataUrlToBlob } from './capture.js';
 import { mergeMessages, mergeSignatureOptions } from './messages.js';
-import { createFloatingTrigger, createInlineTrigger, attachCustomTrigger } from './trigger.js';
+import { createGlobalTrigger, attachCustomTrigger } from './trigger.js';
 import type { TriggerHandle } from './trigger.js';
 
 function resolveTarget(target: DropSignTarget): HTMLElement {
@@ -29,75 +25,57 @@ function resolveTarget(target: DropSignTarget): HTMLElement {
 
 function resolveTriggerLabel(
   trigger: DropSignTrigger | undefined,
-  buttonText: string | undefined,
   msgs: Required<DropSignMessages>,
 ): string {
   if (trigger && 'label' in trigger && trigger.label) return trigger.label;
-  if (buttonText !== undefined) return buttonText;
   return msgs.sign;
+}
+
+async function dataUrlToBlob(dataUrl: string): Promise<Blob> {
+  const res = await fetch(dataUrl);
+  return res.blob();
 }
 
 export class DropSign {
   static init(options: DropSignOptions): DropSignWidget {
-    const {
-      target,
-      buttonText,
-      trigger,
-      messages,
-      signature,
-      onComplete,
-      onCancel,
-      onError,
-      capture: captureOptions,
-      afterConfirm = 'capture',
-    } = options;
+    const { target, trigger, messages, signature, onComplete, onCancel, onError } = options;
 
-    let targetEl: HTMLElement;
-    try {
-      targetEl = resolveTarget(target);
-    } catch (err) {
-      onError?.(err);
-      return { destroy: () => undefined };
+    let targetEl: HTMLElement | undefined;
+    if (target !== undefined) {
+      try {
+        targetEl = resolveTarget(target);
+      } catch (err) {
+        onError?.(err);
+        return { destroy: () => undefined };
+      }
     }
 
     injectStyles();
 
     const msgs = mergeMessages(messages);
     const sigOpts = mergeSignatureOptions(signature);
-    const label = resolveTriggerLabel(trigger, buttonText, msgs);
-
-    const existingPos = window.getComputedStyle(targetEl).position;
-    const prevInlinePos = targetEl.style.position;
-    if (existingPos === 'static') targetEl.style.position = 'relative';
+    const label = resolveTriggerLabel(trigger, msgs);
 
     let overlayContainer: ReturnType<typeof createOverlayContainer> | null = null;
     let placementBox: ReturnType<typeof createPlacementBox> | null = null;
     let currentSigDataUrl = '';
-    let persistedActive = false;
 
     const modal = createSignaturePadModal(
       (dataUrl) => {
         currentSigDataUrl = dataUrl;
         showPlacement(dataUrl);
       },
-      () => {
-        onCancel?.();
-      },
+      () => { onCancel?.(); },
       msgs,
       sigOpts,
     );
 
     let triggerHandle: TriggerHandle;
     try {
-      if (!trigger || !trigger.type || trigger.type === 'floating') {
-        triggerHandle = createFloatingTrigger(
-          trigger ?? {},
-          label,
-          () => modal.open(),
-          targetEl,
-        );
-      } else if (trigger.type === 'inline') {
-        triggerHandle = createInlineTrigger(trigger, label, () => modal.open());
+      if (!trigger || trigger.type === 'global') {
+        const globalTrigger: Extract<DropSignTrigger, { type: 'global' }> =
+          trigger?.type === 'global' ? trigger : { type: 'global' };
+        triggerHandle = createGlobalTrigger(globalTrigger, label, () => modal.open());
       } else if (trigger.type === 'custom') {
         triggerHandle = attachCustomTrigger(trigger, () => modal.open());
       } else {
@@ -106,14 +84,13 @@ export class DropSign {
     } catch (err) {
       modal.destroy();
       removeStyles();
-      if (existingPos === 'static') targetEl.style.position = prevInlinePos;
       onError?.(err);
       return { destroy: () => undefined };
     }
 
     function showPlacement(dataUrl: string) {
       overlayContainer?.destroy();
-      overlayContainer = createOverlayContainer(targetEl);
+      overlayContainer = createOverlayContainer();
 
       function cleanup() {
         placementBox?.destroy();
@@ -128,84 +105,11 @@ export class DropSign {
         async () => {
           if (!placementBox) return;
           const placement = placementBox.getPlacement();
-          if (overlayContainer) overlayContainer.el.style.display = 'none';
+          cleanup();
           try {
-            if (afterConfirm === 'persist') {
-              // Async work first — if it throws, no DOM mutation has happened yet
-              const signatureBlob = await dataUrlToBlob(currentSigDataUrl);
-              const { persistedEl, removePersisted: removeImg } = persistResult(
-                targetEl,
-                currentSigDataUrl,
-                placement,
-              );
-              persistedActive = true;
-              const wrappedRemove = () => {
-                removeImg();
-                persistedActive = false;
-                if (existingPos === 'static') targetEl.style.position = prevInlinePos;
-              };
-              cleanup();
-              const result: PersistResult = {
-                afterConfirm: 'persist',
-                persistedEl,
-                removePersisted: wrappedRemove,
-                signatureBlob,
-                signatureDataUrl: currentSigDataUrl,
-                placement,
-              };
-              await onComplete?.(result);
-
-            } else if (afterConfirm === 'capture') {
-              const raw = await captureResult(
-                targetEl,
-                currentSigDataUrl,
-                placement,
-                captureOptions,
-              );
-              cleanup();
-              const result: CaptureResult = {
-                afterConfirm: 'capture',
-                imageBlob: raw.imageBlob,
-                signatureBlob: raw.signatureBlob,
-                signatureDataUrl: raw.signatureDataUrl,
-                placement: raw.placement,
-              };
-              await onComplete?.(result);
-
-            } else {
-              // 'both': capture before persisting — prevents persisted img from
-              // appearing twice in the PNG (once permanent, once temporary)
-              const raw = await captureResult(
-                targetEl,
-                currentSigDataUrl,
-                placement,
-                captureOptions,
-              );
-              const { persistedEl, removePersisted: removeImg } = persistResult(
-                targetEl,
-                currentSigDataUrl,
-                placement,
-              );
-              persistedActive = true;
-              const wrappedRemove = () => {
-                removeImg();
-                persistedActive = false;
-                if (existingPos === 'static') targetEl.style.position = prevInlinePos;
-              };
-              cleanup();
-              const result: BothResult = {
-                afterConfirm: 'both',
-                persistedEl,
-                removePersisted: wrappedRemove,
-                imageBlob: raw.imageBlob,
-                signatureBlob: raw.signatureBlob,
-                signatureDataUrl: raw.signatureDataUrl,
-                placement: raw.placement,
-              };
-              await onComplete?.(result);
-            }
+            const signatureBlob = await dataUrlToBlob(currentSigDataUrl);
+            await onComplete?.({ signatureDataUrl: currentSigDataUrl, signatureBlob, placement });
           } catch (err) {
-            cleanup();
             onError?.(err);
           }
         },
@@ -227,11 +131,6 @@ export class DropSign {
       modal.destroy();
       placementBox?.destroy();
       overlayContainer?.destroy();
-      // Only restore position if no persisted img is still in the DOM.
-      // If persistedActive, removePersisted() will handle restoration.
-      if (!persistedActive && existingPos === 'static') {
-        targetEl.style.position = prevInlinePos;
-      }
       removeStyles();
     }
 
