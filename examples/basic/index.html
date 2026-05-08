@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DropSign Basic Example</title>
+    <style>
+      body { font-family: system-ui, sans-serif; max-width: 800px; margin: 60px auto; padding: 0 24px; }
+      h1 { font-size: 24px; margin-bottom: 8px; }
+      p { color: #555; margin-bottom: 24px; }
+      #contract-area {
+        border: 2px solid #d1d5db;
+        border-radius: 10px;
+        padding: 32px;
+        min-height: 400px;
+        background: #f9fafb;
+        position: relative;
+      }
+      #contract-area h2 { margin-top: 0; }
+      #output { margin-top: 24px; }
+      #output img { max-width: 100%; border: 1px solid #e5e7eb; border-radius: 8px; }
+      #output pre {
+        background: #111;
+        color: #a3e635;
+        padding: 16px;
+        border-radius: 8px;
+        font-size: 12px;
+        overflow: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>DropSign Demo</h1>
+    <p>Click the <strong>Sign</strong> button inside the contract area, draw your signature, position it, and click Confirm.</p>
+
+    <div id="contract-area">
+      <h2>Service Agreement</h2>
+      <p>This agreement is entered into between <strong>Acme Corp</strong> and the undersigned party.</p>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante.</p>
+      <p>Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo. Quisque sit amet est et sapien ullamcorper pharetra.</p>
+      <br />
+      <p>Signature: ___________________________</p>
+      <p>Date: ___________________________</p>
+    </div>
+
+    <div id="output"></div>
+
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>

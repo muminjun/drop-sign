@@ -1,0 +1,16 @@
+{
+  "name": "@drop-sign/example",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "drop-sign": "workspace:*"
+  },
+  "devDependencies": {
+    "vite": "^6.3.3"
+  }
+}
