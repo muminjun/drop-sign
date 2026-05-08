@@ -75,7 +75,8 @@ export class DropSign {
         async () => {
           if (!placementBox) return;
           const placement = placementBox.getPlacement();
-          // Capture first — overlay must still be in DOM for correct layout context
+          // Hide overlay before capture so dashed border/buttons don't appear in the PNG
+          if (overlayContainer) overlayContainer.el.style.display = 'none';
           try {
             const result = await captureResult(
               targetEl,
