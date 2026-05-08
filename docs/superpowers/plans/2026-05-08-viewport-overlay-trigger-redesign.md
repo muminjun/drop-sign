@@ -102,7 +102,7 @@ export interface DropSignWidget {
 Delete lines 1–9 (the `import { captureResult }` line and the `vi.mock('html-to-image', ...)` block):
 
 ```ts
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { DropSign } from './DropSign.js';
 import { mergeMessages, mergeSignatureOptions } from './messages.js';
 ```
@@ -619,7 +619,7 @@ export function createPlacementBox(
   setupResize(box, nwHandle, -1, -1);
 
   deleteBtn.addEventListener('click', () => {
-    box.remove();
+    destroy();
     onDelete();
   });
 
@@ -630,7 +630,7 @@ export function createPlacementBox(
   function handleKeydown(e: KeyboardEvent) {
     if (e.key === 'Enter') onConfirm();
     if (e.key === 'Escape') {
-      box.remove();
+      destroy();
       onDelete();
     }
   }
