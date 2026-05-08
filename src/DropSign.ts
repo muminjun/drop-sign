@@ -8,9 +8,8 @@ import type {
 import { injectStyles, removeStyles, createOverlayContainer } from './overlay.js';
 import { createSignaturePadModal } from './signature-pad.js';
 import { createPlacementBox } from './placement.js';
-import { captureResult } from './capture.js';
 import { mergeMessages, mergeSignatureOptions } from './messages.js';
-import { createFloatingTrigger, createInlineTrigger, attachCustomTrigger } from './trigger.js';
+import { createGlobalTrigger, attachCustomTrigger } from './trigger.js';
 import type { TriggerHandle } from './trigger.js';
 
 function resolveTarget(target: DropSignTarget): HTMLElement {
@@ -26,44 +25,36 @@ function resolveTarget(target: DropSignTarget): HTMLElement {
 
 function resolveTriggerLabel(
   trigger: DropSignTrigger | undefined,
-  buttonText: string | undefined,
   msgs: Required<DropSignMessages>,
 ): string {
   if (trigger && 'label' in trigger && trigger.label) return trigger.label;
-  if (buttonText !== undefined) return buttonText;
   return msgs.sign;
+}
+
+async function dataUrlToBlob(dataUrl: string): Promise<Blob> {
+  const res = await fetch(dataUrl);
+  return res.blob();
 }
 
 export class DropSign {
   static init(options: DropSignOptions): DropSignWidget {
-    const {
-      target,
-      buttonText,
-      trigger,
-      messages,
-      signature,
-      onComplete,
-      onCancel,
-      onError,
-      capture: captureOptions,
-    } = options;
+    const { target, trigger, messages, signature, onComplete, onCancel, onError } = options;
 
-    let targetEl: HTMLElement;
-    try {
-      targetEl = resolveTarget(target);
-    } catch (err) {
-      onError?.(err);
-      return { destroy: () => undefined };
+    let targetEl: HTMLElement | undefined;
+    if (target !== undefined) {
+      try {
+        targetEl = resolveTarget(target);
+      } catch (err) {
+        onError?.(err);
+        return { destroy: () => undefined };
+      }
     }
 
     injectStyles();
 
     const msgs = mergeMessages(messages);
     const sigOpts = mergeSignatureOptions(signature);
-    const label = resolveTriggerLabel(trigger, buttonText, msgs);
-
-    const existingPos = window.getComputedStyle(targetEl).position;
-    if (existingPos === 'static') targetEl.style.position = 'relative';
+    const label = resolveTriggerLabel(trigger, msgs);
 
     let overlayContainer: ReturnType<typeof createOverlayContainer> | null = null;
     let placementBox: ReturnType<typeof createPlacementBox> | null = null;
@@ -74,24 +65,19 @@ export class DropSign {
         currentSigDataUrl = dataUrl;
         showPlacement(dataUrl);
       },
-      () => {
-        onCancel?.();
-      },
+      () => { onCancel?.(); },
       msgs,
       sigOpts,
     );
 
     let triggerHandle: TriggerHandle;
     try {
-      if (!trigger || !trigger.type || trigger.type === 'floating') {
-        triggerHandle = createFloatingTrigger(
-          trigger ?? {},
+      if (!trigger || trigger.type === 'global') {
+        triggerHandle = createGlobalTrigger(
+          { type: 'global', ...trigger },
           label,
           () => modal.open(),
-          targetEl,
         );
-      } else if (trigger.type === 'inline') {
-        triggerHandle = createInlineTrigger(trigger, label, () => modal.open());
       } else if (trigger.type === 'custom') {
         triggerHandle = attachCustomTrigger(trigger, () => modal.open());
       } else {
@@ -100,14 +86,13 @@ export class DropSign {
     } catch (err) {
       modal.destroy();
       removeStyles();
-      if (existingPos === 'static') targetEl.style.position = '';
       onError?.(err);
       return { destroy: () => undefined };
     }
 
     function showPlacement(dataUrl: string) {
       overlayContainer?.destroy();
-      overlayContainer = createOverlayContainer(targetEl);
+      overlayContainer = createOverlayContainer();
 
       function cleanup() {
         placementBox?.destroy();
@@ -122,18 +107,11 @@ export class DropSign {
         async () => {
           if (!placementBox) return;
           const placement = placementBox.getPlacement();
-          if (overlayContainer) overlayContainer.el.style.display = 'none';
+          cleanup();
           try {
-            const result = await captureResult(
-              targetEl,
-              currentSigDataUrl,
-              placement,
-              captureOptions,
-            );
-            cleanup();
-            await onComplete?.(result);
+            const signatureBlob = await dataUrlToBlob(currentSigDataUrl);
+            await onComplete?.({ signatureDataUrl: currentSigDataUrl, signatureBlob, placement });
           } catch (err) {
-            cleanup();
             onError?.(err);
           }
         },
@@ -156,7 +134,6 @@ export class DropSign {
       placementBox?.destroy();
       overlayContainer?.destroy();
       removeStyles();
-      if (existingPos === 'static') targetEl.style.position = '';
     }
 
     return { destroy };

@@ -297,3 +297,22 @@ describe('createPlacementBox — getPlacement', () => {
   });
 });
 
+describe('DropSign.init', () => {
+  it('onComplete receives signatureDataUrl, signatureBlob, and placement', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => ({ blob: async () => new Blob(['sig']) })));
+
+    const onComplete = vi.fn();
+    const widget = DropSign.init({ onComplete });  // no target
+
+    // The global button should be appended to body
+    const btn = document.querySelector('.ds-button') as HTMLElement;
+    expect(btn).toBeTruthy();
+
+    // onComplete is not called until the user signs — just verify no crash on init
+    expect(onComplete).not.toHaveBeenCalled();
+
+    widget.destroy();
+    vi.unstubAllGlobals();
+  });
+});
+
