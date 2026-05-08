@@ -44,19 +44,37 @@ afterConfirm?: 'persist' | 'capture' | 'both';
 // 기본값: 'persist'
 ```
 
-**`DropSignResult` 변경:**
+**`DropSignResult` — discriminated union으로 변경:**
 
 ```ts
-export interface DropSignResult {
-  signatureBlob: Blob;        // 항상 존재
-  signatureDataUrl: string;   // 항상 존재
-  placement: SignaturePlacement; // 항상 존재
-
-  imageBlob?: Blob;           // 'capture' | 'both'일 때만
-  persistedEl?: HTMLElement;  // 'persist' | 'both'일 때만
-  removePersisted?: () => void; // 'persist' | 'both'일 때만
+interface DropSignResultBase {
+  signatureBlob: Blob;
+  signatureDataUrl: string;
+  placement: SignaturePlacement;
 }
+
+interface PersistResult extends DropSignResultBase {
+  afterConfirm: 'persist';
+  persistedEl: HTMLElement;
+  removePersisted: () => void;
+}
+
+interface CaptureResult extends DropSignResultBase {
+  afterConfirm: 'capture';
+  imageBlob: Blob;
+}
+
+interface BothResult extends DropSignResultBase {
+  afterConfirm: 'both';
+  imageBlob: Blob;
+  persistedEl: HTMLElement;
+  removePersisted: () => void;
+}
+
+export type DropSignResult = PersistResult | CaptureResult | BothResult;
 ```
+
+`afterConfirm` discriminant 필드가 있으므로 strict TypeScript 환경에서 `if (result.afterConfirm === 'capture')` 한 줄로 타입이 좁혀진다. optional 필드에 대한 불필요한 null check 불필요.
 
 #### 모드별 동작
 
@@ -71,8 +89,9 @@ export interface DropSignResult {
 1. Confirm 시 placement 좌표 그대로 `<img>`를 `targetEl` 안에 `position: absolute`로 주입한다.
 2. 오버레이(dashed border, 버튼)는 제거하되, 서명 img는 남긴다.
 3. `DropSignResult.persistedEl`로 해당 엘리먼트를 노출한다.
-4. `removePersisted()` 호출 시 img를 DOM에서 제거한다.
+4. `removePersisted()` 호출 시 img를 DOM에서 제거하고, `targetEl`의 `position`이 DropSign에 의해 변경된 경우 원래 값으로 복원한다.
 5. `DropSign` 위젯의 `destroy()` 호출 시 persisted img는 **제거하지 않는다** — 개발자가 명시적으로 `removePersisted()`를 호출해야 한다.
+6. `destroy()`는 persisted img가 DOM에 남아있는 동안 `targetEl.style.position`을 복원하지 않는다 — position 복원은 `removePersisted()`에 위임한다. 이렇게 해야 `position: absolute`인 img의 containing block이 유지된다.
 
 #### 개발자 활용 예시
 
@@ -80,14 +99,14 @@ export interface DropSignResult {
 DropSign.init({
   target: '#contract',
   afterConfirm: 'persist',   // 기본값이므로 생략 가능
-  onComplete: ({ persistedEl, removePersisted, placement, signatureDataUrl }) => {
+  onComplete: async ({ persistedEl, removePersisted, placement, signatureDataUrl }) => {
     // 인쇄: 서명이 그 위치에 그대로 출력됨
     window.print();
 
     // 또는 pdf-lib으로 placement 좌표 사용
     await embedSignatureInPdf(pdfDoc, { placement, signatureDataUrl });
 
-    // 완료 후 제거
+    // 완료 후 제거 (targetEl position도 함께 복원됨)
     removePersisted();
   }
 });
@@ -106,9 +125,10 @@ DropSign.init({
 
 ## Breaking Changes
 
-- `DropSignResult.imageBlob`이 `Blob`에서 `Blob | undefined`(optional)로 변경됨.
-  - 기존에 `afterConfirm`을 명시하지 않은 코드는 이제 기본값이 `'persist'`이므로 `imageBlob`이 `undefined`가 됨.
-  - 기존 동작을 유지하려면 `afterConfirm: 'capture'`를 명시해야 함.
+- `DropSignResult`가 단일 interface에서 discriminated union(`PersistResult | CaptureResult | BothResult`)으로 변경됨.
+  - 기존에 `result.imageBlob`을 직접 접근하던 코드는 `result.afterConfirm === 'capture'` 또는 `result.afterConfirm === 'both'` 조건 분기 필요.
+  - 기존에 `afterConfirm`을 명시하지 않은 코드는 기본값이 `'persist'`이므로 `imageBlob`이 없는 `PersistResult`를 받게 됨.
+  - 기존 동작(`imageBlob` 반환)을 유지하려면 `afterConfirm: 'capture'`를 명시해야 함.
 - 버전 범프: **v0.2 → v0.3**
 
 ---
@@ -117,7 +137,7 @@ DropSign.init({
 
 | 파일 | 변경 내용 |
 |---|---|
-| `src/types.ts` | `DropSignOptions`에 `afterConfirm` 추가, `DropSignResult` 필드 optional 처리 |
+| `src/types.ts` | `DropSignOptions`에 `afterConfirm` 추가, `DropSignResult`를 discriminated union으로 교체 |
 | `src/signature-pad.ts` | `canvas.style.touchAction = 'none'` 1줄 추가 |
 | `src/capture.ts` | `persistResult()` 함수 추가 (persist 모드용), `captureResult()` 유지 |
 | `src/DropSign.ts` | `afterConfirm` 분기 처리, `onComplete`에 결과 전달 |
