@@ -11,6 +11,7 @@ export function createPlacementBox(
   targetEl: HTMLElement,
   onConfirm: () => void,
   onDelete: () => void,
+  messages: { confirm: string; delete: string },
 ): PlacementBox {
   const box = document.createElement('div');
   box.className = 'ds-sig-box';
@@ -25,12 +26,12 @@ export function createPlacementBox(
 
   const deleteBtn = document.createElement('button');
   deleteBtn.className = 'ds-sig-delete';
-  deleteBtn.textContent = 'Delete';
+  deleteBtn.textContent = messages.delete;
   deleteBtn.type = 'button';
 
   const confirmBtn = document.createElement('button');
   confirmBtn.className = 'ds-sig-confirm';
-  confirmBtn.textContent = 'Confirm';
+  confirmBtn.textContent = messages.confirm;
   confirmBtn.type = 'button';
 
   controls.append(deleteBtn, confirmBtn);
@@ -103,15 +104,18 @@ function resizeHandle(cls: string): HTMLElement {
 }
 
 function setupDrag(box: HTMLElement, container: HTMLElement) {
-  let startX = 0, startY = 0, startLeft = 0, startTop = 0;
   let dragging = false;
+  let startX = 0, startY = 0, startLeft = 0, startTop = 0;
 
-  box.addEventListener('mousedown', (e) => {
+  box.addEventListener('pointerdown', (e) => {
     const target = e.target as HTMLElement;
-    if (target.classList.contains('ds-resize-handle') ||
-        target.tagName === 'BUTTON' ||
-        target.tagName === 'IMG') return;
+    if (
+      target.classList.contains('ds-resize-handle') ||
+      target.tagName === 'BUTTON' ||
+      target.tagName === 'IMG'
+    ) return;
     dragging = true;
+    box.setPointerCapture(e.pointerId);
     startX = e.clientX;
     startY = e.clientY;
     startLeft = parseFloat(box.style.left) || 0;
@@ -119,20 +123,19 @@ function setupDrag(box: HTMLElement, container: HTMLElement) {
     e.preventDefault();
   });
 
-  document.addEventListener('mousemove', (e) => {
+  box.addEventListener('pointermove', (e) => {
     if (!dragging) return;
     const containerRect = container.getBoundingClientRect();
     const boxW = parseFloat(box.style.width) || 0;
     const boxH = parseFloat(box.style.height) || 0;
-    const dx = e.clientX - startX;
-    const dy = e.clientY - startY;
-    const newLeft = Math.max(0, Math.min(containerRect.width - boxW, startLeft + dx));
-    const newTop = Math.max(0, Math.min(containerRect.height - boxH, startTop + dy));
+    const newLeft = Math.max(0, Math.min(containerRect.width - boxW, startLeft + e.clientX - startX));
+    const newTop = Math.max(0, Math.min(containerRect.height - boxH, startTop + e.clientY - startY));
     box.style.left = `${newLeft}px`;
     box.style.top = `${newTop}px`;
   });
 
-  document.addEventListener('mouseup', () => { dragging = false; });
+  box.addEventListener('pointerup', () => { dragging = false; });
+  box.addEventListener('pointercancel', () => { dragging = false; });
 }
 
 function setupResize(
@@ -146,8 +149,9 @@ function setupResize(
   let startX = 0, startY = 0;
   let startW = 0, startH = 0, startLeft = 0, startTop = 0;
 
-  handle.addEventListener('mousedown', (e) => {
+  handle.addEventListener('pointerdown', (e) => {
     resizing = true;
+    handle.setPointerCapture(e.pointerId);
     startX = e.clientX;
     startY = e.clientY;
     startW = parseFloat(box.style.width) || 0;
@@ -158,7 +162,7 @@ function setupResize(
     e.stopPropagation();
   });
 
-  document.addEventListener('mousemove', (e) => {
+  handle.addEventListener('pointermove', (e) => {
     if (!resizing) return;
     const containerRect = container.getBoundingClientRect();
     const dx = (e.clientX - startX) * dirX;
@@ -166,7 +170,6 @@ function setupResize(
 
     let newW = Math.max(60, startW + dx);
     let newH = Math.max(30, startH + dy);
-
     let newLeft = startLeft;
     let newTop = startTop;
 
@@ -190,5 +193,6 @@ function setupResize(
     box.style.top = `${newTop}px`;
   });
 
-  document.addEventListener('mouseup', () => { resizing = false; });
+  handle.addEventListener('pointerup', () => { resizing = false; });
+  handle.addEventListener('pointercancel', () => { resizing = false; });
 }

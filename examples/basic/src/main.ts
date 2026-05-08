@@ -1,43 +1,145 @@
 import { DropSign } from 'drop-sign';
+import type { DropSignResult, DropSignWidget } from 'drop-sign';
 
-const widget = DropSign.init({
-  target: '#contract-area',
-  buttonText: 'Sign',
-  onComplete(result) {
-    const output = document.getElementById('output');
-    if (!output) return;
+type Mode = 'floating-target' | 'floating-viewport' | 'inline-text' | 'custom';
 
-    const resultCard = document.createElement('div');
-    resultCard.className = 'result-card';
+let currentWidget: DropSignWidget | null = null;
 
-    const resultHeader = document.createElement('div');
-    resultHeader.className = 'result-header';
-    resultHeader.innerHTML = '<h3>Signed document (Exported Preview)</h3>';
+const WEIGHT_PRESETS = {
+  thin: { minWidth: 0.3, maxWidth: 1.2 },
+  medium: { minWidth: 0.7, maxWidth: 2.5 },
+  thick: { minWidth: 1.2, maxWidth: 4.0 },
+} as const;
 
-    const resultBody = document.createElement('div');
-    resultBody.className = 'result-body';
+const MODE_DESCRIPTIONS: Record<Mode, string> = {
+  'floating-target': 'Mode: Floating button (target-relative, default)',
+  'floating-viewport': 'Mode: Floating button (fixed to viewport corner)',
+  'inline-text': 'Mode: Inline text trigger 「서명」 with Korean labels',
+  'custom': 'Mode: Custom trigger — user-provided #custom-sign-btn',
+};
 
-    const img = document.createElement('img');
-    img.src = URL.createObjectURL(result.imageBlob);
-    img.alt = 'Signed document with signature';
+function getPenColor(): string {
+  return (document.getElementById('pen-color') as HTMLInputElement).value;
+}
 
-    const metadataContainer = document.createElement('div');
-    metadataContainer.className = 'metadata-container';
-    metadataContainer.innerHTML = '<span class="metadata-label">Placement Metadata</span>';
+function getLineWeight(): { minWidth: number; maxWidth: number } {
+  const val = (document.getElementById('line-weight') as HTMLSelectElement)
+    .value as keyof typeof WEIGHT_PRESETS;
+  return WEIGHT_PRESETS[val] ?? WEIGHT_PRESETS.medium;
+}
 
-    const pre = document.createElement('pre');
-    pre.textContent = JSON.stringify(result.placement, null, 2);
+function onComplete(result: DropSignResult) {
+  const output = document.getElementById('output')!;
+  const card = document.createElement('div');
+  card.className = 'result-card';
 
-    metadataContainer.appendChild(pre);
-    resultBody.append(img, metadataContainer);
-    resultCard.append(resultHeader, resultBody);
+  const header = document.createElement('div');
+  header.className = 'result-header';
+  header.innerHTML = '<h3>Signed document (exported preview)</h3>';
 
-    output.innerHTML = '';
-    output.appendChild(resultCard);
-  },
-  onError(err) {
-    console.error('[DropSign]', err);
-  },
+  const body = document.createElement('div');
+  body.className = 'result-body';
+
+  const img = document.createElement('img');
+  img.src = URL.createObjectURL(result.imageBlob);
+  img.alt = 'Signed document';
+
+  const metaContainer = document.createElement('div');
+  metaContainer.className = 'metadata-container';
+  metaContainer.innerHTML = '<span class="metadata-label">Placement Metadata</span>';
+  const pre = document.createElement('pre');
+  pre.textContent = JSON.stringify(result.placement, null, 2);
+  metaContainer.appendChild(pre);
+
+  body.append(img, metaContainer);
+  card.append(header, body);
+  output.innerHTML = '';
+  output.appendChild(card);
+}
+
+function initMode(mode: Mode) {
+  currentWidget?.destroy();
+  currentWidget = null;
+
+  const inlineTriggerArea = document.getElementById('inline-trigger-area') as HTMLElement;
+  const customTriggerArea = document.getElementById('custom-trigger-area') as HTMLElement;
+  inlineTriggerArea.style.display = 'none';
+  customTriggerArea.style.display = 'none';
+
+  const weight = getLineWeight();
+  const signature = { penColor: getPenColor(), ...weight, velocityFilterWeight: 0.7 };
+  const descEl = document.getElementById('mode-description')!;
+  descEl.textContent = MODE_DESCRIPTIONS[mode];
+
+  if (mode === 'floating-target') {
+    currentWidget = DropSign.init({
+      target: '#contract-area',
+      trigger: { type: 'floating', positionAnchor: 'target', position: 'bottom-right' },
+      signature,
+      onComplete,
+      onError: (err) => console.error('[DropSign]', err),
+    });
+  } else if (mode === 'floating-viewport') {
+    currentWidget = DropSign.init({
+      target: '#contract-area',
+      trigger: { type: 'floating', positionAnchor: 'viewport', position: 'bottom-right' },
+      signature,
+      onComplete,
+      onError: (err) => console.error('[DropSign]', err),
+    });
+  } else if (mode === 'inline-text') {
+    inlineTriggerArea.style.display = 'flex';
+    currentWidget = DropSign.init({
+      target: '#contract-area',
+      trigger: {
+        type: 'inline',
+        container: '#inline-trigger-area',
+        label: '(서명)',
+        variant: 'text',
+      },
+      messages: {
+        sign: '서명',
+        clear: '지우기',
+        cancel: '취소',
+        useSignature: '서명 사용',
+        confirm: '적용',
+        delete: '삭제',
+        signingTitle: '서명을 입력하세요',
+        signingDescription: '마우스, 트랙패드, Apple Pencil 또는 손가락으로 서명하세요.',
+      },
+      signature,
+      onComplete,
+      onError: (err) => console.error('[DropSign]', err),
+    });
+  } else if (mode === 'custom') {
+    customTriggerArea.style.display = 'block';
+    currentWidget = DropSign.init({
+      target: '#contract-area',
+      trigger: { type: 'custom', element: '#custom-sign-btn' },
+      signature,
+      onComplete,
+      onError: (err) => console.error('[DropSign]', err),
+    });
+  }
+}
+
+document.querySelectorAll<HTMLButtonElement>('.mode-btn').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.mode-btn').forEach((b) => b.classList.remove('active'));
+    btn.classList.add('active');
+    initMode(btn.dataset.mode as Mode);
+  });
 });
 
-window.addEventListener('beforeunload', () => widget.destroy());
+document.getElementById('pen-color')!.addEventListener('input', () => {
+  const active = document.querySelector('.mode-btn.active') as HTMLButtonElement;
+  initMode(active.dataset.mode as Mode);
+});
+document.getElementById('line-weight')!.addEventListener('change', () => {
+  const active = document.querySelector('.mode-btn.active') as HTMLButtonElement;
+  initMode(active.dataset.mode as Mode);
+});
+
+initMode('floating-target');
+
+window.addEventListener('beforeunload', () => currentWidget?.destroy());

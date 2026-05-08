@@ -1,8 +1,6 @@
 export const STYLES = `
   .ds-button {
     position: absolute;
-    bottom: 24px;
-    right: 24px;
     padding: 10px 22px;
     background: #0f172a;
     color: #fff;
@@ -14,7 +12,9 @@ export const STYLES = `
     cursor: pointer;
     z-index: 9999;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.1s ease;
   }
   .ds-button:hover {
     background: #1e293b;
@@ -22,7 +22,54 @@ export const STYLES = `
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
   }
   .ds-button:active {
-    transform: translateY(0);
+    transform: scale(0.96);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+  .ds-button[data-no-press]:active {
+    transform: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  .ds-button.ds-button-viewport {
+    position: fixed;
+  }
+
+  .ds-btn-inline {
+    padding: 8px 16px;
+    background: #0f172a;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: system-ui, -apple-system, sans-serif;
+    cursor: pointer;
+    min-height: 44px;
+    min-width: 44px;
+    transition: background 0.15s ease, transform 0.1s ease;
+  }
+  .ds-btn-inline:hover {
+    background: #1e293b;
+  }
+  .ds-btn-inline:active {
+    transform: scale(0.96);
+  }
+  .ds-btn-inline[data-no-press]:active {
+    transform: none;
+  }
+  .ds-btn-inline--text {
+    background: transparent;
+    color: #0f172a;
+    border: none;
+    padding: 4px 2px;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    font-weight: 500;
+    min-height: 44px;
+    min-width: 44px;
+  }
+  .ds-btn-inline--text:hover {
+    background: transparent;
+    color: #1e293b;
   }
 
   .ds-modal-backdrop {
@@ -34,6 +81,8 @@ export const STYLES = `
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 16px;
+    box-sizing: border-box;
   }
 
   .ds-modal {
@@ -46,6 +95,17 @@ export const STYLES = `
     gap: 20px;
     min-width: 440px;
     max-width: 90vw;
+    box-sizing: border-box;
+  }
+
+  @media (max-width: 480px) {
+    .ds-modal {
+      min-width: 0;
+      width: 100%;
+      padding: 20px 16px;
+      border-radius: 16px;
+      gap: 14px;
+    }
   }
 
   .ds-modal-title {
@@ -56,6 +116,13 @@ export const STYLES = `
     margin: 0;
   }
 
+  .ds-modal-description {
+    font-size: 13px;
+    color: #64748b;
+    margin: -10px 0 0;
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+
   .ds-canvas {
     border: 1px solid #e2e8f0;
     border-radius: 8px;
@@ -63,12 +130,16 @@ export const STYLES = `
     touch-action: none;
     display: block;
     background: #f8fafc;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   .ds-modal-actions {
     display: flex;
     gap: 12px;
     justify-content: flex-end;
+    flex-wrap: wrap;
   }
 
   .ds-btn-clear, .ds-btn-cancel, .ds-btn-use {
@@ -79,6 +150,8 @@ export const STYLES = `
     font-family: system-ui, -apple-system, sans-serif;
     cursor: pointer;
     transition: all 0.15s ease;
+    min-height: 44px;
+    min-width: 44px;
   }
 
   .ds-btn-clear, .ds-btn-cancel {
@@ -119,6 +192,7 @@ export const STYLES = `
     min-width: 60px;
     min-height: 30px;
     transition: border-color 0.2s;
+    touch-action: none;
   }
   .ds-sig-box:hover {
     border-color: #0f172a;
@@ -155,6 +229,8 @@ export const STYLES = `
     cursor: pointer;
     pointer-events: all;
     transition: all 0.15s ease;
+    min-height: 36px;
+    min-width: 44px;
   }
 
   .ds-sig-delete {
@@ -183,6 +259,7 @@ export const STYLES = `
     border-radius: 50%;
     pointer-events: all;
     box-sizing: border-box;
+    touch-action: none;
   }
   .ds-resize-se {
     bottom: -4px;
@@ -203,5 +280,16 @@ export const STYLES = `
     top: -4px;
     left: -4px;
     cursor: nw-resize;
+  }
+
+  @media (pointer: coarse) {
+    .ds-resize-handle {
+      width: 16px;
+      height: 16px;
+    }
+    .ds-resize-se { bottom: -8px; right: -8px; }
+    .ds-resize-sw { bottom: -8px; left: -8px; }
+    .ds-resize-ne { top: -8px; right: -8px; }
+    .ds-resize-nw { top: -8px; left: -8px; }
   }
 `;

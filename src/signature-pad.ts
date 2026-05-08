@@ -1,4 +1,5 @@
 import SignaturePad from 'signature_pad';
+import type { DropSignMessages, DropSignSignatureOptions } from './types.js';
 
 export interface SignaturePadModal {
   open(): void;
@@ -8,6 +9,8 @@ export interface SignaturePadModal {
 export function createSignaturePadModal(
   onUse: (dataUrl: string) => void,
   onCancel: () => void,
+  messages: Required<DropSignMessages>,
+  signatureOptions: Required<DropSignSignatureOptions>,
 ): SignaturePadModal {
   let backdrop: HTMLElement | null = null;
   let pad: SignaturePad | null = null;
@@ -21,7 +24,11 @@ export function createSignaturePadModal(
 
     const title = document.createElement('p');
     title.className = 'ds-modal-title';
-    title.textContent = 'Draw your signature';
+    title.textContent = messages.signingTitle;
+
+    const description = document.createElement('p');
+    description.className = 'ds-modal-description';
+    description.textContent = messages.signingDescription;
 
     const canvas = document.createElement('canvas') as HTMLCanvasElement;
     canvas.className = 'ds-canvas';
@@ -33,25 +40,31 @@ export function createSignaturePadModal(
 
     const clearBtn = document.createElement('button');
     clearBtn.className = 'ds-btn-clear';
-    clearBtn.textContent = 'Clear';
+    clearBtn.textContent = messages.clear;
     clearBtn.type = 'button';
 
     const cancelBtn = document.createElement('button');
     cancelBtn.className = 'ds-btn-cancel';
-    cancelBtn.textContent = 'Cancel';
+    cancelBtn.textContent = messages.cancel;
     cancelBtn.type = 'button';
 
     const useBtn = document.createElement('button');
     useBtn.className = 'ds-btn-use';
-    useBtn.textContent = 'Use signature';
+    useBtn.textContent = messages.useSignature;
     useBtn.type = 'button';
 
     actions.append(clearBtn, cancelBtn, useBtn);
-    modal.append(title, canvas, actions);
+    modal.append(title, description, canvas, actions);
     backdrop.appendChild(modal);
     document.body.appendChild(backdrop);
 
-    pad = new SignaturePad(canvas, { backgroundColor: 'rgba(0,0,0,0)' });
+    pad = new SignaturePad(canvas, {
+      backgroundColor: 'rgba(0,0,0,0)',
+      penColor: signatureOptions.penColor,
+      minWidth: signatureOptions.minWidth,
+      maxWidth: signatureOptions.maxWidth,
+      velocityFilterWeight: signatureOptions.velocityFilterWeight,
+    });
 
     clearBtn.addEventListener('click', () => pad?.clear());
 
