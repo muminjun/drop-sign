@@ -113,7 +113,7 @@ export interface DropSignOptions {
   messages?: DropSignMessages;
   signature?: DropSignSignatureOptions;
   classNamePrefix?: string;
-  afterConfirm?: 'persist' | 'capture' | 'both';
+  afterConfirm?: 'persist' | 'capture' | 'both';  // default: 'capture'
   capture?: {
     pixelRatio?: number;
     backgroundColor?: string;
@@ -421,7 +421,7 @@ export class DropSign {
       onCancel,
       onError,
       capture: captureOptions,
-      afterConfirm = 'persist',
+      afterConfirm = 'capture',
     } = options;
 
     let targetEl: HTMLElement;
@@ -503,13 +503,14 @@ export class DropSign {
           if (overlayContainer) overlayContainer.el.style.display = 'none';
           try {
             if (afterConfirm === 'persist') {
+              // Async work first — if it throws, no DOM mutation has happened yet
+              const signatureBlob = await dataUrlToBlob(currentSigDataUrl);
               const { persistedEl, removePersisted: removeImg } = persistResult(
                 targetEl,
                 currentSigDataUrl,
                 placement,
               );
               persistedActive = true;
-              const signatureBlob = await dataUrlToBlob(currentSigDataUrl);
               const wrappedRemove = () => {
                 removeImg();
                 persistedActive = false;
@@ -544,19 +545,20 @@ export class DropSign {
               await onComplete?.(result);
 
             } else {
-              // 'both'
-              const { persistedEl, removePersisted: removeImg } = persistResult(
-                targetEl,
-                currentSigDataUrl,
-                placement,
-              );
-              persistedActive = true;
+              // 'both': capture before persisting — prevents persisted img from
+              // appearing twice in the PNG (once permanent, once temporary)
               const raw = await captureResult(
                 targetEl,
                 currentSigDataUrl,
                 placement,
                 captureOptions,
               );
+              const { persistedEl, removePersisted: removeImg } = persistResult(
+                targetEl,
+                currentSigDataUrl,
+                placement,
+              );
+              persistedActive = true;
               const wrappedRemove = () => {
                 removeImg();
                 persistedActive = false;
