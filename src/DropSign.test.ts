@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { DropSign } from './DropSign.js';
 import { mergeMessages, mergeSignatureOptions } from './messages.js';
+import { createPlacementBox } from './placement.js';
 
 describe('mergeMessages', () => {
   it('returns English defaults when called with no argument', () => {
@@ -190,6 +191,109 @@ describe('trigger modes', () => {
     });
     expect(onError).toHaveBeenCalled();
     expect(() => widget.destroy()).not.toThrow();
+  });
+});
+
+describe('createPlacementBox — getPlacement', () => {
+  beforeEach(() => {
+    Object.defineProperty(window, 'innerWidth', { value: 1024, configurable: true });
+    Object.defineProperty(window, 'innerHeight', { value: 768, configurable: true });
+  });
+
+  it('with target: returns target-relative normalized coords', () => {
+    const target = document.createElement('div');
+    vi.spyOn(target, 'getBoundingClientRect').mockReturnValue({
+      left: 100, top: 50, width: 400, height: 300,
+      right: 500, bottom: 350, x: 100, y: 50, toJSON: () => ({}),
+    } as DOMRect);
+
+    const box = createPlacementBox(
+      'data:image/png;base64,sig',
+      target,
+      () => {}, () => {},
+      { confirm: 'Confirm', delete: 'Delete' },
+    );
+    // box is at viewport (300, 100) → target-relative: (300-100)/400=0.5, (100-50)/300=0.167
+    box.element.style.left = '300px';
+    box.element.style.top = '100px';
+    box.element.style.width = '80px';   // 80/400 = 0.2
+    box.element.style.height = '40px';  // 40/300 ≈ 0.133
+
+    const p = box.getPlacement();
+    expect(p.x).toBeCloseTo(0.5);
+    expect(p.y).toBeCloseTo(0.167, 2);
+    expect(p.width).toBeCloseTo(0.2);
+    expect(p.height).toBeCloseTo(0.133, 2);
+
+    box.destroy();
+  });
+
+  it('with target: allows out-of-range when box is outside target', () => {
+    const target = document.createElement('div');
+    vi.spyOn(target, 'getBoundingClientRect').mockReturnValue({
+      left: 100, top: 50, width: 400, height: 300,
+      right: 500, bottom: 350, x: 100, y: 50, toJSON: () => ({}),
+    } as DOMRect);
+
+    const box = createPlacementBox(
+      'data:image/png;base64,sig',
+      target,
+      () => {}, () => {},
+      { confirm: 'Confirm', delete: 'Delete' },
+    );
+    // box at viewport (0,50) → x = (0-100)/400 = -0.25 (outside target)
+    box.element.style.left = '0px';
+    box.element.style.top = '50px';
+    box.element.style.width = '80px';
+    box.element.style.height = '40px';
+
+    const p = box.getPlacement();
+    expect(p.x).toBeCloseTo(-0.25);
+    expect(p.width).toBeGreaterThan(0);
+    expect(p.height).toBeGreaterThan(0);
+
+    box.destroy();
+  });
+
+  it('without target: returns viewport-relative normalized coords', () => {
+    const box = createPlacementBox(
+      'data:image/png;base64,sig',
+      undefined,
+      () => {}, () => {},
+      { confirm: 'Confirm', delete: 'Delete' },
+    );
+    // 512/1024 = 0.5, 384/768 = 0.5
+    box.element.style.left = '512px';
+    box.element.style.top = '384px';
+    box.element.style.width = '204.8px';  // 204.8/1024 = 0.2
+    box.element.style.height = '76.8px';  // 76.8/768 = 0.1
+
+    const p = box.getPlacement();
+    expect(p.x).toBeCloseTo(0.5);
+    expect(p.y).toBeCloseTo(0.5);
+    expect(p.width).toBeCloseTo(0.2);
+    expect(p.height).toBeCloseTo(0.1);
+
+    box.destroy();
+  });
+
+  it('width and height are always positive', () => {
+    const box = createPlacementBox(
+      'data:image/png;base64,sig',
+      undefined,
+      () => {}, () => {},
+      { confirm: 'Confirm', delete: 'Delete' },
+    );
+    box.element.style.left = '100px';
+    box.element.style.top = '100px';
+    box.element.style.width = '60px';
+    box.element.style.height = '30px';
+
+    const p = box.getPlacement();
+    expect(p.width).toBeGreaterThan(0);
+    expect(p.height).toBeGreaterThan(0);
+
+    box.destroy();
   });
 });
 
