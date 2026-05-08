@@ -7,5 +7,5 @@ export type {
   DropSignMessages,
   DropSignSignatureOptions,
   DropSignWidget,
-  SignaturePlacement,
+  NormalizedPlacement,
 } from './types.js';

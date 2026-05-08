@@ -47,8 +47,7 @@
   },
   "homepage": "https://github.com/muminjun/drop-sign#readme",
   "dependencies": {
-    "html-to-image": "^1.11.11",
-    "interactjs": "^1.10.27",
+"interactjs": "^1.10.27",
     "signature_pad": "^4.2.0"
   },
   "devDependencies": {
