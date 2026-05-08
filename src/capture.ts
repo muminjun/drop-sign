@@ -46,6 +46,11 @@ export function persistResult(
   signatureDataUrl: string,
   placement: SignaturePlacement,
 ): { persistedEl: HTMLElement; removePersisted: () => void } {
+  const computedPos = window.getComputedStyle(targetEl).position;
+  if (computedPos === 'static') {
+    targetEl.style.position = 'relative';
+  }
+
   const sigImg = document.createElement('img');
   sigImg.src = signatureDataUrl;
   sigImg.style.position = 'absolute';
