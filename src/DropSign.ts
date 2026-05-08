@@ -62,6 +62,13 @@ export class DropSign {
       overlayContainer?.destroy();
       overlayContainer = createOverlayContainer(targetEl);
 
+      function cleanup() {
+        placementBox?.destroy();
+        placementBox = null;
+        overlayContainer?.destroy();
+        overlayContainer = null;
+      }
+
       placementBox = createPlacementBox(
         dataUrl,
         targetEl,
@@ -77,17 +84,11 @@ export class DropSign {
               captureOptions,
             );
             // Destroy overlay only after successful capture
-            placementBox?.destroy();
-            placementBox = null;
-            overlayContainer?.destroy();
-            overlayContainer = null;
+            cleanup();
             await onComplete?.(result);
           } catch (err) {
             // On error, still clean up
-            placementBox?.destroy();
-            placementBox = null;
-            overlayContainer?.destroy();
-            overlayContainer = null;
+            cleanup();
             onError?.(err);
           }
         },

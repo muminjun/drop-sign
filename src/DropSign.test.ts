@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { DropSign } from './DropSign.js';
 import { captureResult } from './capture.js';
 
@@ -71,11 +71,15 @@ describe('captureResult', () => {
     scrollY: 0,
   };
 
-  beforeEach(async () => {
+  beforeEach(() => {
     // Provide a minimal fetch stub so dataUrlToBlob works
-    globalThis.fetch = vi.fn(async () => ({
+    vi.stubGlobal('fetch', vi.fn(async () => ({
       blob: async () => new Blob(['fake']),
-    })) as unknown as typeof fetch;
+    })));
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
   it('injects signature img into target before capture', async () => {
@@ -129,6 +133,22 @@ describe('captureResult', () => {
     await captureResult(targetEl, fakeSigDataUrl, placement);
 
     // Should be restored to the previous inline value (empty string)
+    expect(targetEl.style.position).toBe('');
+
+    targetEl.remove();
+  });
+
+  it('cleans up signature img and restores position if toPng throws', async () => {
+    const { toPng } = await import('html-to-image');
+    const toPngMock = vi.mocked(toPng);
+    toPngMock.mockRejectedValueOnce(new Error('capture failed'));
+
+    const targetEl = document.createElement('div');
+    document.body.appendChild(targetEl);
+
+    await expect(captureResult(targetEl, fakeSigDataUrl, placement)).rejects.toThrow('capture failed');
+
+    expect(targetEl.querySelectorAll('img').length).toBe(0);
     expect(targetEl.style.position).toBe('');
 
     targetEl.remove();
