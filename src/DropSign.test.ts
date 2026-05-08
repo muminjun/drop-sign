@@ -62,17 +62,11 @@ describe('DropSign.init', () => {
     expect((err as Error).message).toContain('#missing');
   });
 
-  it('appends sign button to target element', () => {
+  it('appends sign button to document.body', () => {
     const widget = DropSign.init({ target: '#target' });
     const btn = document.querySelector('.ds-button');
     expect(btn).toBeTruthy();
-    expect(btn?.textContent).toBe('Sign');
-    widget.destroy();
-  });
-
-  it('uses custom buttonText', () => {
-    const widget = DropSign.init({ target: '#target', buttonText: 'Add signature' });
-    expect(document.querySelector('.ds-button')?.textContent).toBe('Add signature');
+    expect(document.body.contains(btn)).toBe(true);
     widget.destroy();
   });
 
@@ -102,44 +96,47 @@ describe('trigger modes', () => {
   beforeEach(() => {
     document.body.innerHTML =
       '<div id="target" style="width:400px;height:300px;"></div>' +
-      '<div id="sig-area"></div>' +
       '<button id="custom-btn">My Sign</button>';
     document.head.innerHTML = '';
   });
 
-  it('default floating appends .ds-button inside targetEl', () => {
+  it('default trigger appends .ds-button to document.body', () => {
     const widget = DropSign.init({ target: '#target' });
     const btn = document.querySelector('.ds-button');
     expect(btn).toBeTruthy();
-    expect(document.getElementById('target')!.contains(btn)).toBe(true);
-    widget.destroy();
-  });
-
-  it('floating positionAnchor viewport appends to document.body, not targetEl', () => {
-    const widget = DropSign.init({
-      target: '#target',
-      trigger: { type: 'floating', positionAnchor: 'viewport' },
-    });
-    const btn = document.querySelector('.ds-button-viewport');
-    expect(btn).toBeTruthy();
-    expect(document.getElementById('target')!.contains(btn)).toBe(false);
     expect(document.body.contains(btn)).toBe(true);
+    expect(document.getElementById('target')!.contains(btn)).toBe(false);
     widget.destroy();
   });
 
-  it('floating positionAnchor viewport button is removed from body on destroy', () => {
+  it('global trigger default label is Sign', () => {
+    const widget = DropSign.init({ target: '#target' });
+    expect(document.querySelector('.ds-button')?.textContent).toBe('Sign');
+    widget.destroy();
+  });
+
+  it('global trigger label option overrides default', () => {
     const widget = DropSign.init({
       target: '#target',
-      trigger: { type: 'floating', positionAnchor: 'viewport' },
+      trigger: { type: 'global', label: 'Start Signing' },
     });
+    expect(document.querySelector('.ds-button')?.textContent).toBe('Start Signing');
     widget.destroy();
-    expect(document.querySelector('.ds-button-viewport')).toBeNull();
   });
 
-  it('floating position bottom-left sets correct inline style', () => {
+  it('messages.sign sets the global button label', () => {
     const widget = DropSign.init({
       target: '#target',
-      trigger: { type: 'floating', position: 'bottom-left' },
+      messages: { sign: '서명' },
+    });
+    expect(document.querySelector('.ds-button')?.textContent).toBe('서명');
+    widget.destroy();
+  });
+
+  it('global trigger bottom-left sets correct inline style', () => {
+    const widget = DropSign.init({
+      target: '#target',
+      trigger: { type: 'global', position: 'bottom-left' },
     });
     const btn = document.querySelector('.ds-button') as HTMLElement | null;
     expect(btn?.style.left).toBe('24px');
@@ -147,10 +144,10 @@ describe('trigger modes', () => {
     widget.destroy();
   });
 
-  it('floating position top-right sets correct inline style', () => {
+  it('global trigger top-right sets correct inline style', () => {
     const widget = DropSign.init({
       target: '#target',
-      trigger: { type: 'floating', position: 'top-right' },
+      trigger: { type: 'global', position: 'top-right' },
     });
     const btn = document.querySelector('.ds-button') as HTMLElement | null;
     expect(btn?.style.top).toBe('24px');
@@ -158,27 +155,11 @@ describe('trigger modes', () => {
     widget.destroy();
   });
 
-  it('inline trigger creates button inside container', () => {
-    const widget = DropSign.init({
-      target: '#target',
-      trigger: { type: 'inline', container: '#sig-area', label: '(Sign)' },
-    });
-    const container = document.getElementById('sig-area')!;
-    const btn = container.querySelector('.ds-btn-inline');
-    expect(btn).toBeTruthy();
-    expect(btn?.textContent).toBe('(Sign)');
+  it('global trigger button is removed from body on destroy', () => {
+    const widget = DropSign.init({ target: '#target' });
+    expect(document.querySelector('.ds-button')).toBeTruthy();
     widget.destroy();
-  });
-
-  it('inline text variant adds ds-btn-inline--text class', () => {
-    const widget = DropSign.init({
-      target: '#target',
-      trigger: { type: 'inline', container: '#sig-area', variant: 'text', label: '(서명)' },
-    });
-    const btn = document.querySelector('.ds-btn-inline--text');
-    expect(btn).toBeTruthy();
-    expect(btn?.textContent).toBe('(서명)');
-    widget.destroy();
+    expect(document.querySelector('.ds-button')).toBeNull();
   });
 
   it('custom trigger does not create any new buttons', () => {
@@ -191,16 +172,6 @@ describe('trigger modes', () => {
     widget.destroy();
   });
 
-  it('destroy removes SDK-created inline trigger button', () => {
-    const widget = DropSign.init({
-      target: '#target',
-      trigger: { type: 'inline', container: '#sig-area', label: 'Sign' },
-    });
-    expect(document.querySelector('.ds-btn-inline')).toBeTruthy();
-    widget.destroy();
-    expect(document.querySelector('.ds-btn-inline')).toBeNull();
-  });
-
   it('destroy does not remove custom trigger element from DOM', () => {
     const widget = DropSign.init({
       target: '#target',
@@ -208,31 +179,6 @@ describe('trigger modes', () => {
     });
     widget.destroy();
     expect(document.getElementById('custom-btn')).toBeTruthy();
-  });
-
-  it('messages.sign sets the floating button label', () => {
-    const widget = DropSign.init({
-      target: '#target',
-      messages: { sign: '서명' },
-    });
-    expect(document.querySelector('.ds-button')?.textContent).toBe('서명');
-    widget.destroy();
-  });
-
-  it('trigger.label takes priority over messages.sign', () => {
-    const widget = DropSign.init({
-      target: '#target',
-      trigger: { type: 'floating', label: 'Start Signing' },
-      messages: { sign: '서명' },
-    });
-    expect(document.querySelector('.ds-button')?.textContent).toBe('Start Signing');
-    widget.destroy();
-  });
-
-  it('buttonText is used when no messages.sign is provided', () => {
-    const widget = DropSign.init({ target: '#target', buttonText: 'Add Signature' });
-    expect(document.querySelector('.ds-button')?.textContent).toBe('Add Signature');
-    widget.destroy();
   });
 
   it('calls onError and returns no-op widget when custom trigger element not found', () => {
