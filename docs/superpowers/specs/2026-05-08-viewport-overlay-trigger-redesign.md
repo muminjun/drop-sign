@@ -29,20 +29,20 @@ type DropSignTrigger =
 
 ### `NormalizedPlacement`
 
-모든 좌표는 0–1 비율:
+기준 요소 대비 정규화 비율. 박스가 기준 요소 바깥에 놓이면 0–1 범위를 초과할 수 있다:
 
 ```ts
 interface NormalizedPlacement {
-  x: number;      // 기준 너비 대비 left 위치
-  y: number;      // 기준 높이 대비 top 위치
-  width: number;  // 기준 너비 대비 박스 너비
-  height: number; // 기준 높이 대비 박스 높이
+  x: number;      // 기준 너비 대비 left 위치 (target 바깥이면 음수 또는 1 초과 가능)
+  y: number;      // 기준 높이 대비 top 위치 (target 바깥이면 음수 또는 1 초과 가능)
+  width: number;  // 기준 너비 대비 박스 너비 (항상 양수)
+  height: number; // 기준 높이 대비 박스 높이 (항상 양수)
 }
 ```
 
 좌표 기준: `target` 제공 시 target 기준, 없으면 뷰포트 기준.
 
-PDF 예시: `x * pdfPage.width`, `y * pdfPage.height` — 변환 없이 바로 사용 가능.
+PDF 예시: `x * pdfPage.width`, `y * pdfPage.height` — 변환 없이 바로 사용 가능. target 바깥 배치 시 범위 초과 값을 개발자가 직접 클램핑하거나 허용할지 결정한다.
 
 ### `DropSignResult`
 
@@ -149,6 +149,6 @@ function getPlacement(): NormalizedPlacement {
 ## 4. 테스트
 
 - `DropSign.test.ts`: `html-to-image` mock 및 캡처 관련 assertion 제거
-- `placement` 좌표가 0–1 범위 내인지 검증하는 케이스 추가
+- `placement` `width`/`height`가 항상 양수인지 검증, `x`/`y`는 target 바깥 배치 시 범위 초과 허용 케이스 추가
 - `target` 없는 경우 뷰포트 기준 좌표 반환 검증
 - `global` / `custom` 트리거 동작 테스트
