@@ -62,17 +62,21 @@ export class DropSign {
       overlayContainer?.destroy();
       overlayContainer = createOverlayContainer(targetEl);
 
+      function cleanup() {
+        placementBox?.destroy();
+        placementBox = null;
+        overlayContainer?.destroy();
+        overlayContainer = null;
+      }
+
       placementBox = createPlacementBox(
         dataUrl,
         targetEl,
         async () => {
           if (!placementBox) return;
           const placement = placementBox.getPlacement();
-          placementBox.destroy();
-          placementBox = null;
-          overlayContainer?.destroy();
-          overlayContainer = null;
-
+          // Hide overlay before capture so dashed border/buttons don't appear in the PNG
+          if (overlayContainer) overlayContainer.el.style.display = 'none';
           try {
             const result = await captureResult(
               targetEl,
@@ -80,8 +84,12 @@ export class DropSign {
               placement,
               captureOptions,
             );
+            // Destroy overlay only after successful capture
+            cleanup();
             await onComplete?.(result);
           } catch (err) {
+            // On error, still clean up
+            cleanup();
             onError?.(err);
           }
         },
