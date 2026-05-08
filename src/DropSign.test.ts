@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { DropSign } from './DropSign.js';
-import { captureResult, persistResult } from './capture.js';
+import { captureResult, persistResult, dataUrlToBlob } from './capture.js';
 import { mergeMessages, mergeSignatureOptions } from './messages.js';
 
 // Must be hoisted — mocks html-to-image for capture unit tests
@@ -404,5 +404,42 @@ describe('persistResult', () => {
     expect(targetEl.querySelectorAll('img').length).toBe(0);
 
     targetEl.remove();
+  });
+
+  it('removePersisted() is idempotent — calling twice does not throw', () => {
+    const targetEl = document.createElement('div');
+    targetEl.style.position = 'relative';
+    document.body.appendChild(targetEl);
+
+    const { removePersisted } = persistResult(targetEl, fakeSigDataUrl, placement);
+    removePersisted();
+    expect(() => removePersisted()).not.toThrow();
+
+    targetEl.remove();
+  });
+
+  it('img has pointer-events:none so it does not block underlying content', () => {
+    const targetEl = document.createElement('div');
+    targetEl.style.position = 'relative';
+    document.body.appendChild(targetEl);
+
+    const { persistedEl } = persistResult(targetEl, fakeSigDataUrl, placement);
+    expect(persistedEl.style.pointerEvents).toBe('none');
+
+    targetEl.remove();
+  });
+});
+
+describe('dataUrlToBlob', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('converts a data URL to a Blob via fetch', async () => {
+    const fakeBlob = new Blob(['hello']);
+    vi.stubGlobal('fetch', vi.fn(async () => ({ blob: async () => fakeBlob })));
+
+    const result = await dataUrlToBlob('data:text/plain;base64,aGVsbG8=');
+    expect(result).toBe(fakeBlob);
   });
 });
