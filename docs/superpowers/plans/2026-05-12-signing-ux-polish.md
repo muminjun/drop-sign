@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Improve the signing modal and placement box UX without changing the public DropSign API.
+**Goal:** Improve the signing modal and placement box UX without breaking the public DropSign API. New user-facing copy must go through the existing `messages` localization surface.
 
-**Architecture:** `src/signature-pad.ts` owns empty-signature state, primary button state, and canvas sizing. `src/placement.ts` owns placement toolbar positioning state. `src/styles.ts` contains the visual states. Tests are split between a focused new `src/signature-pad.test.ts` and existing placement tests in `src/DropSign.test.ts`.
+**Architecture:** `src/types.ts` and `src/messages.ts` own the optional empty-state message key and its English default. `src/signature-pad.ts` owns empty-signature state, primary button state, and canvas sizing. `src/placement.ts` owns placement toolbar positioning state. `src/styles.ts` contains the visual states. Tests are split between a focused new `src/signature-pad.test.ts` and existing placement tests in `src/DropSign.test.ts`.
 
 **Tech Stack:** TypeScript, `signature_pad`, DOM APIs, Vitest + happy-dom, pnpm scripts
 
@@ -14,11 +14,14 @@
 
 | File | Action | Responsibility |
 |---|---|---|
+| `src/types.ts` | Modify | Add optional empty-signature hint message key |
+| `src/messages.ts` | Modify | Add English default for the empty-signature hint |
 | `src/signature-pad.ts` | Modify | Empty-signature state, disabled primary action, responsive canvas backing store |
-| `src/signature-pad.test.ts` | Create | Modal behavior tests with a mocked `signature_pad` |
+| `src/signature-pad.test.ts` | Create | Modal behavior and localized empty hint tests with a mocked `signature_pad` |
 | `src/placement.ts` | Modify | Toolbar above/below state updates on init, drag, and resize |
 | `src/DropSign.test.ts` | Modify | Placement toolbar regression tests |
 | `src/styles.ts` | Modify | Disabled action, empty hint, toolbar-below styles |
+| `README.md` | Modify | Document the new empty-signature hint message key |
 
 ---
 
@@ -108,13 +111,13 @@ function rect(width: number, height: number): DOMRect {
   } as DOMRect;
 }
 
-function openModal() {
+function openModal(messages = mergeMessages()) {
   const onUse = vi.fn();
   const onCancel = vi.fn();
   const modal = createSignaturePadModal(
     onUse,
     onCancel,
-    mergeMessages(),
+    messages,
     mergeSignatureOptions(),
   );
 
@@ -145,6 +148,18 @@ describe('createSignaturePadModal', () => {
 
     expect(useBtn.disabled).toBe(true);
     expect(document.querySelector('.ds-empty-hint')?.textContent).toBe('Draw a signature to continue.');
+
+    modal.destroy();
+  });
+
+  it('uses localized empty-state hint copy from messages', () => {
+    const { modal } = openModal(
+      mergeMessages({ emptySignatureHint: '서명을 입력해야 계속할 수 있습니다.' }),
+    );
+
+    expect(document.querySelector('.ds-empty-hint')?.textContent).toBe(
+      '서명을 입력해야 계속할 수 있습니다.',
+    );
 
     modal.destroy();
   });
@@ -218,7 +233,7 @@ Run:
 pnpm test -- src/signature-pad.test.ts
 ```
 
-Expected: tests fail because `.ds-btn-use` is not disabled, `.ds-empty-hint` does not exist, and the canvas is not resized from `getBoundingClientRect()`.
+Expected: tests fail because `messages.emptySignatureHint` has not been added yet, `.ds-btn-use` is not disabled, `.ds-empty-hint` does not exist or is not sourced from `messages.emptySignatureHint`, and the canvas is not resized from `getBoundingClientRect()`.
 
 - [ ] **Step 3: Commit the failing tests**
 
@@ -232,11 +247,40 @@ git commit -m "test: cover signature modal empty state and canvas sizing"
 ## Task 2: Implement Signature Modal UX
 
 **Files:**
+- Modify: `src/types.ts`
+- Modify: `src/messages.ts`
 - Modify: `src/signature-pad.ts`
 - Modify: `src/styles.ts`
+- Modify: `README.md`
 - Test: `src/signature-pad.test.ts`
 
-- [ ] **Step 1: Add modal state helpers in `src/signature-pad.ts`**
+- [ ] **Step 1: Add localizable empty-state message key**
+
+In `src/types.ts`, add an optional `emptySignatureHint` field to `DropSignMessages`:
+
+```ts
+export interface DropSignMessages {
+  sign?: string;
+  clear?: string;
+  cancel?: string;
+  useSignature?: string;
+  confirm?: string;
+  delete?: string;
+  signingTitle?: string;
+  signingDescription?: string;
+  emptySignatureHint?: string;
+}
+```
+
+In `src/messages.ts`, add the English default:
+
+```ts
+emptySignatureHint: 'Draw a signature to continue.',
+```
+
+In `README.md`, add `emptySignatureHint` to the localization example and default messages table. This keeps the new modal copy overrideable for localized consumers.
+
+- [ ] **Step 2: Add modal state helpers in `src/signature-pad.ts`**
 
 Inside `createSignaturePadModal`, add these helpers before `open()`:
 
@@ -257,14 +301,14 @@ function resizeCanvas(canvas: HTMLCanvasElement, currentPad: SignaturePad | null
 }
 ```
 
-- [ ] **Step 2: Update modal creation and button state**
+- [ ] **Step 3: Update modal creation and button state**
 
 In `open()`, after creating `useBtn`, add:
 
 ```ts
 const emptyHint = document.createElement('p');
 emptyHint.className = 'ds-empty-hint';
-emptyHint.textContent = 'Draw a signature to continue.';
+emptyHint.textContent = messages.emptySignatureHint;
 
 let hasSignature = false;
 
@@ -289,7 +333,7 @@ to:
 modal.append(title, description, canvas, emptyHint, actions);
 ```
 
-- [ ] **Step 3: Wire `signature_pad` events and safe resize behavior**
+- [ ] **Step 4: Wire `signature_pad` events and safe resize behavior**
 
 After constructing `pad = new SignaturePad(...)`, add:
 
@@ -333,7 +377,7 @@ Keep the existing empty guard in the use handler:
 if (!pad || pad.isEmpty()) return;
 ```
 
-- [ ] **Step 4: Remove resize listener during destroy**
+- [ ] **Step 5: Remove resize listener during destroy**
 
 In `destroy()`, before `pad?.off();`, add:
 
@@ -344,7 +388,7 @@ if (resizeHandler) {
 }
 ```
 
-- [ ] **Step 5: Add styles for disabled use button and empty hint**
+- [ ] **Step 6: Add styles for disabled use button and empty hint**
 
 In `src/styles.ts`, after `.ds-btn-use:hover`, add:
 
@@ -363,7 +407,7 @@ In `src/styles.ts`, after `.ds-btn-use:hover`, add:
   }
 ```
 
-- [ ] **Step 6: Run the modal tests**
+- [ ] **Step 7: Run the modal tests**
 
 Run:
 
@@ -373,10 +417,10 @@ pnpm test -- src/signature-pad.test.ts
 
 Expected: all tests in `src/signature-pad.test.ts` pass.
 
-- [ ] **Step 7: Commit modal implementation**
+- [ ] **Step 8: Commit modal implementation**
 
 ```bash
-git add src/signature-pad.ts src/styles.ts src/signature-pad.test.ts
+git add src/types.ts src/messages.ts src/signature-pad.ts src/styles.ts src/signature-pad.test.ts README.md
 git commit -m "fix: improve signature modal empty state and canvas sizing"
 ```
 
@@ -618,11 +662,14 @@ git commit -m "fix: keep placement controls reachable near viewport edges"
 ## Task 5: Run Final Verification
 
 **Files:**
+- Verify: `src/types.ts`
+- Verify: `src/messages.ts`
 - Verify: `src/signature-pad.ts`
 - Verify: `src/signature-pad.test.ts`
 - Verify: `src/placement.ts`
 - Verify: `src/DropSign.test.ts`
 - Verify: `src/styles.ts`
+- Verify: `README.md`
 
 - [ ] **Step 1: Run focused tests**
 
@@ -660,7 +707,7 @@ Run:
 git diff -- src/types.ts src/index.ts
 ```
 
-Expected: no output. This UX plan must not change public TypeScript API exports.
+Expected: the only public TypeScript API change is the optional `DropSignMessages.emptySignatureHint` localization key. There should be no export removals, renamed types, or required new fields.
 
 - [ ] **Step 4: Inspect final source diff**
 
@@ -668,7 +715,7 @@ Run:
 
 ```bash
 git diff --stat HEAD
-git diff -- src/signature-pad.ts src/signature-pad.test.ts src/placement.ts src/DropSign.test.ts src/styles.ts
+git diff -- src/types.ts src/messages.ts src/signature-pad.ts src/signature-pad.test.ts src/placement.ts src/DropSign.test.ts src/styles.ts README.md
 ```
 
 Expected: only files from this plan are changed.
@@ -678,7 +725,7 @@ Expected: only files from this plan are changed.
 If lint or formatting required small corrections, commit only files from this plan:
 
 ```bash
-git add src/signature-pad.ts src/signature-pad.test.ts src/placement.ts src/DropSign.test.ts src/styles.ts
+git add src/types.ts src/messages.ts src/signature-pad.ts src/signature-pad.test.ts src/placement.ts src/DropSign.test.ts src/styles.ts README.md
 git commit -m "chore: finalize signing UX polish"
 ```
 
