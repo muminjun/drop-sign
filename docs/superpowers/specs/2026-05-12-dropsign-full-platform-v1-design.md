@@ -51,7 +51,7 @@ The cloud product is a separate full-stack application that consumes the SDK.
 | Primary database | PostgreSQL. Stores tenant data, metadata, statuses, audit records, and webhook delivery state. |
 | Object storage | Private S3-compatible bucket. Stores original PDFs, completed PDFs, signature images, and exports. |
 | Queue | Redis-backed queue or managed job queue. Used for emails, webhooks, PDF rendering, reminders, and billing usage jobs. |
-| CDN | Serves `widget.js` and versioned widget assets with long cache lifetimes. |
+| CDN | Serves the stable `widget.js` bootstrap with no-cache or short-cache headers. The bootstrap loads immutable versioned assets with long cache lifetimes. |
 | Email provider | Sends signing requests, reminders, completion notices, and operational alerts. |
 | Billing provider | Stripe-compatible subscription, plan, usage, and invoice lifecycle. |
 | Observability | Structured logs, metrics, traces, job dashboards, and error tracking for API, widget, and workers. |
@@ -71,6 +71,7 @@ and infrastructure together.
 | `Project` | Installable unit with public project key, widget settings, API keys, webhooks, and environments. |
 | `ProjectApiKey` | Server API credential. Stored hashed; shown once on creation. |
 | `WidgetConfig` | Button position, color, labels, page targeting, mobile behavior, custom trigger rules, and enabled workflows. |
+| `WidgetSession` | Backend-minted signed context for browser widget signing. Binds project, allowed origin, signer/request/document scope, expiry, and metadata claims. |
 | `Document` | Uploaded source document and generated completed document state. |
 | `Template` | Reusable document layout with fields, roles, routing defaults, and message defaults. |
 | `Field` | Signature, initials, date, name, text, checkbox, or metadata-backed value with page and normalized placement. |
@@ -105,9 +106,14 @@ starts the SDK signing flow, then submits signature artifacts to the API. It sup
 - Floating button position, color, label, and mobile placement.
 - Custom trigger selectors such as `[data-dropsign-trigger]`.
 - Page targeting rules based on path, host, and query.
-- Runtime identity via `window.DropSign.identify({ userId, email, name, metadata })`.
-- Runtime document context via `window.DropSign.setContext({ documentId, requestId, metadata })`.
+- Runtime identity hints via `window.DropSign.identify({ userId, email, name, metadata })`.
+- Runtime context via `window.DropSign.setContext({ sessionToken, metadata })`, where `sessionToken` is minted by the customer's backend or by a DropSign server API call.
 - Client callbacks: `onReady`, `onOpen`, `onComplete`, `onCancel`, `onError`.
+
+`identify()` values are caller-controlled hints. They can be stored as untrusted metadata for display,
+correlation, or webhook payloads, but the ingest API must not use them to authorize signer identity or
+to select a `SigningRequest`, `Signer`, or `Document`. Request, signer, and document binding requires
+a valid `WidgetSession` token or another server-side lookup owned by the project.
 
 ### Dashboard
 
@@ -152,10 +158,13 @@ Webhooks cover:
 - `signing_request.completed`
 - `document.completed`
 - `document.failed`
-- `webhook.failed`
 
 Webhook payloads include event id, project id, workspace id, request id, document id, signer id,
 timestamps, metadata, artifact references, and an HMAC signature header.
+
+Webhook delivery failures are internal operational events shown in the dashboard and audit timeline.
+They are not emitted as customer-delivered webhooks, so a failing endpoint cannot recursively generate
+more failure webhooks.
 
 ---
 
@@ -167,10 +176,12 @@ timestamps, metadata, artifact references, and an HMAC signature header.
 2. Loader reads `data-project-key` and calls the config endpoint.
 3. API returns public widget settings, allowed origins, enabled workflows, and version flags.
 4. Loader verifies current origin and path targeting, then renders the button or attaches custom triggers.
-5. User signs with the SDK.
-6. Widget posts signature data, normalized placement, runtime identity, and metadata to the API.
-7. API creates or updates a `SigningRequest`, stores `SignatureArtifact`, writes `AuditEvent`, and enqueues document/webhook/email jobs.
-8. Widget receives a completion response and fires client callbacks.
+5. Customer backend or DropSign API creates a `WidgetSession` token for any flow that binds the signature to an existing signer, request, or document.
+6. User signs with the SDK.
+7. Widget posts signature data, normalized placement, `WidgetSession` token, runtime identity hints, and metadata to the API.
+8. API validates token signature, expiry, project, origin, and scoped request/signer/document claims before creating or updating any records.
+9. API stores `SignatureArtifact`, writes `AuditEvent`, and enqueues document/webhook/email jobs.
+10. Widget receives a completion response and fires client callbacks.
 
 ### 2. Dashboard Template Creation
 
@@ -229,6 +240,7 @@ timestamps, metadata, artifact references, and an HMAC signature header.
 - Tenant isolation is enforced by `workspaceId` on every workspace-owned entity.
 - Dashboard access uses role-based permissions: owner, admin, developer, member, viewer, support-admin.
 - Public project keys are not secrets; server API keys are secrets and stored hashed.
+- Browser-supplied identity and document values are untrusted. Widget ingest only binds signatures to requests, signers, or documents through a valid `WidgetSession` token or server-side lookup.
 - Signing links use high-entropy tokens, expiry, single-signer scope, and revocation state.
 - Uploaded files are private by default and served through short-lived signed URLs.
 - Webhooks include HMAC signatures and event ids for replay protection.
@@ -247,13 +259,14 @@ timestamps, metadata, artifact references, and an HMAC signature header.
 |---|---|
 | Widget config fetch fails | Widget stays hidden, logs safe client error, calls `onError` if registered. |
 | Origin not allowed | Widget does not boot and records a rejected config access event. |
+| Missing or invalid widget session | API rejects request-bound signature ingest and records a security audit event without storing the signature as completed. |
 | Signature upload fails | Widget keeps local completion state, exposes retry while the page is open, and records the failure if the API was reached. |
 | Invalid signing token | Public signing page shows expired or invalid link state without leaking document data. |
 | Signer signs out of order | API rejects with routing error and public page shows waiting state. |
 | Required fields missing | Client prevents submit; API revalidates before accepting. |
 | PDF generation fails | Request moves to `document_failed`, records job error, dashboard exposes retry. |
 | Email send fails | Worker retries; dashboard shows failed notification and manual resend. |
-| Webhook delivery fails | Worker retries; endpoint can be disabled after repeated failures; dashboard shows attempts. |
+| Webhook delivery fails | Worker retries, records an internal delivery failure, and dashboard shows attempts. It does not enqueue a customer-facing `webhook.failed` webhook. |
 | Billing limit exceeded | API blocks billable action with upgrade-required response and records quota event. |
 | Duplicate callback/API retry | Idempotency keys and event ids prevent duplicate signing artifacts and webhook events. |
 
@@ -268,13 +281,14 @@ timestamps, metadata, artifact references, and an HMAC signature header.
 
 ### Widget
 
-- Browser tests for loader boot, allowed origins, page targeting, custom triggers, mobile position, callbacks, and config fetch failure.
+- Browser tests for loader boot, allowed origins, page targeting, custom triggers, mobile position, callbacks, config fetch failure, and bootstrap/versioned asset cache behavior.
 - Contract tests for config response shape and artifact upload payload.
 
 ### API
 
 - Unit tests for domain transitions: request creation, signer routing, required field validation, completion, cancellation, revocation, and quotas.
 - Integration tests with PostgreSQL for tenant isolation, API keys, webhook endpoints, audit events, and usage recording.
+- Security tests for widget ingest rejecting unsigned or mismatched request, signer, document, project, origin, and expired `WidgetSession` claims.
 - Idempotency tests for duplicate uploads, duplicate job runs, billing webhooks, and webhook retries.
 
 ### Dashboard
@@ -290,7 +304,7 @@ timestamps, metadata, artifact references, and an HMAC signature header.
 
 - PDF golden tests comparing generated output structure, page count, field placement, and hash creation.
 - Email provider fake tests for invitation, reminder, completion, and failure paths.
-- Webhook delivery tests for signing header, timeout, retry schedule, manual resend, and disabled endpoint behavior.
+- Webhook delivery tests for signing header, timeout, retry schedule, manual resend, disabled endpoint behavior, and non-recursive failure handling.
 - Billing tests for plan limit enforcement, usage aggregation, subscription webhook idempotency, and downgrade restrictions.
 
 ---
@@ -319,7 +333,7 @@ and tests before moving to the next module.
 
 DropSign Full Platform v1 is complete when:
 
-- A developer can create a project, install the script tag, identify a user, collect a signature, and receive a webhook.
+- A developer can create a project, install the script tag, pass identity hints or a signed widget session, collect a signature, and receive a webhook.
 - An operator can configure widget appearance, page targeting, and mobile behavior without changing site code.
 - A non-developer can upload a PDF, place fields, create a signing link, and receive a completed document.
 - A workspace can invite team members, assign roles, view audit timelines, and inspect failed jobs.
