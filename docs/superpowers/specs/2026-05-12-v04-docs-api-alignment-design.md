@@ -107,11 +107,13 @@ const widget = DropSign.init({
     console.log(result.placement);
   },
 });
-
-widget.destroy();
 ```
 
-The example should not mention `imageBlob`.
+The example should not mention `imageBlob`. It also should not call `widget.destroy()`
+inside the minimal quick start because doing so immediately removes the SDK-created
+trigger and prevents the user from opening the signing flow. Cleanup can be shown later
+as lifecycle guidance, such as calling `widget.destroy()` when a page, route, or host
+component unmounts.
 
 ### Trigger Modes
 
