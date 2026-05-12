@@ -248,6 +248,16 @@ DropSign includes mobile and touch behavior out of the box:
 | `onCancel` | `() => void` | - | Called when signing or placement is cancelled |
 | `onError` | `(error: unknown) => void` | - | Called on recoverable SDK errors |
 
+### Error handling
+
+DropSign reports recoverable errors through `onError` without throwing to the host app:
+
+- If `target` is a selector and no matching element is found, `onError` is called and
+  `DropSign.init()` returns a no-op widget.
+- If `trigger.type` is `custom` and `element` does not resolve to an `HTMLElement`,
+  `onError` is called and `DropSign.init()` returns a no-op widget.
+- If converting the signature data URL to `signatureBlob` fails, `onError` is called.
+
 ### `DropSignTrigger`
 
 ```ts
@@ -475,7 +485,7 @@ Expected:
 Run:
 
 ```bash
-rg "imageBlob|capture\.|floating|inline trigger|buttonText|SignaturePlacement|signed area" README.md
+rg "imageBlob|capture\.|floating|inline|buttonText|SignaturePlacement|signed area" README.md
 rg "v0\.2|Signature captured" examples/basic
 ```
 
