@@ -1,6 +1,6 @@
 # Widget Platform Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Build DropSign Cloud Phase 02: a CDN-installed website widget platform that loads public project config, enforces allowed origins and page targeting, boots the DropSign SDK, accepts runtime identity/context, uploads signature artifacts with WidgetSession tokens, and exposes tested browser and API contracts.
 
@@ -210,11 +210,11 @@ window.DropSign.open();
 - Modify: `/Users/minjun/Documents/dropsign-cloud/packages/contracts/src/index.ts`
 - Create: `/Users/minjun/Documents/dropsign-cloud/packages/contracts/src/widget.test.ts`
 
-- [ ] **Step 1: Verify the contracts package scaffold**
+- [x] **Step 1: Verify the contracts package scaffold**
 
 Phase 01 should already create `@dropsign/contracts` with `package.json`, `tsconfig.json`, and `src/index.ts`. If the package is missing because Phase 01 was executed before this review update, create those files now using the same placeholder shared-package shape from Phase 01 before writing widget contracts.
 
-- [ ] **Step 2: Write failing contract tests**
+- [x] **Step 2: Write failing contract tests**
 
 Create `/Users/minjun/Documents/dropsign-cloud/packages/contracts/src/widget.test.ts`:
 
@@ -293,7 +293,7 @@ describe('widget contracts', () => {
 });
 ```
 
-- [ ] **Step 2: Run contract tests and verify failure**
+- [x] **Step 2: Run contract tests and verify failure**
 
 Run:
 
@@ -304,7 +304,7 @@ pnpm vitest run packages/contracts/src/widget.test.ts
 
 Expected: FAIL with an import error for `./widget` or missing exported schemas.
 
-- [ ] **Step 3: Implement shared contracts**
+- [x] **Step 3: Implement shared contracts**
 
 Create `/Users/minjun/Documents/dropsign-cloud/packages/contracts/src/widget.ts`:
 
@@ -429,7 +429,7 @@ export * from './widget.js';
 
 If `index.ts` already exports Phase 01 modules, append `export * from './widget.js';` without deleting existing exports.
 
-- [ ] **Step 4: Run contract tests and verify pass**
+- [x] **Step 4: Run contract tests and verify pass**
 
 Run:
 
@@ -440,7 +440,7 @@ pnpm vitest run packages/contracts/src/widget.test.ts
 
 Expected: PASS for all 3 widget contract tests.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /Users/minjun/Documents/dropsign-cloud
@@ -457,7 +457,7 @@ git commit -m "feat: add widget platform contracts"
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/widget/widget.routes.test.ts`
 - Modify: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts`
 
-- [ ] **Step 1: Write failing API tests for config and cache semantics**
+- [x] **Step 1: Write failing API tests for config and cache semantics**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/widget/widget.routes.test.ts`:
 
@@ -553,7 +553,7 @@ describe('widget public routes', () => {
 });
 ```
 
-- [ ] **Step 2: Run API tests and verify failure**
+- [x] **Step 2: Run API tests and verify failure**
 
 Run:
 
@@ -564,7 +564,7 @@ pnpm vitest run apps/api/src/widget/widget.routes.test.ts
 
 Expected: FAIL because `widget.routes.ts`, seed helpers, and mounted routes do not exist.
 
-- [ ] **Step 3: Implement config schema, repository, and routes**
+- [x] **Step 3: Implement config schema, repository, and routes**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/widget/widgetConfig.schema.ts`:
 
@@ -742,7 +742,7 @@ await app.register(createWidgetPlugin({
 }));
 ```
 
-- [ ] **Step 4: Add test seed helper**
+- [x] **Step 4: Add test seed helper**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/widget/widget.seed.test.ts`:
 
@@ -784,7 +784,7 @@ export async function seedProjectWithWidgetConfig(db: {
 }
 ```
 
-- [ ] **Step 5: Run API tests and verify pass**
+- [x] **Step 5: Run API tests and verify pass**
 
 Run:
 
@@ -795,7 +795,7 @@ pnpm vitest run apps/api/src/widget/widget.routes.test.ts
 
 Expected: PASS for config, origin rejection, no-cache bootstrap, and immutable asset header tests.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd /Users/minjun/Documents/dropsign-cloud
@@ -811,7 +811,7 @@ git commit -m "feat: expose widget config and CDN bootstrap routes"
 - Modify: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/widget/widget.routes.ts`
 - Modify: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/widget/widget.routes.test.ts`
 
-- [ ] **Step 1: Add failing ingest security tests**
+- [x] **Step 1: Add failing ingest security tests**
 
 Append to `/Users/minjun/Documents/dropsign-cloud/apps/api/src/widget/widget.routes.test.ts`:
 
@@ -1056,7 +1056,7 @@ describe('widget artifact ingest', () => {
 });
 ```
 
-- [ ] **Step 2: Run ingest tests and verify failure**
+- [x] **Step 2: Run ingest tests and verify failure**
 
 Run:
 
@@ -1067,7 +1067,7 @@ pnpm vitest run apps/api/src/widget/widget.routes.test.ts -t "widget artifact in
 
 Expected: FAIL because `signWidgetSession`, `POST /v1/widget/artifacts`, and artifact persistence are missing.
 
-- [ ] **Step 3: Implement WidgetSession signing and verification**
+- [x] **Step 3: Implement WidgetSession signing and verification**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/widget/widgetSession.ts`:
 
@@ -1123,7 +1123,7 @@ export async function verifyWidgetSession(input: {
 }
 ```
 
-- [ ] **Step 4: Implement artifact repository and route**
+- [x] **Step 4: Implement artifact repository and route**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/widget/widgetArtifact.repository.ts`:
 
@@ -1244,7 +1244,7 @@ app.post('/v1/widget/artifacts', async (request, reply) => {
 
 Update the router dependency type to include `WIDGET_SESSION_SECRET: string`.
 
-- [ ] **Step 5: Run ingest tests and verify pass**
+- [x] **Step 5: Run ingest tests and verify pass**
 
 Run:
 
@@ -1255,7 +1255,7 @@ pnpm vitest run apps/api/src/widget/widget.routes.test.ts -t "widget artifact in
 
 Expected: PASS for missing token rejection, accepted matching token, expired token rejection, project key mismatch rejection, and origin mismatch rejection.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd /Users/minjun/Documents/dropsign-cloud
@@ -1276,7 +1276,7 @@ git commit -m "feat: validate widget sessions for artifact ingest"
 - Modify: `/Users/minjun/Documents/dropsign-cloud/package.json`
 - Modify: `/Users/minjun/Documents/dropsign-cloud/pnpm-workspace.yaml`
 
-- [ ] **Step 1: Add failing build expectation**
+- [x] **Step 1: Add failing build expectation**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/widget/src/main.ts`:
 
@@ -1322,7 +1322,7 @@ declare global {
 }
 ```
 
-- [ ] **Step 2: Run build command and verify failure**
+- [x] **Step 2: Run build command and verify failure**
 
 Run:
 
@@ -1333,7 +1333,7 @@ pnpm --filter @dropsign/widget build
 
 Expected: FAIL because `apps/widget/package.json` and Vite config do not exist.
 
-- [ ] **Step 3: Add widget package and Vite config**
+- [x] **Step 3: Add widget package and Vite config**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/widget/package.json`:
 
@@ -1441,7 +1441,7 @@ Modify root `/Users/minjun/Documents/dropsign-cloud/package.json` scripts:
 
 Preserve all existing scripts and add only the three widget scripts.
 
-- [ ] **Step 4: Run widget build and verify pass**
+- [x] **Step 4: Run widget build and verify pass**
 
 Run:
 
@@ -1454,7 +1454,7 @@ test -f dist/widget-assets/v1.0.0/drop-sign-widget.iife.js
 
 Expected: `pnpm --filter @dropsign/widget build` exits 0 and `test -f` exits 0.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /Users/minjun/Documents/dropsign-cloud
@@ -1470,7 +1470,7 @@ git commit -m "feat: add widget Vite application"
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/widget/src/__tests__/pageTargeting.test.ts`
 - Modify: `/Users/minjun/Documents/dropsign-cloud/apps/widget/src/types.ts`
 
-- [ ] **Step 1: Write failing widget unit tests**
+- [x] **Step 1: Write failing widget unit tests**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/widget/src/__tests__/pageTargeting.test.ts`:
 
@@ -1528,7 +1528,7 @@ describe('discoverWidgetScript', () => {
 });
 ```
 
-- [ ] **Step 2: Run widget tests and verify failure**
+- [x] **Step 2: Run widget tests and verify failure**
 
 Run:
 
@@ -1539,7 +1539,7 @@ pnpm --filter @dropsign/widget test -- src/__tests__/pageTargeting.test.ts
 
 Expected: FAIL because `pageTargeting.ts` and `scriptDiscovery.ts` do not exist.
 
-- [ ] **Step 3: Implement targeting and script discovery**
+- [x] **Step 3: Implement targeting and script discovery**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/widget/src/pageTargeting.ts`:
 
@@ -1584,7 +1584,7 @@ export function discoverWidgetScript(script: HTMLScriptElement | null = document
 }
 ```
 
-- [ ] **Step 4: Run widget tests and verify pass**
+- [x] **Step 4: Run widget tests and verify pass**
 
 Run:
 
@@ -1595,7 +1595,7 @@ pnpm --filter @dropsign/widget test -- src/__tests__/pageTargeting.test.ts
 
 Expected: PASS for all targeting and script discovery tests.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /Users/minjun/Documents/dropsign-cloud
@@ -1610,7 +1610,7 @@ git commit -m "feat: add widget page targeting"
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/widget/src/__tests__/dropSignGlobal.test.ts`
 - Modify: `/Users/minjun/Documents/dropsign-cloud/apps/widget/src/types.ts`
 
-- [ ] **Step 1: Write failing global API tests**
+- [x] **Step 1: Write failing global API tests**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/widget/src/__tests__/dropSignGlobal.test.ts`:
 
@@ -1667,7 +1667,7 @@ describe('createDropSignGlobal', () => {
 });
 ```
 
-- [ ] **Step 2: Run global API tests and verify failure**
+- [x] **Step 2: Run global API tests and verify failure**
 
 Run:
 
@@ -1678,7 +1678,7 @@ pnpm --filter @dropsign/widget test -- src/__tests__/dropSignGlobal.test.ts
 
 Expected: FAIL because `dropSignGlobal.ts` does not exist.
 
-- [ ] **Step 3: Implement global API**
+- [x] **Step 3: Implement global API**
 
 Modify `/Users/minjun/Documents/dropsign-cloud/apps/widget/src/types.ts` to include:
 
@@ -1796,7 +1796,7 @@ export function installDropSignGlobal(): InternalApi {
 }
 ```
 
-- [ ] **Step 4: Run global API tests and verify pass**
+- [x] **Step 4: Run global API tests and verify pass**
 
 Run:
 
@@ -1807,7 +1807,7 @@ pnpm --filter @dropsign/widget test -- src/__tests__/dropSignGlobal.test.ts
 
 Expected: PASS for identity/context storage and callback emission.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /Users/minjun/Documents/dropsign-cloud
@@ -1822,7 +1822,7 @@ git commit -m "feat: expose widget runtime API"
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/widget/src/sdkBoot.ts`
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/widget/src/__tests__/apiClient.test.ts`
 
-- [ ] **Step 1: Write failing API client tests**
+- [x] **Step 1: Write failing API client tests**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/widget/src/__tests__/apiClient.test.ts`:
 
@@ -1910,7 +1910,7 @@ describe('createWidgetApiClient', () => {
 });
 ```
 
-- [ ] **Step 2: Run API client tests and verify failure**
+- [x] **Step 2: Run API client tests and verify failure**
 
 Run:
 
@@ -1921,7 +1921,7 @@ pnpm --filter @dropsign/widget test -- src/__tests__/apiClient.test.ts
 
 Expected: FAIL because `apiClient.ts` does not exist.
 
-- [ ] **Step 3: Implement API client and SDK boot wrapper**
+- [x] **Step 3: Implement API client and SDK boot wrapper**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/widget/src/apiClient.ts`:
 
@@ -2038,7 +2038,7 @@ export function createWidgetSdk(): WidgetSdk {
 }
 ```
 
-- [ ] **Step 4: Run API client tests and verify pass**
+- [x] **Step 4: Run API client tests and verify pass**
 
 Run:
 
@@ -2049,7 +2049,7 @@ pnpm --filter @dropsign/widget test -- src/__tests__/apiClient.test.ts
 
 Expected: PASS for config URL construction and artifact upload headers.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /Users/minjun/Documents/dropsign-cloud
@@ -2065,7 +2065,7 @@ git commit -m "feat: add widget API client and SDK boot"
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/widget/tests/widget.browser.spec.ts`
 - Modify: `/Users/minjun/Documents/dropsign-cloud/playwright.config.ts`
 
-- [ ] **Step 1: Write failing browser tests**
+- [x] **Step 1: Write failing browser tests**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/widget/tests/widget.browser.spec.ts`:
 
@@ -2252,7 +2252,7 @@ export default defineConfig({
 });
 ```
 
-- [ ] **Step 2: Run browser tests and verify failure**
+- [x] **Step 2: Run browser tests and verify failure**
 
 Run:
 
@@ -2263,7 +2263,7 @@ pnpm --filter @dropsign/widget test:browser -- apps/widget/tests/widget.browser.
 
 Expected: FAIL because widget orchestration and deterministic SDK test hook are missing.
 
-- [ ] **Step 3: Implement orchestration**
+- [x] **Step 3: Implement orchestration**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/widget/src/widget.ts`:
 
@@ -2438,7 +2438,7 @@ void bootWidget({
 });
 ```
 
-- [ ] **Step 4: Run browser tests and verify pass**
+- [x] **Step 4: Run browser tests and verify pass**
 
 Run:
 
@@ -2449,7 +2449,7 @@ pnpm --filter @dropsign/widget test:browser -- apps/widget/tests/widget.browser.
 
 Expected: PASS for boot/upload/callback behavior and config failure behavior.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /Users/minjun/Documents/dropsign-cloud
@@ -2464,7 +2464,7 @@ git commit -m "feat: boot widget signing flow"
 - Modify: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts`
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/widget/tests/bootstrap-cache.spec.ts`
 
-- [ ] **Step 1: Write failing bootstrap integration test**
+- [x] **Step 1: Write failing bootstrap integration test**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/widget/tests/bootstrap-cache.spec.ts`:
 
@@ -2509,7 +2509,7 @@ test('bootstrap loads immutable versioned widget asset from script tag project k
 });
 ```
 
-- [ ] **Step 2: Run bootstrap browser test and verify failure**
+- [x] **Step 2: Run bootstrap browser test and verify failure**
 
 Run:
 
@@ -2520,7 +2520,7 @@ pnpm --filter @dropsign/widget test:browser -- apps/widget/tests/bootstrap-cache
 
 Expected: FAIL if the bootstrap does not copy `data-project-key` or if the widget entry throws on 204 page-not-targeted.
 
-- [ ] **Step 3: Serve built assets from disk with immutable headers**
+- [x] **Step 3: Serve built assets from disk with immutable headers**
 
 Modify `/Users/minjun/Documents/dropsign-cloud/apps/api/src/widget/widget.routes.ts` to replace the test shim route body with file serving:
 
@@ -2563,7 +2563,7 @@ Modify `/Users/minjun/Documents/dropsign-cloud/apps/widget/src/widget.ts` so `pa
   }
 ```
 
-- [ ] **Step 4: Build widget and run cache tests**
+- [x] **Step 4: Build widget and run cache tests**
 
 Run:
 
@@ -2576,7 +2576,7 @@ pnpm --filter @dropsign/widget test:browser -- apps/widget/tests/bootstrap-cache
 
 Expected: widget build exits 0; API immutable asset test passes against disk asset; browser bootstrap test passes.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /Users/minjun/Documents/dropsign-cloud
@@ -2589,7 +2589,7 @@ git commit -m "feat: serve immutable widget assets"
 **Files:**
 - Modify only files already touched in Tasks 1-9 if verification exposes a defect.
 
-- [ ] **Step 1: Run focused widget and API tests**
+- [x] **Step 1: Run focused widget and API tests**
 
 Run:
 
@@ -2602,7 +2602,7 @@ pnpm --filter @dropsign/widget test:browser -- apps/widget/tests/widget.browser.
 
 Expected: all tests pass. Expected focused coverage includes contract shape, allowed-origin rejection, page targeting, no-cache `widget.js`, immutable assets, WidgetSession mismatch rejection, successful artifact ingest, browser boot, callbacks, SDK open, upload, and config failure.
 
-- [ ] **Step 2: Run repository quality gates**
+- [x] **Step 2: Run repository quality gates**
 
 Run:
 
@@ -2616,7 +2616,7 @@ pnpm build
 
 Expected: all commands exit 0. If `pnpm build` creates generated files under `dist/`, do not commit generated `dist/` unless the cloud repository explicitly tracks deployment artifacts.
 
-- [ ] **Step 3: Inspect changed files**
+- [x] **Step 3: Inspect changed files**
 
 Run:
 
@@ -2628,7 +2628,7 @@ git diff --stat
 
 Expected: changed files are limited to the exact cloud paths listed in this plan plus lockfile updates from `pnpm install`. No files under `/Users/minjun/Documents/drop-sign` are changed.
 
-- [ ] **Step 4: Commit verification fixes if any were required**
+- [x] **Step 4: Commit verification fixes if any were required**
 
 If Step 1 or Step 2 required corrections, commit the corrections:
 

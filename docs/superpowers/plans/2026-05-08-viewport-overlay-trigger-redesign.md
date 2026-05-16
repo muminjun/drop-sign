@@ -1,6 +1,6 @@
 # DropSign v0.4 — Viewport Overlay & Trigger Redesign Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Redesign DropSign as a pure placement UI layer — full-viewport overlay, two trigger types (global/custom), and normalized coordinate output instead of PNG capture.
 
@@ -33,7 +33,7 @@
 - Modify: `src/types.ts`
 - Modify: `src/DropSign.test.ts` (remove captureResult describe block + broken imports)
 
-- [ ] **Step 1: Rewrite `src/types.ts`**
+- [x] **Step 1: Rewrite `src/types.ts`**
 
 Replace the entire file with:
 
@@ -97,7 +97,7 @@ export interface DropSignWidget {
 }
 ```
 
-- [ ] **Step 2: Remove captureResult block from `src/DropSign.test.ts`**
+- [x] **Step 2: Remove captureResult block from `src/DropSign.test.ts`**
 
 Delete lines 1–9 (the `import { captureResult }` line and the `vi.mock('html-to-image', ...)` block):
 
@@ -111,7 +111,7 @@ Then delete the entire `describe('captureResult', ...)` block (lines 256–351).
 
 Also delete the `afterEach` block (lines 276–278) that was inside `captureResult` — it will move to that describe block's scope and doesn't exist elsewhere.
 
-- [ ] **Step 3: Run typecheck to see compile errors**
+- [x] **Step 3: Run typecheck to see compile errors**
 
 ```bash
 pnpm typecheck 2>&1 | head -60
@@ -119,7 +119,7 @@ pnpm typecheck 2>&1 | head -60
 
 Expected: errors in `DropSign.ts`, `trigger.ts`, `capture.ts` (they still reference old types). This is expected — we'll fix each in subsequent tasks.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/types.ts src/DropSign.test.ts
@@ -134,7 +134,7 @@ git commit -m "refactor: new types for v0.4 — NormalizedPlacement, global/cust
 - Modify: `src/trigger.ts`
 - Modify: `src/DropSign.test.ts` (rewrite trigger mode tests)
 
-- [ ] **Step 1: Write the failing trigger tests**
+- [x] **Step 1: Write the failing trigger tests**
 
 Replace the entire `describe('trigger modes', ...)` block in `src/DropSign.test.ts` with:
 
@@ -241,7 +241,7 @@ describe('trigger modes', () => {
 });
 ```
 
-- [ ] **Step 2: Also update the `DropSign.init` describe block tests that reference old behavior**
+- [x] **Step 2: Also update the `DropSign.init` describe block tests that reference old behavior**
 
 In `describe('DropSign.init', ...)`, update:
 
@@ -257,7 +257,7 @@ it('appends sign button to document.body', () => {
 
 Delete the `'uses custom buttonText'` test (buttonText option is removed).
 
-- [ ] **Step 3: Run tests to confirm failures**
+- [x] **Step 3: Run tests to confirm failures**
 
 ```bash
 pnpm exec vitest run src/DropSign.test.ts 2>&1 | tail -30
@@ -265,7 +265,7 @@ pnpm exec vitest run src/DropSign.test.ts 2>&1 | tail -30
 
 Expected: multiple FAIL — trigger mode tests reference new behavior that doesn't exist yet, plus type errors from old DropSign.ts.
 
-- [ ] **Step 4: Rewrite `src/trigger.ts`**
+- [x] **Step 4: Rewrite `src/trigger.ts`**
 
 Replace the entire file with:
 
@@ -339,7 +339,7 @@ export function attachCustomTrigger(
 }
 ```
 
-- [ ] **Step 5: Run tests (they will still fail because DropSign.ts hasn't been updated yet — that's fine)**
+- [x] **Step 5: Run tests (they will still fail because DropSign.ts hasn't been updated yet — that's fine)**
 
 ```bash
 pnpm exec vitest run src/DropSign.test.ts 2>&1 | tail -20
@@ -347,7 +347,7 @@ pnpm exec vitest run src/DropSign.test.ts 2>&1 | tail -20
 
 Expected: compile/import errors from DropSign.ts referencing the old trigger functions. Move on.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/trigger.ts src/DropSign.test.ts
@@ -361,7 +361,7 @@ git commit -m "refactor: trigger.ts — global + custom only, remove inline/floa
 **Files:**
 - Modify: `src/overlay.ts`
 
-- [ ] **Step 1: Rewrite `src/overlay.ts`**
+- [x] **Step 1: Rewrite `src/overlay.ts`**
 
 Replace the entire file with:
 
@@ -409,7 +409,7 @@ export function createOverlayContainer(): OverlayContainer {
 }
 ```
 
-- [ ] **Step 2: Run typecheck to confirm overlay.ts is clean**
+- [x] **Step 2: Run typecheck to confirm overlay.ts is clean**
 
 ```bash
 pnpm typecheck 2>&1 | grep overlay
@@ -417,7 +417,7 @@ pnpm typecheck 2>&1 | grep overlay
 
 Expected: no errors from overlay.ts. Errors from DropSign.ts calling the old signature are expected.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/overlay.ts
@@ -432,7 +432,7 @@ git commit -m "refactor: overlay — body-mounted position:fixed, remove targetE
 - Modify: `src/placement.ts`
 - Modify: `src/DropSign.test.ts` (add placement unit tests)
 
-- [ ] **Step 1: Write failing placement tests**
+- [x] **Step 1: Write failing placement tests**
 
 Add this import at the top of `src/DropSign.test.ts`:
 
@@ -547,7 +547,7 @@ describe('createPlacementBox — getPlacement', () => {
 });
 ```
 
-- [ ] **Step 2: Run tests to confirm failures**
+- [x] **Step 2: Run tests to confirm failures**
 
 ```bash
 pnpm exec vitest run src/DropSign.test.ts --reporter=verbose 2>&1 | grep -E "(FAIL|PASS|✓|×)" | head -30
@@ -555,7 +555,7 @@ pnpm exec vitest run src/DropSign.test.ts --reporter=verbose 2>&1 | grep -E "(FA
 
 Expected: `createPlacementBox — getPlacement` tests fail (old signature / wrong return type).
 
-- [ ] **Step 3: Rewrite `src/placement.ts`**
+- [x] **Step 3: Rewrite `src/placement.ts`**
 
 Replace the entire file with:
 
@@ -765,7 +765,7 @@ function setupResize(
 }
 ```
 
-- [ ] **Step 4: Run the placement tests**
+- [x] **Step 4: Run the placement tests**
 
 ```bash
 pnpm exec vitest run src/DropSign.test.ts --reporter=verbose 2>&1 | grep -E "createPlacementBox"
@@ -773,7 +773,7 @@ pnpm exec vitest run src/DropSign.test.ts --reporter=verbose 2>&1 | grep -E "cre
 
 Expected: all 4 `createPlacementBox — getPlacement` tests PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/placement.ts src/DropSign.test.ts
@@ -788,7 +788,7 @@ git commit -m "refactor: placement — viewport drag bounds, NormalizedPlacement
 - Modify: `src/DropSign.ts`
 - Modify: `src/DropSign.test.ts` (add onComplete result shape test)
 
-- [ ] **Step 1: Add an integration test for onComplete result shape**
+- [x] **Step 1: Add an integration test for onComplete result shape**
 
 Add at the end of `describe('DropSign.init', ...)` in `src/DropSign.test.ts`:
 
@@ -812,7 +812,7 @@ it('onComplete receives signatureDataUrl, signatureBlob, and placement', async (
 });
 ```
 
-- [ ] **Step 2: Run tests to confirm this test passes (it's minimal — just verifies no crash on init without target)**
+- [x] **Step 2: Run tests to confirm this test passes (it's minimal — just verifies no crash on init without target)**
 
 ```bash
 pnpm exec vitest run src/DropSign.test.ts 2>&1 | tail -20
@@ -820,7 +820,7 @@ pnpm exec vitest run src/DropSign.test.ts 2>&1 | tail -20
 
 Expected: tests still fail because DropSign.ts hasn't been updated. Move on.
 
-- [ ] **Step 3: Rewrite `src/DropSign.ts`**
+- [x] **Step 3: Rewrite `src/DropSign.ts`**
 
 Replace the entire file with:
 
@@ -968,7 +968,7 @@ export class DropSign {
 }
 ```
 
-- [ ] **Step 4: Run all tests**
+- [x] **Step 4: Run all tests**
 
 ```bash
 pnpm exec vitest run src/DropSign.test.ts --reporter=verbose 2>&1 | tail -40
@@ -976,7 +976,7 @@ pnpm exec vitest run src/DropSign.test.ts --reporter=verbose 2>&1 | tail -40
 
 Expected: all tests PASS. If any fail, check the error message and fix.
 
-- [ ] **Step 5: Run typecheck**
+- [x] **Step 5: Run typecheck**
 
 ```bash
 pnpm typecheck
@@ -984,7 +984,7 @@ pnpm typecheck
 
 Expected: errors only from `capture.ts` (still exists, still imports deleted types) and possibly `index.ts`. Fix by proceeding to Task 6.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/DropSign.ts src/DropSign.test.ts
@@ -1001,13 +1001,13 @@ git commit -m "refactor: DropSign.ts — target optional, remove captureResult, 
 - Modify: `src/index.ts`
 - Modify: `package.json`
 
-- [ ] **Step 1: Delete `src/capture.ts`**
+- [x] **Step 1: Delete `src/capture.ts`**
 
 ```bash
 rm src/capture.ts
 ```
 
-- [ ] **Step 2: Update `src/index.ts`**
+- [x] **Step 2: Update `src/index.ts`**
 
 Replace the entire file with:
 
@@ -1025,7 +1025,7 @@ export type {
 } from './types.js';
 ```
 
-- [ ] **Step 3: Update `.ds-button` and `.ds-placement-overlay` in `src/styles.ts`**
+- [x] **Step 3: Update `.ds-button` and `.ds-placement-overlay` in `src/styles.ts`**
 
 Change `.ds-button` from `position: absolute` to `position: fixed`:
 
@@ -1059,7 +1059,7 @@ Change `.ds-placement-overlay` from `position: absolute` + `overflow: hidden` to
   }
 ```
 
-- [ ] **Step 4: Remove `html-to-image` from `package.json`**
+- [x] **Step 4: Remove `html-to-image` from `package.json`**
 
 Remove this line from `"dependencies"`:
 ```json
@@ -1071,7 +1071,7 @@ Then run:
 pnpm install
 ```
 
-- [ ] **Step 5: Run full test suite**
+- [x] **Step 5: Run full test suite**
 
 ```bash
 pnpm test
@@ -1079,7 +1079,7 @@ pnpm test
 
 Expected: all tests PASS, zero failures.
 
-- [ ] **Step 6: Run typecheck and lint**
+- [x] **Step 6: Run typecheck and lint**
 
 ```bash
 pnpm typecheck && pnpm lint
@@ -1087,7 +1087,7 @@ pnpm typecheck && pnpm lint
 
 Expected: no errors, no warnings.
 
-- [ ] **Step 7: Build**
+- [x] **Step 7: Build**
 
 ```bash
 pnpm build
@@ -1095,7 +1095,7 @@ pnpm build
 
 Expected: `dist/` generated without errors.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add src/capture.ts src/styles.ts src/index.ts package.json pnpm-lock.yaml

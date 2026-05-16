@@ -1,6 +1,6 @@
 # DropSign v0.3 — Trackpad Fix & `afterConfirm` Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Fix MacBook trackpad drawing in the signature canvas and add an `afterConfirm` option so the signed result can be persisted in the DOM, captured as PNG, or both.
 
@@ -27,7 +27,7 @@
 **Files:**
 - Modify: `src/signature-pad.ts:33`
 
-- [ ] **Step 1: Add inline style after canvas class assignment**
+- [x] **Step 1: Add inline style after canvas class assignment**
 
 In `src/signature-pad.ts`, after `canvas.className = 'ds-canvas'` (line 33), add:
 
@@ -39,7 +39,7 @@ canvas.width = 480;
 canvas.height = 200;
 ```
 
-- [ ] **Step 2: Typecheck**
+- [x] **Step 2: Typecheck**
 
 ```bash
 pnpm typecheck
@@ -47,7 +47,7 @@ pnpm typecheck
 
 Expected: no errors.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/signature-pad.ts
@@ -61,7 +61,7 @@ git commit -m "fix: set touch-action:none inline on canvas for trackpad support"
 **Files:**
 - Modify: `src/types.ts`
 
-- [ ] **Step 1: Replace `DropSignResult` and update `DropSignOptions`**
+- [x] **Step 1: Replace `DropSignResult` and update `DropSignOptions`**
 
 Open `src/types.ts`. Replace the existing `DropSignResult` interface and update `DropSignOptions` so the file reads:
 
@@ -165,7 +165,7 @@ export interface DropSignWidget {
 }
 ```
 
-- [ ] **Step 2: Typecheck**
+- [x] **Step 2: Typecheck**
 
 ```bash
 pnpm typecheck
@@ -173,7 +173,7 @@ pnpm typecheck
 
 Expected: errors in `src/DropSign.ts` and `src/capture.ts` because they still reference the old `DropSignResult` shape — that's fine, we fix those in Tasks 3 and 4.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/types.ts
@@ -188,7 +188,7 @@ git commit -m "feat(types): add afterConfirm option and discriminated DropSignRe
 - Modify: `src/capture.ts`
 - Test: `src/DropSign.test.ts`
 
-- [ ] **Step 1: Write failing tests for `persistResult()`**
+- [x] **Step 1: Write failing tests for `persistResult()`**
 
 In `src/DropSign.test.ts`, add the following `describe` block after the existing `captureResult` describe block (before the final closing brace of the file):
 
@@ -257,7 +257,7 @@ Also add `persistResult` to the import at the top of the test file:
 import { captureResult, persistResult } from './capture.js';
 ```
 
-- [ ] **Step 2: Run tests to confirm they fail**
+- [x] **Step 2: Run tests to confirm they fail**
 
 ```bash
 pnpm exec vitest run src/DropSign.test.ts
@@ -265,7 +265,7 @@ pnpm exec vitest run src/DropSign.test.ts
 
 Expected: `persistResult` tests FAIL with "persistResult is not a function" or import error.
 
-- [ ] **Step 3: Implement `persistResult()` and export `dataUrlToBlob` in `capture.ts`**
+- [x] **Step 3: Implement `persistResult()` and export `dataUrlToBlob` in `capture.ts`**
 
 Replace the full content of `src/capture.ts` with:
 
@@ -343,7 +343,7 @@ export async function dataUrlToBlob(dataUrl: string): Promise<Blob> {
 
 Note: `captureResult` return type is now a plain object (not `DropSignResult`) because the discriminant field is added by `DropSign.ts`. The `DropSignResult` import is no longer needed — remove it from the import line.
 
-- [ ] **Step 4: Run tests to confirm they pass**
+- [x] **Step 4: Run tests to confirm they pass**
 
 ```bash
 pnpm exec vitest run src/DropSign.test.ts
@@ -351,7 +351,7 @@ pnpm exec vitest run src/DropSign.test.ts
 
 Expected: all `persistResult` tests PASS. All existing `captureResult` tests still PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/capture.ts src/DropSign.test.ts
@@ -365,7 +365,7 @@ git commit -m "feat(capture): add persistResult() and export dataUrlToBlob"
 **Files:**
 - Modify: `src/DropSign.ts`
 
-- [ ] **Step 1: Rewrite `DropSign.ts`**
+- [x] **Step 1: Rewrite `DropSign.ts`**
 
 Replace the full content of `src/DropSign.ts` with:
 
@@ -612,7 +612,7 @@ export class DropSign {
 }
 ```
 
-- [ ] **Step 2: Typecheck**
+- [x] **Step 2: Typecheck**
 
 ```bash
 pnpm typecheck
@@ -620,7 +620,7 @@ pnpm typecheck
 
 Expected: no errors.
 
-- [ ] **Step 3: Run all tests**
+- [x] **Step 3: Run all tests**
 
 ```bash
 pnpm test
@@ -628,7 +628,7 @@ pnpm test
 
 Expected: all tests PASS.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/DropSign.ts
@@ -642,7 +642,7 @@ git commit -m "feat: implement afterConfirm option with persist/capture/both mod
 **Files:**
 - Modify: `src/DropSign.test.ts`
 
-- [ ] **Step 1: Add `afterConfirm` mode tests to the `persistResult` describe block**
+- [x] **Step 1: Add `afterConfirm` mode tests to the `persistResult` describe block**
 
 Append the following tests inside the existing `describe('persistResult', ...)` block (after the last `it(...)` inside it):
 
@@ -671,7 +671,7 @@ Append the following tests inside the existing `describe('persistResult', ...)` 
   });
 ```
 
-- [ ] **Step 2: Add a `describe` block for `afterConfirm` modes via `dataUrlToBlob`**
+- [x] **Step 2: Add a `describe` block for `afterConfirm` modes via `dataUrlToBlob`**
 
 Add the following after the `persistResult` describe block in `src/DropSign.test.ts`:
 
@@ -697,7 +697,7 @@ Also add `dataUrlToBlob` to the import at the top of the file:
 import { captureResult, persistResult, dataUrlToBlob } from './capture.js';
 ```
 
-- [ ] **Step 3: Run all tests**
+- [x] **Step 3: Run all tests**
 
 ```bash
 pnpm test
@@ -705,7 +705,7 @@ pnpm test
 
 Expected: all tests PASS.
 
-- [ ] **Step 4: Lint**
+- [x] **Step 4: Lint**
 
 ```bash
 pnpm lint
@@ -713,7 +713,7 @@ pnpm lint
 
 Expected: no errors or warnings.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/DropSign.test.ts
@@ -727,11 +727,11 @@ git commit -m "test: add persistResult and dataUrlToBlob unit tests"
 **Files:**
 - Modify: `package.json`
 
-- [ ] **Step 1: Bump version to 0.3.0**
+- [x] **Step 1: Bump version to 0.3.0**
 
 In `package.json`, change `"version": "0.1.0"` to `"version": "0.3.0"`.
 
-- [ ] **Step 2: Build**
+- [x] **Step 2: Build**
 
 ```bash
 pnpm build
@@ -739,7 +739,7 @@ pnpm build
 
 Expected: `dist/` regenerated with no errors.
 
-- [ ] **Step 3: Full test + typecheck + lint**
+- [x] **Step 3: Full test + typecheck + lint**
 
 ```bash
 pnpm test && pnpm typecheck && pnpm lint
@@ -747,7 +747,7 @@ pnpm test && pnpm typecheck && pnpm lint
 
 Expected: all pass.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add package.json

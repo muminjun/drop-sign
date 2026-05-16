@@ -1,6 +1,6 @@
 # DropSign Platform v1 Phase 01 Cloud Foundation Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Build the DropSign Cloud foundation as a sibling pnpm TypeScript monorepo with a tenant-aware Fastify API, Prisma PostgreSQL schema, auth/session base, storage abstraction, health endpoint, project create/list endpoints, and base tests.
 
@@ -70,7 +70,7 @@ Do not edit `/Users/minjun/Documents/drop-sign/tsup.config.ts`. Do not edit any 
 - Create: `/Users/minjun/Documents/dropsign-cloud/.gitignore`
 - Create: `/Users/minjun/Documents/dropsign-cloud/.env.example`
 
-- [ ] **Step 1: Create the sibling repo directory**
+- [x] **Step 1: Create the sibling repo directory**
 
 Run:
 
@@ -83,7 +83,7 @@ mkdir -p apps/api apps/web apps/widget apps/worker apps/e2e packages/config pack
 
 Expected: `Initialized empty Git repository in /Users/minjun/Documents/dropsign-cloud/.git/` if the directory has no existing Git repository. If Git reports `Reinitialized existing Git repository`, continue only when `git status --short` shows no unrelated user work.
 
-- [ ] **Step 2: Write the workspace files**
+- [x] **Step 2: Write the workspace files**
 
 Create `/Users/minjun/Documents/dropsign-cloud/package.json`:
 
@@ -240,7 +240,7 @@ DATABASE_URL=postgresql://dropsign:dropsign@localhost:5432/dropsign_cloud
 SESSION_HEADER_SECRET=replace-with-32-byte-local-secret
 ```
 
-- [ ] **Step 3: Create placeholder shared packages used by later phases**
+- [x] **Step 3: Create placeholder shared packages used by later phases**
 
 Create these directories:
 
@@ -279,7 +279,7 @@ Create `/Users/minjun/Documents/dropsign-cloud/apps/e2e/package.json`:
 }
 ```
 
-- [ ] **Step 4: Install dependencies**
+- [x] **Step 4: Install dependencies**
 
 Run:
 
@@ -290,7 +290,7 @@ pnpm install
 
 Expected: `pnpm-lock.yaml` is created and the install exits with code `0`.
 
-- [ ] **Step 5: Run baseline commands**
+- [x] **Step 5: Run baseline commands**
 
 Run:
 
@@ -310,7 +310,7 @@ pnpm typecheck
 
 Expected: placeholder shared packages typecheck successfully with empty `src/index.ts` files.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 Run:
 
@@ -330,7 +330,7 @@ Expected: commit succeeds with root workspace, lint, format, test, e2e, and envi
 - Create: `/Users/minjun/Documents/dropsign-cloud/packages/config/src/index.ts`
 - Create: `/Users/minjun/Documents/dropsign-cloud/packages/config/src/index.test.ts`
 
-- [ ] **Step 1: Write the failing config tests**
+- [x] **Step 1: Write the failing config tests**
 
 Create directories:
 
@@ -417,7 +417,7 @@ describe('parseConfig', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run:
 
@@ -428,7 +428,7 @@ pnpm --filter @dropsign/config test
 
 Expected: FAIL with `Cannot find module './index.js'`.
 
-- [ ] **Step 3: Implement typed config parsing**
+- [x] **Step 3: Implement typed config parsing**
 
 Create `/Users/minjun/Documents/dropsign-cloud/packages/config/src/index.ts`:
 
@@ -474,7 +474,7 @@ export function loadConfig(): AppConfig {
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run:
 
@@ -494,7 +494,7 @@ pnpm --filter @dropsign/config typecheck
 
 Expected: PASS with no TypeScript errors.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 Run:
 
@@ -515,7 +515,7 @@ Expected: commit succeeds with the config package and lockfile changes.
 - Create: `/Users/minjun/Documents/dropsign-cloud/packages/db/src/client.ts`
 - Create: `/Users/minjun/Documents/dropsign-cloud/packages/db/src/index.ts`
 
-- [ ] **Step 1: Write the Prisma package files with a schema validation target**
+- [x] **Step 1: Write the Prisma package files with a schema validation target**
 
 Create directories:
 
@@ -706,7 +706,7 @@ model AuditEvent {
 }
 ```
 
-- [ ] **Step 2: Run schema validation**
+- [x] **Step 2: Run schema validation**
 
 Run:
 
@@ -718,7 +718,7 @@ pnpm --filter @dropsign/db prisma:validate
 
 Expected: PASS with `The schema at prisma/schema.prisma is valid`.
 
-- [ ] **Step 3: Generate Prisma client and add database exports**
+- [x] **Step 3: Generate Prisma client and add database exports**
 
 Run:
 
@@ -765,7 +765,7 @@ export type { PrismaClient } from '@prisma/client';
 export { Prisma } from '@prisma/client';
 ```
 
-- [ ] **Step 4: Run typecheck**
+- [x] **Step 4: Run typecheck**
 
 Run:
 
@@ -776,7 +776,7 @@ pnpm --filter @dropsign/db typecheck
 
 Expected: PASS with no TypeScript errors.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 Run:
 
@@ -796,7 +796,7 @@ Expected: commit succeeds with the database package, generated Prisma metadata i
 - Create: `/Users/minjun/Documents/dropsign-cloud/packages/storage/src/index.ts`
 - Create: `/Users/minjun/Documents/dropsign-cloud/packages/storage/src/index.test.ts`
 
-- [ ] **Step 1: Write the failing storage tests**
+- [x] **Step 1: Write the failing storage tests**
 
 Create directories:
 
@@ -887,7 +887,7 @@ describe('InMemoryStorage', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run:
 
@@ -898,7 +898,7 @@ pnpm --filter @dropsign/storage test
 
 Expected: FAIL with `Cannot find module './index.js'`.
 
-- [ ] **Step 3: Implement the storage contract**
+- [x] **Step 3: Implement the storage contract**
 
 Create `/Users/minjun/Documents/dropsign-cloud/packages/storage/src/index.ts`:
 
@@ -965,7 +965,7 @@ export class InMemoryStorage implements ObjectStorage {
 }
 ```
 
-- [ ] **Step 4: Run tests and typecheck**
+- [x] **Step 4: Run tests and typecheck**
 
 Run:
 
@@ -977,7 +977,7 @@ pnpm --filter @dropsign/storage typecheck
 
 Expected: PASS with `2 tests` and no TypeScript errors.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 Run:
 
@@ -1001,7 +1001,7 @@ Expected: commit succeeds with the storage package and lockfile changes.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/routes/health.ts`
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/routes/health.test.ts`
 
-- [ ] **Step 1: Write the failing health route test**
+- [x] **Step 1: Write the failing health route test**
 
 Create directories:
 
@@ -1093,7 +1093,7 @@ describe('GET /health', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run:
 
@@ -1105,7 +1105,7 @@ pnpm --filter @dropsign/api test -- --runInBand
 
 Expected: FAIL with `Cannot find module '../app.js'`.
 
-- [ ] **Step 3: Implement Fastify app factory and health route**
+- [x] **Step 3: Implement Fastify app factory and health route**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/routes/health.ts`:
 
@@ -1168,7 +1168,7 @@ Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/index.ts`:
 export { buildApiApp, type BuildApiAppOptions } from './app.js';
 ```
 
-- [ ] **Step 4: Run test and typecheck**
+- [x] **Step 4: Run test and typecheck**
 
 Run:
 
@@ -1180,7 +1180,7 @@ pnpm --filter @dropsign/api typecheck
 
 Expected: PASS with `1 test` and no TypeScript errors.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 Run:
 
@@ -1202,7 +1202,7 @@ Expected: commit succeeds with the API app, route test, and lockfile changes.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/test/buildTestApp.ts`
 - Modify: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/routes/health.test.ts`
 
-- [ ] **Step 1: Write failing tests for protected tenant behavior**
+- [x] **Step 1: Write failing tests for protected tenant behavior**
 
 Create directories:
 
@@ -1266,7 +1266,7 @@ export async function buildTestApp(options: BuildApiAppOptions = {}) {
 }
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run:
 
@@ -1277,7 +1277,7 @@ pnpm --filter @dropsign/api test -- --runInBand
 
 Expected: FAIL with `Cannot find module '../test/buildTestApp.js'` or a 404 for `/v1/projects`.
 
-- [ ] **Step 3: Implement request decorations and middleware**
+- [x] **Step 3: Implement request decorations and middleware**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/types/fastify.d.ts`:
 
@@ -1415,7 +1415,7 @@ export async function buildApiApp(options: BuildApiAppOptions = {}): Promise<Fas
 }
 ```
 
-- [ ] **Step 4: Run tests and typecheck**
+- [x] **Step 4: Run tests and typecheck**
 
 Run:
 
@@ -1427,7 +1427,7 @@ pnpm --filter @dropsign/api typecheck
 
 Expected: PASS with `2 tests` and no TypeScript errors.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 Run:
 
@@ -1448,7 +1448,7 @@ Expected: commit succeeds with API middleware and tests.
 - Modify: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/test/buildTestApp.ts`
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/routes/projects.test.ts`
 
-- [ ] **Step 1: Write failing project endpoint tests**
+- [x] **Step 1: Write failing project endpoint tests**
 
 Create directories:
 
@@ -1581,7 +1581,7 @@ describe('project routes', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run:
 
@@ -1592,7 +1592,7 @@ pnpm --filter @dropsign/api test -- --runInBand
 
 Expected: FAIL because `/v1/projects` returns the temporary empty route and `POST /v1/projects` returns 404.
 
-- [ ] **Step 3: Implement project repository and routes**
+- [x] **Step 3: Implement project repository and routes**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/repositories/projectRepository.ts`:
 
@@ -1916,7 +1916,7 @@ export async function buildTestApp(options: BuildApiAppOptions = {}) {
 }
 ```
 
-- [ ] **Step 4: Run tests and typecheck**
+- [x] **Step 4: Run tests and typecheck**
 
 Run:
 
@@ -1928,7 +1928,7 @@ pnpm --filter @dropsign/api typecheck
 
 Expected: PASS with `5 tests` and no TypeScript errors.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 Run:
 
@@ -1946,7 +1946,7 @@ Expected: commit succeeds with repository-backed project API routes.
 - Modify: `/Users/minjun/Documents/dropsign-cloud/packages/db/prisma/schema.prisma`
 - Generated by command: `/Users/minjun/Documents/dropsign-cloud/packages/db/prisma/migrations/20260512000000_cloud_foundation/migration.sql`
 
-- [ ] **Step 1: Verify the schema targets PostgreSQL before migration**
+- [x] **Step 1: Verify the schema targets PostgreSQL before migration**
 
 Run:
 
@@ -1957,7 +1957,7 @@ pnpm --filter @dropsign/db prisma:validate
 
 Expected: PASS with `The schema at prisma/schema.prisma is valid`.
 
-- [ ] **Step 2: Create the first migration against a local PostgreSQL database**
+- [x] **Step 2: Create the first migration against a local PostgreSQL database**
 
 Start PostgreSQL separately with this database URL:
 
@@ -1975,7 +1975,7 @@ pnpm --filter @dropsign/db prisma migrate diff --from-empty --to-schema-datamode
 
 Expected: PASS with `/Users/minjun/Documents/dropsign-cloud/packages/db/prisma/migrations/20260512000000_cloud_foundation/migration.sql` created and containing `CREATE TABLE`.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 Run:
 
@@ -1992,7 +1992,7 @@ Expected: commit succeeds with the initial PostgreSQL migration.
 **Files:**
 - Modify only if verification exposes an implementation defect in a file created by this plan under `/Users/minjun/Documents/dropsign-cloud`.
 
-- [ ] **Step 1: Run all package tests**
+- [x] **Step 1: Run all package tests**
 
 Run:
 
@@ -2003,7 +2003,7 @@ pnpm test
 
 Expected: PASS with config, storage, and API tests. The output includes `9 tests` after Tasks 2, 4, 5, 6, and 7 are complete.
 
-- [ ] **Step 2: Run all typechecks**
+- [x] **Step 2: Run all typechecks**
 
 Run:
 
@@ -2014,7 +2014,7 @@ pnpm typecheck
 
 Expected: PASS across `@dropsign/config`, `@dropsign/db`, `@dropsign/storage`, and `@dropsign/api`.
 
-- [ ] **Step 3: Run Prisma validation**
+- [x] **Step 3: Run Prisma validation**
 
 Run:
 
@@ -2025,7 +2025,7 @@ pnpm --filter @dropsign/db prisma:validate
 
 Expected: PASS with `The schema at prisma/schema.prisma is valid`.
 
-- [ ] **Step 4: Build all packages**
+- [x] **Step 4: Build all packages**
 
 Run:
 
@@ -2036,7 +2036,7 @@ pnpm build
 
 Expected: PASS and generated `dist` directories under `apps/api`, `packages/config`, `packages/db`, and `packages/storage`.
 
-- [ ] **Step 5: Run the API manually**
+- [x] **Step 5: Run the API manually**
 
 Run:
 
@@ -2062,7 +2062,7 @@ Expected:
 
 Stop `pnpm dev` with `Ctrl-C`.
 
-- [ ] **Step 6: Commit verification fixes if any were required**
+- [x] **Step 6: Commit verification fixes if any were required**
 
 Run only when Step 1, Step 2, Step 3, or Step 4 required code changes:
 
