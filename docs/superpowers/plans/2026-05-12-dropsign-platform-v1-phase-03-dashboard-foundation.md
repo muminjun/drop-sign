@@ -1,6 +1,6 @@
 # Dashboard Foundation Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Build the Phase 03 DropSign Cloud dashboard foundation: authenticated Next.js shell, workspace/project navigation, project settings, widget configuration, install snippet copy, signature records, webhook delivery previews, route guards, and browser/component test coverage.
 
@@ -148,7 +148,7 @@ export type WebhookDeliveryPreview = {
 - Modify: `/Users/minjun/Documents/dropsign-cloud/packages/api-client/src/index.ts`
 - Test: `/Users/minjun/Documents/dropsign-cloud/packages/api-client/src/dashboard.test.ts`
 
-- [ ] **Step 1: Write the failing API client tests**
+- [x] **Step 1: Write the failing API client tests**
 
 Create `/Users/minjun/Documents/dropsign-cloud/packages/api-client/src/dashboard.test.ts`:
 
@@ -278,7 +278,7 @@ describe('dashboard api client', () => {
 });
 ```
 
-- [ ] **Step 2: Run the API client tests and verify the expected failure**
+- [x] **Step 2: Run the API client tests and verify the expected failure**
 
 Run:
 
@@ -289,7 +289,7 @@ pnpm --filter @dropsign/api-client test -- dashboard.test.ts
 
 Expected: FAIL because `packages/api-client/src/dashboard.ts` does not exist or does not export `getDashboardProject`, `getSignatureRecordDetail`, and `updateWidgetConfig`.
 
-- [ ] **Step 3: Implement the dashboard API client**
+- [x] **Step 3: Implement the dashboard API client**
 
 Create `/Users/minjun/Documents/dropsign-cloud/packages/api-client/src/dashboard.ts`:
 
@@ -503,7 +503,7 @@ Modify `/Users/minjun/Documents/dropsign-cloud/packages/api-client/src/index.ts`
 export * from './dashboard';
 ```
 
-- [ ] **Step 4: Run the API client tests and verify they pass**
+- [x] **Step 4: Run the API client tests and verify they pass**
 
 Run:
 
@@ -514,7 +514,7 @@ pnpm --filter @dropsign/api-client test -- dashboard.test.ts
 
 Expected: PASS with all three dashboard API client tests passing.
 
-- [ ] **Step 5: Commit the API client contract**
+- [x] **Step 5: Commit the API client contract**
 
 Run:
 
@@ -535,7 +535,7 @@ Expected: commit succeeds and `git status --short` does not list these three fil
 - Test: `/Users/minjun/Documents/dropsign-cloud/apps/web/src/lib/auth/roles.test.ts`
 - Test: `/Users/minjun/Documents/dropsign-cloud/apps/web/src/middleware.test.ts`
 
-- [ ] **Step 1: Write the failing role and middleware tests**
+- [x] **Step 1: Write the failing role and middleware tests**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/src/lib/auth/roles.test.ts`:
 
@@ -589,7 +589,7 @@ describe('dashboard middleware', () => {
 });
 ```
 
-- [ ] **Step 2: Run tests and verify the expected failure**
+- [x] **Step 2: Run tests and verify the expected failure**
 
 Run:
 
@@ -600,7 +600,7 @@ pnpm --filter @dropsign/web test -- src/lib/auth/roles.test.ts src/middleware.te
 
 Expected: FAIL because `roles.ts`, `session.ts`, and `middleware.ts` are missing.
 
-- [ ] **Step 3: Implement session loading and route guards**
+- [x] **Step 3: Implement session loading and route guards**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/src/lib/auth/session.ts`:
 
@@ -701,7 +701,7 @@ export const config = {
 };
 ```
 
-- [ ] **Step 4: Run tests and verify they pass**
+- [x] **Step 4: Run tests and verify they pass**
 
 Run:
 
@@ -712,7 +712,7 @@ pnpm --filter @dropsign/web test -- src/lib/auth/roles.test.ts src/middleware.te
 
 Expected: PASS for role and middleware tests.
 
-- [ ] **Step 5: Commit auth guards**
+- [x] **Step 5: Commit auth guards**
 
 Run:
 
@@ -735,7 +735,7 @@ Expected: commit succeeds.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/web/src/components/dashboard/workspace-project-switcher.tsx`
 - Test: `/Users/minjun/Documents/dropsign-cloud/apps/web/src/components/dashboard/workspace-project-switcher.test.tsx`
 
-- [ ] **Step 1: Write the failing switcher component test**
+- [x] **Step 1: Write the failing switcher component test**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/src/components/dashboard/workspace-project-switcher.test.tsx`:
 
@@ -793,7 +793,7 @@ describe('WorkspaceProjectSwitcher', () => {
 });
 ```
 
-- [ ] **Step 2: Run the component test and verify the expected failure**
+- [x] **Step 2: Run the component test and verify the expected failure**
 
 Run:
 
@@ -804,7 +804,7 @@ pnpm --filter @dropsign/web test -- src/components/dashboard/workspace-project-s
 
 Expected: FAIL because the switcher component does not exist.
 
-- [ ] **Step 3: Implement shell and switcher components**
+- [x] **Step 3: Implement shell and switcher components**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/src/components/dashboard/workspace-project-switcher.tsx`:
 
@@ -939,7 +939,7 @@ export function AppShell({
 }
 ```
 
-- [ ] **Step 4: Implement app routes**
+- [x] **Step 4: Implement app routes**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/src/app/(auth)/sign-in/page.tsx`:
 
@@ -1053,7 +1053,7 @@ export default async function ProjectsPage({ params }: { params: { workspaceId: 
 }
 ```
 
-- [ ] **Step 5: Run switcher test and verify it passes**
+- [x] **Step 5: Run switcher test and verify it passes**
 
 Run:
 
@@ -1064,7 +1064,7 @@ pnpm --filter @dropsign/web test -- src/components/dashboard/workspace-project-s
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit dashboard shell**
+- [x] **Step 6: Commit dashboard shell**
 
 Run:
 
@@ -1086,7 +1086,7 @@ Expected: commit succeeds.
 - Test: `/Users/minjun/Documents/dropsign-cloud/apps/web/src/components/dashboard/install-snippet-card.test.tsx`
 - Test: `/Users/minjun/Documents/dropsign-cloud/apps/web/src/components/dashboard/project-settings-form.test.tsx`
 
-- [ ] **Step 1: Write failing tests for the install snippet and settings form**
+- [x] **Step 1: Write failing tests for the install snippet and settings form**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/src/components/dashboard/install-snippet-card.test.tsx`:
 
@@ -1155,7 +1155,7 @@ describe('ProjectSettingsForm', () => {
 });
 ```
 
-- [ ] **Step 2: Run tests and verify the expected failure**
+- [x] **Step 2: Run tests and verify the expected failure**
 
 Run:
 
@@ -1166,7 +1166,7 @@ pnpm --filter @dropsign/web test -- src/components/dashboard/install-snippet-car
 
 Expected: FAIL because the components do not exist.
 
-- [ ] **Step 3: Implement settings form and install snippet**
+- [x] **Step 3: Implement settings form and install snippet**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/src/components/dashboard/install-snippet-card.tsx`:
 
@@ -1270,7 +1270,7 @@ export function ProjectSettingsForm({ project, onSubmit }: Props) {
 }
 ```
 
-- [ ] **Step 4: Implement project settings routes**
+- [x] **Step 4: Implement project settings routes**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/src/app/(dashboard)/workspaces/[workspaceId]/projects/[projectId]/layout.tsx`:
 
@@ -1318,7 +1318,7 @@ export default async function ProjectSettingsPage({
 }
 ```
 
-- [ ] **Step 5: Run tests and verify they pass**
+- [x] **Step 5: Run tests and verify they pass**
 
 Run:
 
@@ -1329,7 +1329,7 @@ pnpm --filter @dropsign/web test -- src/components/dashboard/install-snippet-car
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit project settings**
+- [x] **Step 6: Commit project settings**
 
 Run:
 
@@ -1348,7 +1348,7 @@ Expected: commit succeeds.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/web/src/components/dashboard/widget-config-form.tsx`
 - Test: `/Users/minjun/Documents/dropsign-cloud/apps/web/src/components/dashboard/widget-config-form.test.tsx`
 
-- [ ] **Step 1: Write the failing widget form test**
+- [x] **Step 1: Write the failing widget form test**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/src/components/dashboard/widget-config-form.test.tsx`:
 
@@ -1423,7 +1423,7 @@ describe('WidgetConfigForm', () => {
 });
 ```
 
-- [ ] **Step 2: Run the widget form test and verify the expected failure**
+- [x] **Step 2: Run the widget form test and verify the expected failure**
 
 Run:
 
@@ -1434,7 +1434,7 @@ pnpm --filter @dropsign/web test -- src/components/dashboard/widget-config-form.
 
 Expected: FAIL because `WidgetConfigForm` does not exist.
 
-- [ ] **Step 3: Implement the widget configuration form**
+- [x] **Step 3: Implement the widget configuration form**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/src/components/dashboard/widget-config-form.tsx`:
 
@@ -1625,7 +1625,7 @@ export function WidgetConfigForm({ config, onSubmit }: Props) {
 }
 ```
 
-- [ ] **Step 4: Implement the widget settings page**
+- [x] **Step 4: Implement the widget settings page**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/src/app/(dashboard)/workspaces/[workspaceId]/projects/[projectId]/widget/page.tsx`:
 
@@ -1658,7 +1658,7 @@ export default async function WidgetPage({ params }: { params: { projectId: stri
 }
 ```
 
-- [ ] **Step 5: Run the widget form test and verify it passes**
+- [x] **Step 5: Run the widget form test and verify it passes**
 
 Run:
 
@@ -1669,7 +1669,7 @@ pnpm --filter @dropsign/web test -- src/components/dashboard/widget-config-form.
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit widget settings**
+- [x] **Step 6: Commit widget settings**
 
 Run:
 
@@ -1691,7 +1691,7 @@ Expected: commit succeeds.
 - Test: `/Users/minjun/Documents/dropsign-cloud/apps/web/src/components/dashboard/signature-records-table.test.tsx`
 - Test: `/Users/minjun/Documents/dropsign-cloud/apps/web/src/components/dashboard/signature-record-detail.test.tsx`
 
-- [ ] **Step 1: Write failing signature component tests**
+- [x] **Step 1: Write failing signature component tests**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/src/components/dashboard/signature-records-table.test.tsx`:
 
@@ -1780,7 +1780,7 @@ describe('SignatureRecordDetailView', () => {
 });
 ```
 
-- [ ] **Step 2: Run tests and verify the expected failure**
+- [x] **Step 2: Run tests and verify the expected failure**
 
 Run:
 
@@ -1791,7 +1791,7 @@ pnpm --filter @dropsign/web test -- src/components/dashboard/signature-records-t
 
 Expected: FAIL because the signature components do not exist.
 
-- [ ] **Step 3: Implement signature list and detail components**
+- [x] **Step 3: Implement signature list and detail components**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/src/components/dashboard/signature-records-table.tsx`:
 
@@ -1922,7 +1922,7 @@ export function SignatureRecordDetailView({ record }: { record: SignatureRecordD
 }
 ```
 
-- [ ] **Step 4: Implement signature routes**
+- [x] **Step 4: Implement signature routes**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/src/app/(dashboard)/workspaces/[workspaceId]/projects/[projectId]/signatures/page.tsx`:
 
@@ -1988,7 +1988,7 @@ export default async function SignatureDetailPage({
 }
 ```
 
-- [ ] **Step 5: Run signature tests and verify they pass**
+- [x] **Step 5: Run signature tests and verify they pass**
 
 Run:
 
@@ -1999,7 +1999,7 @@ pnpm --filter @dropsign/web test -- src/components/dashboard/signature-records-t
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit signature records UI**
+- [x] **Step 6: Commit signature records UI**
 
 Run:
 
@@ -2018,7 +2018,7 @@ Expected: commit succeeds.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/web/src/components/dashboard/webhook-delivery-table.tsx`
 - Test: `/Users/minjun/Documents/dropsign-cloud/apps/web/src/components/dashboard/webhook-delivery-table.test.tsx`
 
-- [ ] **Step 1: Write the failing webhook delivery table test**
+- [x] **Step 1: Write the failing webhook delivery table test**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/src/components/dashboard/webhook-delivery-table.test.tsx`:
 
@@ -2057,7 +2057,7 @@ describe('WebhookDeliveryTable', () => {
 });
 ```
 
-- [ ] **Step 2: Run the webhook delivery test and verify the expected failure**
+- [x] **Step 2: Run the webhook delivery test and verify the expected failure**
 
 Run:
 
@@ -2068,7 +2068,7 @@ pnpm --filter @dropsign/web test -- src/components/dashboard/webhook-delivery-ta
 
 Expected: FAIL because the component does not exist.
 
-- [ ] **Step 3: Implement webhook delivery preview table**
+- [x] **Step 3: Implement webhook delivery preview table**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/src/components/dashboard/webhook-delivery-table.tsx`:
 
@@ -2112,7 +2112,7 @@ export function WebhookDeliveryTable({
 }
 ```
 
-- [ ] **Step 4: Implement webhook delivery page**
+- [x] **Step 4: Implement webhook delivery page**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/src/app/(dashboard)/workspaces/[workspaceId]/projects/[projectId]/webhooks/deliveries/page.tsx`:
 
@@ -2143,7 +2143,7 @@ export default async function WebhookDeliveriesPage({
 }
 ```
 
-- [ ] **Step 5: Run webhook delivery test and verify it passes**
+- [x] **Step 5: Run webhook delivery test and verify it passes**
 
 Run:
 
@@ -2154,7 +2154,7 @@ pnpm --filter @dropsign/web test -- src/components/dashboard/webhook-delivery-ta
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit webhook delivery preview**
+- [x] **Step 6: Commit webhook delivery preview**
 
 Run:
 
@@ -2174,7 +2174,7 @@ Expected: commit succeeds.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/web/e2e/dashboard-foundation.spec.ts`
 - Modify: `/Users/minjun/Documents/dropsign-cloud/apps/web/playwright.config.ts`
 
-- [ ] **Step 1: Add failing Playwright flow**
+- [x] **Step 1: Add failing Playwright flow**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/e2e/dashboard-foundation.spec.ts`:
 
@@ -2322,7 +2322,7 @@ test('admin configures widget, copies install snippet, and inspects records', as
 });
 ```
 
-- [ ] **Step 2: Run Playwright and verify the expected failure**
+- [x] **Step 2: Run Playwright and verify the expected failure**
 
 Run:
 
@@ -2333,7 +2333,7 @@ pnpm --filter @dropsign/web exec playwright test e2e/dashboard-foundation.spec.t
 
 Expected: FAIL because dashboard routes, Playwright config, or app server wiring is incomplete before the preceding tasks are merged.
 
-- [ ] **Step 3: Add MSW dashboard handlers for component tests**
+- [x] **Step 3: Add MSW dashboard handlers for component tests**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/src/test/msw/dashboard-handlers.ts`:
 
@@ -2376,7 +2376,7 @@ afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 ```
 
-- [ ] **Step 4: Configure Playwright web server**
+- [x] **Step 4: Configure Playwright web server**
 
 Modify `/Users/minjun/Documents/dropsign-cloud/apps/web/playwright.config.ts` so it contains:
 
@@ -2406,7 +2406,7 @@ export default defineConfig({
 });
 ```
 
-- [ ] **Step 5: Run component and Playwright tests and verify they pass**
+- [x] **Step 5: Run component and Playwright tests and verify they pass**
 
 Run:
 
@@ -2418,7 +2418,7 @@ pnpm --filter @dropsign/web exec playwright test e2e/dashboard-foundation.spec.t
 
 Expected: PASS for all dashboard component tests, auth tests, middleware test, and the dashboard Playwright flow.
 
-- [ ] **Step 6: Commit dashboard test harness**
+- [x] **Step 6: Commit dashboard test harness**
 
 Run:
 
@@ -2450,7 +2450,7 @@ Expected: commit succeeds.
   - `/Users/minjun/Documents/dropsign-cloud/apps/web/src/middleware.ts`
   - `/Users/minjun/Documents/dropsign-cloud/apps/web/e2e/dashboard-foundation.spec.ts`
 
-- [ ] **Step 1: Check formatting**
+- [x] **Step 1: Check formatting**
 
 Run:
 
@@ -2461,7 +2461,7 @@ pnpm format
 
 Expected: command exits 0 and formats only files changed by this phase.
 
-- [ ] **Step 2: Run lint**
+- [x] **Step 2: Run lint**
 
 Run:
 
@@ -2472,7 +2472,7 @@ pnpm lint
 
 Expected: command exits 0 with no ESLint errors or warnings.
 
-- [ ] **Step 3: Run typecheck**
+- [x] **Step 3: Run typecheck**
 
 Run:
 
@@ -2483,7 +2483,7 @@ pnpm typecheck
 
 Expected: command exits 0 with no TypeScript errors.
 
-- [ ] **Step 4: Run unit and component tests**
+- [x] **Step 4: Run unit and component tests**
 
 Run:
 
@@ -2505,7 +2505,7 @@ pnpm --filter @dropsign/web exec playwright test e2e/dashboard-foundation.spec.t
 
 Expected: command exits 0 with the `admin configures widget, copies install snippet, and inspects records` test passing in Chromium.
 
-- [ ] **Step 6: Build the web app**
+- [x] **Step 6: Build the web app**
 
 Run:
 
@@ -2516,7 +2516,7 @@ pnpm build
 
 Expected: command exits 0 and Next.js builds the dashboard routes without server/client boundary errors.
 
-- [ ] **Step 7: Inspect git status**
+- [x] **Step 7: Inspect git status**
 
 Run:
 
@@ -2532,7 +2532,7 @@ git add apps/web packages/api-client
 git commit -m "chore: format dashboard foundation"
 ```
 
-- [ ] **Step 8: Confirm commit boundaries**
+- [x] **Step 8: Confirm commit boundaries**
 
 Expected Phase 03 commits:
 
@@ -2555,13 +2555,13 @@ chore: format dashboard foundation
 
 ## Acceptance Checklist
 
-- [ ] Authenticated users can access the dashboard shell, and unauthenticated users are redirected to `/sign-in`.
-- [ ] Viewer role can inspect signature records and webhook deliveries, but cannot access project settings or widget settings.
-- [ ] Workspace and project switchers navigate to the correct workspace/project routes.
-- [ ] Project settings form saves project name and allowed origins.
-- [ ] Install snippet card displays and copies a script tag containing the project public key.
-- [ ] Widget form saves button label, color, desktop position, mobile position, trigger selector, and page targeting rules.
-- [ ] Signature records list renders source, status, signer, document, completion state, and detail links.
-- [ ] Signature detail renders artifact placement, document hash, metadata, and audit timeline.
-- [ ] Webhook delivery page renders read-only status, response excerpt, attempt count, and retry timestamp with no resend action.
+- [x] Authenticated users can access the dashboard shell, and unauthenticated users are redirected to `/sign-in`.
+- [x] Viewer role can inspect signature records and webhook deliveries, but cannot access project settings or widget settings.
+- [x] Workspace and project switchers navigate to the correct workspace/project routes.
+- [x] Project settings form saves project name and allowed origins.
+- [x] Install snippet card displays and copies a script tag containing the project public key.
+- [x] Widget form saves button label, color, desktop position, mobile position, trigger selector, and page targeting rules.
+- [x] Signature records list renders source, status, signer, document, completion state, and detail links.
+- [x] Signature detail renders artifact placement, document hash, metadata, and audit timeline.
+- [x] Webhook delivery page renders read-only status, response excerpt, attempt count, and retry timestamp with no resend action.
 - [ ] Component tests, API client tests, route guard tests, Playwright flow, lint, typecheck, and build pass.
