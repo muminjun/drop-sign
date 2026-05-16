@@ -53,6 +53,16 @@ beforeEach(() => {
   document.head.innerHTML = '';
 });
 
+function pointerEvent(type: string, clientX: number, clientY: number): PointerEvent {
+  const event = new Event(type, { bubbles: true, cancelable: true }) as PointerEvent;
+  Object.defineProperties(event, {
+    clientX: { value: clientX },
+    clientY: { value: clientY },
+    pointerId: { value: 1 },
+  });
+  return event;
+}
+
 describe('DropSign.init', () => {
   it('throws if target not found', () => {
     const onError = vi.fn();
@@ -212,6 +222,10 @@ describe('createPlacementBox — getPlacement', () => {
   beforeEach(() => {
     Object.defineProperty(window, 'innerWidth', { value: 1024, configurable: true });
     Object.defineProperty(window, 'innerHeight', { value: 768, configurable: true });
+    Object.defineProperty(HTMLElement.prototype, 'setPointerCapture', {
+      configurable: true,
+      value: vi.fn(),
+    });
   });
 
   it('with target: returns target-relative normalized coords', () => {
@@ -303,6 +317,42 @@ describe('createPlacementBox — getPlacement', () => {
     const p = box.getPlacement();
     expect(p.width).toBeGreaterThan(0);
     expect(p.height).toBeGreaterThan(0);
+
+    box.destroy();
+  });
+
+  it('moves placement controls below the box near the top edge after dragging', () => {
+    const box = createPlacementBox(
+      'data:image/png;base64,sig',
+      undefined,
+      () => {},
+      () => {},
+      { confirm: 'Confirm', delete: 'Delete' },
+    );
+
+    box.element.dispatchEvent(pointerEvent('pointerdown', 512, 384));
+    box.element.dispatchEvent(pointerEvent('pointermove', 512, -1000));
+
+    expect(box.element.classList.contains('ds-sig-box--controls-below')).toBe(true);
+
+    box.destroy();
+  });
+
+  it('keeps placement controls above the box when there is top space after resizing', () => {
+    const box = createPlacementBox(
+      'data:image/png;base64,sig',
+      undefined,
+      () => {},
+      () => {},
+      { confirm: 'Confirm', delete: 'Delete' },
+    );
+    const resizeHandle = box.element.querySelector<HTMLElement>('.ds-resize-se')!;
+
+    box.element.style.top = '120px';
+    resizeHandle.dispatchEvent(pointerEvent('pointerdown', 560, 424));
+    resizeHandle.dispatchEvent(pointerEvent('pointermove', 620, 464));
+
+    expect(box.element.classList.contains('ds-sig-box--controls-below')).toBe(false);
 
     box.destroy();
   });
