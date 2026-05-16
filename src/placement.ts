@@ -50,14 +50,23 @@ export function createPlacementBox(
   box.style.width = `${initW}px`;
   box.style.height = `${initH}px`;
 
+  function updateControlPlacement() {
+    const top = parseFloat(box.style.top) || 0;
+    const controlsHeight = controls.offsetHeight || 40;
+    const gap = 8;
+    box.classList.toggle('ds-sig-box--controls-below', top < controlsHeight + gap);
+  }
+
   const ac = new AbortController();
   const { signal } = ac;
 
-  setupDrag(box, signal);
-  setupResize(box, seHandle, 1, 1, signal);
-  setupResize(box, swHandle, -1, 1, signal);
-  setupResize(box, neHandle, 1, -1, signal);
-  setupResize(box, nwHandle, -1, -1, signal);
+  setupDrag(box, signal, updateControlPlacement);
+  setupResize(box, seHandle, 1, 1, signal, updateControlPlacement);
+  setupResize(box, swHandle, -1, 1, signal, updateControlPlacement);
+  setupResize(box, neHandle, 1, -1, signal, updateControlPlacement);
+  setupResize(box, nwHandle, -1, -1, signal, updateControlPlacement);
+
+  updateControlPlacement();
 
   deleteBtn.addEventListener('click', () => {
     destroy();
@@ -115,7 +124,7 @@ function resizeHandle(cls: string): HTMLElement {
   return el;
 }
 
-function setupDrag(box: HTMLElement, signal: AbortSignal) {
+function setupDrag(box: HTMLElement, signal: AbortSignal, onMove: () => void) {
   let dragging = false;
   let startX = 0, startY = 0, startLeft = 0, startTop = 0;
 
@@ -143,6 +152,7 @@ function setupDrag(box: HTMLElement, signal: AbortSignal) {
     const newTop  = Math.max(0, Math.min(window.innerHeight - boxH, startTop  + e.clientY - startY));
     box.style.left = `${newLeft}px`;
     box.style.top  = `${newTop}px`;
+    onMove();
   }, { signal });
 
   box.addEventListener('pointerup', () => { dragging = false; }, { signal });
@@ -155,6 +165,7 @@ function setupResize(
   dirX: number,
   dirY: number,
   signal: AbortSignal,
+  onMove: () => void,
 ) {
   let resizing = false;
   let startX = 0, startY = 0;
@@ -201,6 +212,7 @@ function setupResize(
     box.style.height = `${newH}px`;
     box.style.left   = `${newLeft}px`;
     box.style.top    = `${newTop}px`;
+    onMove();
   }, { signal });
 
   handle.addEventListener('pointerup', () => { resizing = false; }, { signal });

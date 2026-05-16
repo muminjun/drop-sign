@@ -186,6 +186,10 @@ export const STYLES = `
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
+  .ds-sig-box--controls-below .ds-sig-controls {
+    top: auto;
+    bottom: -40px;
+  }
 
   .ds-sig-delete, .ds-sig-confirm {
     border: none;
