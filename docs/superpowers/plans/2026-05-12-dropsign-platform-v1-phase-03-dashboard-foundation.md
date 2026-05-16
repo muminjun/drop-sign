@@ -2494,7 +2494,7 @@ pnpm test
 
 Expected: command exits 0 and includes passing tests for API client contracts, role guards, dashboard forms, signature records, and webhook delivery previews.
 
-- [ ] **Step 5: Run dashboard Playwright tests**
+- [x] **Step 5: Run dashboard Playwright tests**
 
 Run:
 
@@ -2564,4 +2564,4 @@ chore: format dashboard foundation
 - [x] Signature records list renders source, status, signer, document, completion state, and detail links.
 - [x] Signature detail renders artifact placement, document hash, metadata, and audit timeline.
 - [x] Webhook delivery page renders read-only status, response excerpt, attempt count, and retry timestamp with no resend action.
-- [ ] Component tests, API client tests, route guard tests, Playwright flow, lint, typecheck, and build pass.
+- [x] Component tests, API client tests, route guard tests, Playwright flow, lint, typecheck, and build pass.
