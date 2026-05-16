@@ -1,6 +1,6 @@
 # DropSign Signing UX Polish Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Improve the signing modal and placement box UX without breaking the public DropSign API. New user-facing copy must go through the existing `messages` localization surface.
 
@@ -30,7 +30,7 @@
 **Files:**
 - Create: `src/signature-pad.test.ts`
 
-- [ ] **Step 1: Create `src/signature-pad.test.ts` with failing tests**
+- [x] **Step 1: Create `src/signature-pad.test.ts` with failing tests**
 
 Create `src/signature-pad.test.ts`:
 
@@ -225,7 +225,7 @@ describe('createSignaturePadModal', () => {
 });
 ```
 
-- [ ] **Step 2: Run the new tests and verify failure**
+- [x] **Step 2: Run the new tests and verify failure**
 
 Run:
 
@@ -235,7 +235,7 @@ pnpm test -- src/signature-pad.test.ts
 
 Expected: tests fail because `messages.emptySignatureHint` has not been added yet, `.ds-btn-use` is not disabled, `.ds-empty-hint` does not exist or is not sourced from `messages.emptySignatureHint`, and the canvas is not resized from `getBoundingClientRect()`.
 
-- [ ] **Step 3: Commit the failing tests**
+- [x] **Step 3: Commit the failing tests**
 
 ```bash
 git add src/signature-pad.test.ts
@@ -254,7 +254,7 @@ git commit -m "test: cover signature modal empty state and canvas sizing"
 - Modify: `README.md`
 - Test: `src/signature-pad.test.ts`
 
-- [ ] **Step 1: Add localizable empty-state message key**
+- [x] **Step 1: Add localizable empty-state message key**
 
 In `src/types.ts`, add an optional `emptySignatureHint` field to `DropSignMessages`:
 
@@ -280,7 +280,7 @@ emptySignatureHint: 'Draw a signature to continue.',
 
 In `README.md`, add `emptySignatureHint` to the localization example and default messages table. This keeps the new modal copy overrideable for localized consumers.
 
-- [ ] **Step 2: Add modal state helpers in `src/signature-pad.ts`**
+- [x] **Step 2: Add modal state helpers in `src/signature-pad.ts`**
 
 Inside `createSignaturePadModal`, add these helpers before `open()`:
 
@@ -301,7 +301,7 @@ function resizeCanvas(canvas: HTMLCanvasElement, currentPad: SignaturePad | null
 }
 ```
 
-- [ ] **Step 3: Update modal creation and button state**
+- [x] **Step 3: Update modal creation and button state**
 
 In `open()`, after creating `useBtn`, add:
 
@@ -333,7 +333,7 @@ to:
 modal.append(title, description, canvas, emptyHint, actions);
 ```
 
-- [ ] **Step 4: Wire `signature_pad` events and safe resize behavior**
+- [x] **Step 4: Wire `signature_pad` events and safe resize behavior**
 
 After constructing `pad = new SignaturePad(...)`, add:
 
@@ -377,7 +377,7 @@ Keep the existing empty guard in the use handler:
 if (!pad || pad.isEmpty()) return;
 ```
 
-- [ ] **Step 5: Remove resize listener during destroy**
+- [x] **Step 5: Remove resize listener during destroy**
 
 In `destroy()`, before `pad?.off();`, add:
 
@@ -388,7 +388,7 @@ if (resizeHandler) {
 }
 ```
 
-- [ ] **Step 6: Add styles for disabled use button and empty hint**
+- [x] **Step 6: Add styles for disabled use button and empty hint**
 
 In `src/styles.ts`, after `.ds-btn-use:hover`, add:
 
@@ -407,7 +407,7 @@ In `src/styles.ts`, after `.ds-btn-use:hover`, add:
   }
 ```
 
-- [ ] **Step 7: Run the modal tests**
+- [x] **Step 7: Run the modal tests**
 
 Run:
 
@@ -417,7 +417,7 @@ pnpm test -- src/signature-pad.test.ts
 
 Expected: all tests in `src/signature-pad.test.ts` pass.
 
-- [ ] **Step 8: Commit modal implementation**
+- [x] **Step 8: Commit modal implementation**
 
 ```bash
 git add src/types.ts src/messages.ts src/signature-pad.ts src/styles.ts src/signature-pad.test.ts README.md
@@ -431,7 +431,7 @@ git commit -m "fix: improve signature modal empty state and canvas sizing"
 **Files:**
 - Modify: `src/DropSign.test.ts`
 
-- [ ] **Step 1: Add pointer event helper to `src/DropSign.test.ts`**
+- [x] **Step 1: Add pointer event helper to `src/DropSign.test.ts`**
 
 After the top-level `beforeEach`, add:
 
@@ -456,7 +456,7 @@ Object.defineProperty(HTMLElement.prototype, 'setPointerCapture', {
 });
 ```
 
-- [ ] **Step 2: Add toolbar-below drag test**
+- [x] **Step 2: Add toolbar-below drag test**
 
 Inside `describe('createPlacementBox — getPlacement', ...)`, add:
 
@@ -479,7 +479,7 @@ it('moves placement controls below the box near the top edge after dragging', ()
 });
 ```
 
-- [ ] **Step 3: Add toolbar-above resize test**
+- [x] **Step 3: Add toolbar-above resize test**
 
 Inside the same describe block, add:
 
@@ -504,7 +504,7 @@ it('keeps placement controls above the box when there is top space after resizin
 });
 ```
 
-- [ ] **Step 4: Run placement tests and verify failure**
+- [x] **Step 4: Run placement tests and verify failure**
 
 Run:
 
@@ -514,7 +514,7 @@ pnpm test -- src/DropSign.test.ts
 
 Expected: new toolbar tests fail because `ds-sig-box--controls-below` is not applied.
 
-- [ ] **Step 5: Commit failing placement tests**
+- [x] **Step 5: Commit failing placement tests**
 
 ```bash
 git add src/DropSign.test.ts
@@ -530,7 +530,7 @@ git commit -m "test: cover placement toolbar edge positioning"
 - Modify: `src/styles.ts`
 - Test: `src/DropSign.test.ts`
 
-- [ ] **Step 1: Add toolbar state in `src/placement.ts`**
+- [x] **Step 1: Add toolbar state in `src/placement.ts`**
 
 In `createPlacementBox`, after setting initial `left`, `top`, `width`, and `height`, add:
 
@@ -564,7 +564,7 @@ setupResize(box, nwHandle, -1, -1, signal, updateControlPlacement);
 updateControlPlacement();
 ```
 
-- [ ] **Step 2: Update drag helper signature and callback**
+- [x] **Step 2: Update drag helper signature and callback**
 
 Change:
 
@@ -590,7 +590,7 @@ add:
 onMove();
 ```
 
-- [ ] **Step 3: Update resize helper signature and callback**
+- [x] **Step 3: Update resize helper signature and callback**
 
 Change:
 
@@ -629,7 +629,7 @@ add:
 onMove();
 ```
 
-- [ ] **Step 4: Add toolbar-below CSS**
+- [x] **Step 4: Add toolbar-below CSS**
 
 In `src/styles.ts`, after the `.ds-sig-controls` block, add:
 
@@ -640,7 +640,7 @@ In `src/styles.ts`, after the `.ds-sig-controls` block, add:
   }
 ```
 
-- [ ] **Step 5: Run placement tests**
+- [x] **Step 5: Run placement tests**
 
 Run:
 
@@ -650,7 +650,7 @@ pnpm test -- src/DropSign.test.ts
 
 Expected: all tests in `src/DropSign.test.ts` pass.
 
-- [ ] **Step 6: Commit placement implementation**
+- [x] **Step 6: Commit placement implementation**
 
 ```bash
 git add src/placement.ts src/styles.ts src/DropSign.test.ts
@@ -671,7 +671,7 @@ git commit -m "fix: keep placement controls reachable near viewport edges"
 - Verify: `src/styles.ts`
 - Verify: `README.md`
 
-- [ ] **Step 1: Run focused tests**
+- [x] **Step 1: Run focused tests**
 
 Run:
 
@@ -681,7 +681,7 @@ pnpm test -- src/signature-pad.test.ts src/DropSign.test.ts
 
 Expected: all modal and placement tests pass.
 
-- [ ] **Step 2: Run full package checks**
+- [x] **Step 2: Run full package checks**
 
 Run:
 
@@ -699,7 +699,7 @@ Expected:
 - Vitest reports all tests passing.
 - tsup builds ESM, CJS, and DTS output.
 
-- [ ] **Step 3: Inspect public API diff**
+- [x] **Step 3: Inspect public API diff**
 
 Run:
 
@@ -709,7 +709,7 @@ git diff -- src/types.ts src/index.ts
 
 Expected: the only public TypeScript API change is the optional `DropSignMessages.emptySignatureHint` localization key. There should be no export removals, renamed types, or required new fields.
 
-- [ ] **Step 4: Inspect final source diff**
+- [x] **Step 4: Inspect final source diff**
 
 Run:
 
@@ -720,7 +720,7 @@ git diff -- src/types.ts src/messages.ts src/signature-pad.ts src/signature-pad.
 
 Expected: only files from this plan are changed.
 
-- [ ] **Step 5: Commit verification fixes if needed**
+- [x] **Step 5: Commit verification fixes if needed**
 
 If lint or formatting required small corrections, commit only files from this plan:
 

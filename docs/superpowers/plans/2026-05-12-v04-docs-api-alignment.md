@@ -1,6 +1,6 @@
 # DropSign v0.4 Docs and API Alignment Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Make the README and basic demo describe the current v0.4 placement-only SDK API accurately.
 
@@ -25,7 +25,7 @@
 **Files:**
 - Modify: `README.md`
 
-- [ ] **Step 1: Record current stale README terms**
+- [x] **Step 1: Record current stale README terms**
 
 Run:
 
@@ -35,7 +35,7 @@ rg "imageBlob|capture\.|floating|inline|buttonText|SignaturePlacement|signed are
 
 Expected: the command prints matches from the current stale README. Those matches are the terms this task removes from the public quick-start and API reference.
 
-- [ ] **Step 2: Replace `README.md`**
+- [x] **Step 2: Replace `README.md`**
 
 Replace the full contents of `README.md` with:
 
@@ -345,7 +345,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 MIT
 ```
 
-- [ ] **Step 3: Verify stale README terms are gone**
+- [x] **Step 3: Verify stale README terms are gone**
 
 Run:
 
@@ -355,7 +355,7 @@ rg "imageBlob|capture\.|floating|inline|buttonText|SignaturePlacement|signed are
 
 Expected: no output and exit code 1.
 
-- [ ] **Step 4: Commit README update**
+- [x] **Step 4: Commit README update**
 
 ```bash
 git add README.md
@@ -370,7 +370,7 @@ git commit -m "docs: align README with v0.4 placement API"
 - Modify: `examples/basic/index.html`
 - Modify: `examples/basic/src/main.ts`
 
-- [ ] **Step 1: Update demo HTML title and subtitle**
+- [x] **Step 1: Update demo HTML title and subtitle**
 
 In `examples/basic/index.html`, change:
 
@@ -396,7 +396,7 @@ to:
 <p class="subtitle">Draw a signature, place it on the viewport, and inspect normalized output</p>
 ```
 
-- [ ] **Step 2: Move the custom trigger to the signature side**
+- [x] **Step 2: Move the custom trigger to the signature side**
 
 In `examples/basic/index.html`, replace the full `.signature-section` block with:
 
@@ -414,7 +414,7 @@ In `examples/basic/index.html`, replace the full `.signature-section` block with
 </div>
 ```
 
-- [ ] **Step 3: Update the result heading without `innerHTML`**
+- [x] **Step 3: Update the result heading without `innerHTML`**
 
 In `examples/basic/src/main.ts`, replace:
 
@@ -434,7 +434,7 @@ heading.textContent = 'Signature placement captured';
 header.appendChild(heading);
 ```
 
-- [ ] **Step 4: Build the example**
+- [x] **Step 4: Build the example**
 
 Run:
 
@@ -444,7 +444,7 @@ pnpm --filter @drop-sign/example build
 
 Expected: Vite build succeeds and prints `✓ built`.
 
-- [ ] **Step 5: Commit demo copy update**
+- [x] **Step 5: Commit demo copy update**
 
 ```bash
 git add examples/basic/index.html examples/basic/src/main.ts
@@ -460,7 +460,7 @@ git commit -m "docs: update basic demo copy for placement output"
 - Verify: `examples/basic/index.html`
 - Verify: `examples/basic/src/main.ts`
 
-- [ ] **Step 1: Run repository checks**
+- [x] **Step 1: Run repository checks**
 
 Run:
 
@@ -480,7 +480,7 @@ Expected:
 - tsup builds ESM, CJS, and DTS output.
 - Vite example build succeeds.
 
-- [ ] **Step 2: Confirm public docs and demo no longer expose removed public copy**
+- [x] **Step 2: Confirm public docs and demo no longer expose removed public copy**
 
 Run:
 
@@ -491,7 +491,7 @@ rg "v0\.2|Signature captured" examples/basic
 
 Expected: no output and exit code 1.
 
-- [ ] **Step 3: Inspect final diff**
+- [x] **Step 3: Inspect final diff**
 
 Run:
 
@@ -502,7 +502,7 @@ git diff -- README.md examples/basic/index.html examples/basic/src/main.ts
 
 Expected: only README and basic demo copy/code changes from this plan are present.
 
-- [ ] **Step 4: Commit any verification-only formatting changes**
+- [x] **Step 4: Commit any verification-only formatting changes**
 
 If formatting changed files in this plan, commit them:
 
