@@ -574,7 +574,7 @@ Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/modules/billing/quot
 
 ```ts
 import type { FastifyInstance } from 'fastify';
-import { QuotaExceededError } from './usage-service';
+import { QuotaExceededError } from './usage-service.js';
 
 export async function registerQuotaErrorHandler(app: FastifyInstance): Promise<void> {
   app.setErrorHandler((error, _request, reply) => {
@@ -670,7 +670,7 @@ Create `/Users/minjun/Documents/dropsign-cloud/apps/api/test/billing-webhook-rou
 
 ```ts
 import { describe, expect, it, vi } from 'vitest';
-import { buildApiApp } from '../src/app';
+import { buildApiApp } from '../src/app.js';
 
 describe('billing webhook routes', () => {
   it('processes subscription updated events idempotently', async () => {
@@ -788,7 +788,7 @@ Create `/Users/minjun/Documents/dropsign-cloud/packages/billing/src/stripe-compa
 
 ```ts
 import { z } from 'zod';
-import type { BillingProvider, BillingSubscriptionEvent } from './types';
+import type { BillingProvider, BillingSubscriptionEvent } from './types.js';
 
 const stripeSubscriptionEventSchema = z.object({
   id: z.string(),
@@ -831,8 +831,8 @@ export class StripeCompatibleBillingProvider implements BillingProvider {
 Create `/Users/minjun/Documents/dropsign-cloud/packages/billing/src/index.ts`:
 
 ```ts
-export type { BillingProvider, BillingSubscriptionEvent } from './types';
-export { StripeCompatibleBillingProvider } from './stripe-compatible-provider';
+export type { BillingProvider, BillingSubscriptionEvent } from './types.js';
+export { StripeCompatibleBillingProvider } from './stripe-compatible-provider.js';
 ```
 
 - [ ] **Step 4: Implement billing webhook route**
@@ -900,17 +900,17 @@ export async function registerBillingWebhookRoutes(app: FastifyInstance): Promis
 
 - [ ] **Step 5: Register billing webhook routes**
 
-Modify `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts` to this route-registration shape:
+Modify `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts` to include this route-registration shape while preserving all earlier route registrations:
 
 ```ts
 import Fastify from 'fastify';
-import { registerApiKeyRoutes } from './modules/api-keys/api-key-routes';
-import { registerAuditRoutes } from './modules/audit/audit-routes';
-import { registerBillingWebhookRoutes } from './modules/billing/billing-webhook-routes';
-import { registerBillingSummaryRoutes } from './modules/billing/billing-summary-routes';
-import { registerQuotaErrorHandler } from './modules/billing/quota-plugin';
-import { registerEmailRoutes } from './modules/email/email-routes';
-import { registerWebhookRoutes } from './modules/webhooks/webhook-routes';
+import { registerApiKeyRoutes } from './modules/api-keys/api-key-routes.js';
+import { registerAuditRoutes } from './modules/audit/audit-routes.js';
+import { registerBillingWebhookRoutes } from './modules/billing/billing-webhook-routes.js';
+import { registerBillingSummaryRoutes } from './modules/billing/billing-summary-routes.js';
+import { registerQuotaErrorHandler } from './modules/billing/quota-plugin.js';
+import { registerEmailRoutes } from './modules/email/email-routes.js';
+import { registerWebhookRoutes } from './modules/webhooks/webhook-routes.js';
 
 export async function buildApiApp(deps: { db: unknown; queues?: { email?: unknown; webhook?: unknown } }) {
   const app = Fastify();
@@ -964,7 +964,7 @@ Create `/Users/minjun/Documents/dropsign-cloud/apps/api/test/billing-summary-rou
 
 ```ts
 import { describe, expect, it, vi } from 'vitest';
-import { buildApiApp } from '../src/app';
+import { buildApiApp } from '../src/app.js';
 
 describe('billing summary routes', () => {
   it('returns plan, usage, invoices, and payment method state for the active workspace', async () => {
@@ -1092,7 +1092,7 @@ Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/modules/billing/bill
 
 ```ts
 import type { FastifyInstance } from 'fastify';
-import { getBillingSummary } from './billing-summary-service';
+import { getBillingSummary } from './billing-summary-service.js';
 
 export async function registerBillingSummaryRoutes(app: FastifyInstance): Promise<void> {
   app.get('/v1/billing/summary', async (request, reply) => {
@@ -1214,7 +1214,7 @@ export function UsageMeter({
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/components/billing/billing-summary.tsx`:
 
 ```tsx
-import { UsageMeter } from './usage-meter';
+import { UsageMeter } from './usage-meter.js';
 
 interface UsageRow {
   label: string;

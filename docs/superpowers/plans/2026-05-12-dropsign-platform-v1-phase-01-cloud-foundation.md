@@ -17,13 +17,18 @@ Create only files under `/Users/minjun/Documents/dropsign-cloud` during implemen
 - Create: `/Users/minjun/Documents/dropsign-cloud/package.json` - root scripts and workspace tooling.
 - Create: `/Users/minjun/Documents/dropsign-cloud/pnpm-workspace.yaml` - app/package workspace patterns.
 - Create: `/Users/minjun/Documents/dropsign-cloud/tsconfig.base.json` - strict shared TypeScript settings.
+- Create: `/Users/minjun/Documents/dropsign-cloud/eslint.config.js` - ESLint v9 flat config.
+- Create: `/Users/minjun/Documents/dropsign-cloud/prettier.config.js` - shared formatting config.
+- Create: `/Users/minjun/Documents/dropsign-cloud/vitest.config.ts` - root Vitest config for cross-package tests.
+- Create: `/Users/minjun/Documents/dropsign-cloud/playwright.config.ts` - root Playwright config and e2e entry point.
 - Create: `/Users/minjun/Documents/dropsign-cloud/.gitignore` - ignored dependencies, build output, env files, and coverage.
 - Create: `/Users/minjun/Documents/dropsign-cloud/.env.example` - documented local environment variables.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/package.json` - API dependencies and scripts.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/tsconfig.json` - API TypeScript config.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/vitest.config.ts` - API test config.
-- Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/server.ts` - Fastify app factory and route registration.
-- Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/index.ts` - runtime entry point.
+- Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts` - Fastify app factory and route registration.
+- Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/server.ts` - runtime listener wrapper.
+- Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/index.ts` - optional package exports.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/types/fastify.d.ts` - Fastify request decorations.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/plugins/session.ts` - session foundation from signed dev headers.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/plugins/tenant.ts` - workspace tenant guard.
@@ -46,6 +51,9 @@ Create only files under `/Users/minjun/Documents/dropsign-cloud` during implemen
 - Create: `/Users/minjun/Documents/dropsign-cloud/packages/storage/tsconfig.json` - storage TypeScript config.
 - Create: `/Users/minjun/Documents/dropsign-cloud/packages/storage/src/index.ts` - storage abstraction interface and local in-memory test implementation.
 - Create: `/Users/minjun/Documents/dropsign-cloud/packages/storage/src/index.test.ts` - storage interface tests.
+- Create placeholder app directories for later phases: `/Users/minjun/Documents/dropsign-cloud/apps/web`, `/Users/minjun/Documents/dropsign-cloud/apps/widget`, `/Users/minjun/Documents/dropsign-cloud/apps/worker`, and `/Users/minjun/Documents/dropsign-cloud/apps/e2e`.
+- Create: `/Users/minjun/Documents/dropsign-cloud/apps/e2e/package.json` - e2e workspace package manifest with `name: @dropsign/e2e` and a `test` script that runs `playwright test`. Later phases add test files under `apps/e2e/tests/`; the manifest must exist so `pnpm --filter @dropsign/e2e` resolves.
+- Create minimal skeleton packages for later phases: `/Users/minjun/Documents/dropsign-cloud/packages/contracts`, `/Users/minjun/Documents/dropsign-cloud/packages/api-client`, `/Users/minjun/Documents/dropsign-cloud/packages/domain`, `/Users/minjun/Documents/dropsign-cloud/packages/email`, `/Users/minjun/Documents/dropsign-cloud/packages/billing`, `/Users/minjun/Documents/dropsign-cloud/packages/testkit`, and `/Users/minjun/Documents/dropsign-cloud/packages/ui`, each with `package.json`, `tsconfig.json`, and `src/index.ts`.
 
 Do not edit `/Users/minjun/Documents/drop-sign/tsup.config.ts`. Do not edit any existing plan files in `/Users/minjun/Documents/drop-sign/docs/superpowers/plans`.
 
@@ -55,6 +63,10 @@ Do not edit `/Users/minjun/Documents/drop-sign/tsup.config.ts`. Do not edit any 
 - Create: `/Users/minjun/Documents/dropsign-cloud/package.json`
 - Create: `/Users/minjun/Documents/dropsign-cloud/pnpm-workspace.yaml`
 - Create: `/Users/minjun/Documents/dropsign-cloud/tsconfig.base.json`
+- Create: `/Users/minjun/Documents/dropsign-cloud/eslint.config.js`
+- Create: `/Users/minjun/Documents/dropsign-cloud/prettier.config.js`
+- Create: `/Users/minjun/Documents/dropsign-cloud/vitest.config.ts`
+- Create: `/Users/minjun/Documents/dropsign-cloud/playwright.config.ts`
 - Create: `/Users/minjun/Documents/dropsign-cloud/.gitignore`
 - Create: `/Users/minjun/Documents/dropsign-cloud/.env.example`
 
@@ -66,7 +78,7 @@ Run:
 mkdir -p /Users/minjun/Documents/dropsign-cloud
 cd /Users/minjun/Documents/dropsign-cloud
 git init
-mkdir -p apps/api packages/config packages/db packages/storage
+mkdir -p apps/api apps/web apps/widget apps/worker apps/e2e packages/config packages/db packages/storage
 ```
 
 Expected: `Initialized empty Git repository in /Users/minjun/Documents/dropsign-cloud/.git/` if the directory has no existing Git repository. If Git reports `Reinitialized existing Git repository`, continue only when `git status --short` shows no unrelated user work.
@@ -87,6 +99,7 @@ Create `/Users/minjun/Documents/dropsign-cloud/package.json`:
     "dev": "pnpm --filter @dropsign/api dev",
     "lint": "eslint . --max-warnings 0",
     "test": "vitest run --passWithNoTests",
+    "e2e": "playwright test",
     "typecheck": "pnpm -r typecheck",
     "format": "prettier --write \"**/*.{ts,json,md,yml,yaml}\"",
     "db:generate": "pnpm --filter @dropsign/db prisma:generate",
@@ -95,7 +108,9 @@ Create `/Users/minjun/Documents/dropsign-cloud/package.json`:
   "devDependencies": {
     "@eslint/js": "^9.26.0",
     "@types/node": "^22.15.17",
+    "@playwright/test": "^1.52.0",
     "eslint": "^9.26.0",
+    "globals": "^16.1.0",
     "prettier": "^3.5.3",
     "tsx": "^4.19.4",
     "typescript": "^5.8.3",
@@ -135,6 +150,73 @@ Create `/Users/minjun/Documents/dropsign-cloud/tsconfig.base.json`:
 }
 ```
 
+Create `/Users/minjun/Documents/dropsign-cloud/eslint.config.js`:
+
+```js
+import js from '@eslint/js';
+import globals from 'globals';
+import tseslint from 'typescript-eslint';
+
+export default tseslint.config(
+  js.configs.recommended,
+  ...tseslint.configs.strictTypeChecked,
+  {
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
+  {
+    ignores: ['dist', 'coverage', 'node_modules', 'packages/db/src/generated'],
+  },
+);
+```
+
+Create `/Users/minjun/Documents/dropsign-cloud/prettier.config.js`:
+
+```js
+export default {
+  singleQuote: true,
+  trailingComma: 'all',
+  printWidth: 100,
+  semi: true,
+};
+```
+
+Create `/Users/minjun/Documents/dropsign-cloud/vitest.config.ts`:
+
+```ts
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+  test: {
+    environment: 'node',
+    include: ['apps/**/*.test.ts', 'packages/**/*.test.ts'],
+    passWithNoTests: true,
+  },
+});
+```
+
+Create `/Users/minjun/Documents/dropsign-cloud/playwright.config.ts`:
+
+```ts
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  testDir: './apps',
+  testMatch: ['**/e2e/**/*.spec.ts', '**/tests/**/*.spec.ts'],
+  reporter: [['list']],
+  use: {
+    trace: 'retain-on-failure',
+  },
+});
+```
+
 Create `/Users/minjun/Documents/dropsign-cloud/.gitignore`:
 
 ```gitignore
@@ -158,7 +240,46 @@ DATABASE_URL=postgresql://dropsign:dropsign@localhost:5432/dropsign_cloud
 SESSION_HEADER_SECRET=replace-with-32-byte-local-secret
 ```
 
-- [ ] **Step 3: Install dependencies**
+- [ ] **Step 3: Create placeholder shared packages used by later phases**
+
+Create these directories:
+
+```bash
+mkdir -p packages/contracts/src packages/api-client/src packages/domain/src packages/email/src packages/billing/src packages/testkit/src packages/ui/src
+```
+
+For each placeholder package, create a `package.json` with the workspace package name, a `tsconfig.json` extending `../../tsconfig.base.json`, and an empty `src/index.ts`. Use these package names:
+
+```text
+@dropsign/contracts
+@dropsign/api-client
+@dropsign/domain
+@dropsign/email
+@dropsign/billing
+@dropsign/testkit
+@dropsign/ui
+```
+
+Each placeholder `package.json` must include `private: true`, `type: "module"`, an export for `./src/index.ts`, and `build`, `test`, and `typecheck` scripts matching the config/db/storage package shape. Later phases append source files to these packages; they must not need to create package manifests from scratch.
+
+Create `/Users/minjun/Documents/dropsign-cloud/apps/e2e/package.json`:
+
+```json
+{
+  "name": "@dropsign/e2e",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.52.0"
+  }
+}
+```
+
+- [ ] **Step 4: Install dependencies**
 
 Run:
 
@@ -169,7 +290,7 @@ pnpm install
 
 Expected: `pnpm-lock.yaml` is created and the install exits with code `0`.
 
-- [ ] **Step 4: Run baseline commands**
+- [ ] **Step 5: Run baseline commands**
 
 Run:
 
@@ -187,19 +308,19 @@ cd /Users/minjun/Documents/dropsign-cloud
 pnpm typecheck
 ```
 
-Expected: pnpm reports no selected workspace packages with a `typecheck` script, or exits successfully without TypeScript errors.
+Expected: placeholder shared packages typecheck successfully with empty `src/index.ts` files.
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 6: Commit**
 
 Run:
 
 ```bash
 cd /Users/minjun/Documents/dropsign-cloud
-git add package.json pnpm-workspace.yaml pnpm-lock.yaml tsconfig.base.json .gitignore .env.example
+git add package.json pnpm-workspace.yaml pnpm-lock.yaml tsconfig.base.json eslint.config.js prettier.config.js vitest.config.ts playwright.config.ts .gitignore .env.example apps packages/contracts packages/api-client packages/domain packages/email packages/billing packages/testkit packages/ui
 git commit -m "chore: scaffold dropsign cloud workspace"
 ```
 
-Expected: commit succeeds with six created files plus `pnpm-lock.yaml`.
+Expected: commit succeeds with root workspace, lint, format, test, e2e, and environment files plus `pnpm-lock.yaml`.
 
 ### Task 2: Add Typed Runtime Config
 
@@ -874,6 +995,7 @@ Expected: commit succeeds with the storage package and lockfile changes.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/package.json`
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/tsconfig.json`
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/vitest.config.ts`
+- Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts`
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/server.ts`
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/index.ts`
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/routes/health.ts`
@@ -949,11 +1071,11 @@ Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/routes/health.test.t
 
 ```ts
 import { describe, expect, it } from 'vitest';
-import { buildServer } from '../server.js';
+import { buildApiApp } from '../app.js';
 
 describe('GET /health', () => {
   it('returns service status', async () => {
-    const app = await buildServer();
+    const app = await buildApiApp();
 
     const response = await app.inject({
       method: 'GET',
@@ -981,7 +1103,7 @@ pnpm install
 pnpm --filter @dropsign/api test -- --runInBand
 ```
 
-Expected: FAIL with `Cannot find module '../server.js'`.
+Expected: FAIL with `Cannot find module '../app.js'`.
 
 - [ ] **Step 3: Implement Fastify app factory and health route**
 
@@ -1000,18 +1122,18 @@ export const healthRoutes: FastifyPluginAsync = async (app) => {
 };
 ```
 
-Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/server.ts`:
+Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts`:
 
 ```ts
 import sensible from '@fastify/sensible';
 import Fastify, { type FastifyInstance } from 'fastify';
 import { healthRoutes } from './routes/health.js';
 
-export type BuildServerOptions = {
+export type BuildApiAppOptions = {
   logger?: boolean;
 };
 
-export async function buildServer(options: BuildServerOptions = {}): Promise<FastifyInstance> {
+export async function buildApiApp(options: BuildApiAppOptions = {}): Promise<FastifyInstance> {
   const app = Fastify({
     logger: options.logger ?? false,
   });
@@ -1023,14 +1145,14 @@ export async function buildServer(options: BuildServerOptions = {}): Promise<Fas
 }
 ```
 
-Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/index.ts`:
+Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/server.ts`:
 
 ```ts
 import { loadConfig } from '@dropsign/config';
-import { buildServer } from './server.js';
+import { buildApiApp } from './app.js';
 
 const config = loadConfig();
-const app = await buildServer({ logger: config.nodeEnv !== 'test' });
+const app = await buildApiApp({ logger: config.nodeEnv !== 'test' });
 
 try {
   await app.listen({ host: '0.0.0.0', port: config.port });
@@ -1038,6 +1160,12 @@ try {
   app.log.error(error);
   process.exit(1);
 }
+```
+
+Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/index.ts`:
+
+```ts
+export { buildApiApp, type BuildApiAppOptions } from './app.js';
 ```
 
 - [ ] **Step 4: Run test and typecheck**
@@ -1070,7 +1198,7 @@ Expected: commit succeeds with the API app, route test, and lockfile changes.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/types/fastify.d.ts`
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/plugins/session.ts`
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/plugins/tenant.ts`
-- Modify: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/server.ts`
+- Modify: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts`
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/test/buildTestApp.ts`
 - Modify: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/routes/health.test.ts`
 
@@ -1128,10 +1256,10 @@ describe('GET /health', () => {
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/test/buildTestApp.ts`:
 
 ```ts
-import { buildServer, type BuildServerOptions } from '../server.js';
+import { buildApiApp, type BuildApiAppOptions } from '../app.js';
 
-export async function buildTestApp(options: BuildServerOptions = {}) {
-  return buildServer({
+export async function buildTestApp(options: BuildApiAppOptions = {}) {
+  return buildApiApp({
     logger: false,
     ...options,
   });
@@ -1254,7 +1382,7 @@ function readWorkspaceHeader(request: FastifyRequest): string | undefined {
 }
 ```
 
-Replace `/Users/minjun/Documents/dropsign-cloud/apps/api/src/server.ts` with:
+Replace `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts` with:
 
 ```ts
 import sensible from '@fastify/sensible';
@@ -1263,11 +1391,11 @@ import { sessionPlugin } from './plugins/session.js';
 import { tenantPlugin } from './plugins/tenant.js';
 import { healthRoutes } from './routes/health.js';
 
-export type BuildServerOptions = {
+export type BuildApiAppOptions = {
   logger?: boolean;
 };
 
-export async function buildServer(options: BuildServerOptions = {}): Promise<FastifyInstance> {
+export async function buildApiApp(options: BuildApiAppOptions = {}): Promise<FastifyInstance> {
   const app = Fastify({
     logger: options.logger ?? false,
   });
@@ -1316,7 +1444,7 @@ Expected: commit succeeds with API middleware and tests.
 **Files:**
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/repositories/projectRepository.ts`
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/routes/projects.ts`
-- Modify: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/server.ts`
+- Modify: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts`
 - Modify: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/test/buildTestApp.ts`
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/routes/projects.test.ts`
 
@@ -1737,7 +1865,7 @@ export const projectRoutes: FastifyPluginAsync<ProjectRoutesOptions> = async (
 };
 ```
 
-Replace `/Users/minjun/Documents/dropsign-cloud/apps/api/src/server.ts` with:
+Replace `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts` with:
 
 ```ts
 import { prisma } from '@dropsign/db';
@@ -1752,12 +1880,12 @@ import {
 import { healthRoutes } from './routes/health.js';
 import { projectRoutes } from './routes/projects.js';
 
-export type BuildServerOptions = {
+export type BuildApiAppOptions = {
   logger?: boolean;
   projectRepository?: ProjectRepository;
 };
 
-export async function buildServer(options: BuildServerOptions = {}): Promise<FastifyInstance> {
+export async function buildApiApp(options: BuildApiAppOptions = {}): Promise<FastifyInstance> {
   const app = Fastify({
     logger: options.logger ?? false,
   });
@@ -1777,10 +1905,10 @@ Replace `/Users/minjun/Documents/dropsign-cloud/apps/api/src/test/buildTestApp.t
 
 ```ts
 import { InMemoryProjectRepository } from '../repositories/projectRepository.js';
-import { buildServer, type BuildServerOptions } from '../server.js';
+import { buildApiApp, type BuildApiAppOptions } from '../app.js';
 
-export async function buildTestApp(options: BuildServerOptions = {}) {
-  return buildServer({
+export async function buildTestApp(options: BuildApiAppOptions = {}) {
+  return buildApiApp({
     logger: false,
     projectRepository: new InMemoryProjectRepository(),
     ...options,
@@ -1966,4 +2094,4 @@ Expected: commit succeeds only when verification produced a tracked code or conf
 - `@dropsign/storage` exports an `ObjectStorage` interface and a tested `InMemoryStorage` implementation.
 - `@dropsign/api` exposes `GET /health`, `GET /v1/projects`, and `POST /v1/projects`.
 - Project endpoints require DropSign session headers, enforce workspace tenant scoping, create a default widget config, and record a `project.created` audit event through the repository boundary.
-- `pnpm test`, `pnpm typecheck`, `pnpm --filter @dropsign/db prisma:validate`, and `pnpm build` pass from `/Users/minjun/Documents/dropsign-cloud`.
+- `pnpm test`, `pnpm typecheck`, `pnpm --filter @dropsign/db prisma:validate`, `pnpm build`, and `pnpm e2e` pass from `/Users/minjun/Documents/dropsign-cloud`.

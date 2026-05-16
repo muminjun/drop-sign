@@ -162,7 +162,7 @@ Idempotency-Key: widget_01HXWIDGET0000000000000000
   },
   "sdk": {
     "name": "drop-sign",
-    "version": "0.4.0"
+    "version": "0.1.0"
   }
 }
 ```
@@ -204,11 +204,17 @@ window.DropSign.open();
 ## Task 1: Add Shared Widget Contracts
 
 **Files:**
+- Verify or create: `/Users/minjun/Documents/dropsign-cloud/packages/contracts/package.json`
+- Verify or create: `/Users/minjun/Documents/dropsign-cloud/packages/contracts/tsconfig.json`
 - Create: `/Users/minjun/Documents/dropsign-cloud/packages/contracts/src/widget.ts`
 - Modify: `/Users/minjun/Documents/dropsign-cloud/packages/contracts/src/index.ts`
 - Create: `/Users/minjun/Documents/dropsign-cloud/packages/contracts/src/widget.test.ts`
 
-- [ ] **Step 1: Write failing contract tests**
+- [ ] **Step 1: Verify the contracts package scaffold**
+
+Phase 01 should already create `@dropsign/contracts` with `package.json`, `tsconfig.json`, and `src/index.ts`. If the package is missing because Phase 01 was executed before this review update, create those files now using the same placeholder shared-package shape from Phase 01 before writing widget contracts.
+
+- [ ] **Step 2: Write failing contract tests**
 
 Create `/Users/minjun/Documents/dropsign-cloud/packages/contracts/src/widget.test.ts`:
 
@@ -218,7 +224,7 @@ import {
   widgetArtifactUploadSchema,
   widgetConfigResponseSchema,
   widgetSessionClaimsSchema,
-} from './widget';
+} from './widget.js';
 
 describe('widget contracts', () => {
   it('accepts the public widget config response shape', () => {
@@ -258,7 +264,7 @@ describe('widget contracts', () => {
       sessionToken: 'token',
       signature: { mimeType: 'image/png', dataUrl: 'data:image/png;base64,abc' },
       placement: { page: 1, x: 0.1, y: 0.1, width: 0.2, height: 0.1 },
-      sdk: { name: 'drop-sign', version: '0.4.0' },
+      sdk: { name: 'drop-sign', version: '0.1.0' },
     });
 
     expect(result.success).toBe(false);
@@ -418,10 +424,10 @@ export type WidgetRuntimeContext = z.infer<typeof widgetRuntimeContextSchema>;
 Modify `/Users/minjun/Documents/dropsign-cloud/packages/contracts/src/index.ts`:
 
 ```ts
-export * from './widget';
+export * from './widget.js';
 ```
 
-If `index.ts` already exports Phase 01 modules, append `export * from './widget';` without deleting existing exports.
+If `index.ts` already exports Phase 01 modules, append `export * from './widget.js';` without deleting existing exports.
 
 - [ ] **Step 4: Run contract tests and verify pass**
 
@@ -722,8 +728,9 @@ export function createWidgetPlugin(deps: WidgetPluginDeps): FastifyPluginAsync {
 Modify `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts` by registering the widget plugin inside the existing Fastify app factory:
 
 ```ts
-import { createWidgetPlugin } from './widget/widget.routes';
+import { createWidgetPlugin } from './widget/widget.routes.js';
 
+// Keep all existing Phase 01 route/plugin registrations above this line.
 await app.register(createWidgetPlugin({
   db,
   env: {
@@ -832,7 +839,7 @@ describe('widget artifact ingest', () => {
         metadata: { source: 'test' },
         signature: { mimeType: 'image/png', dataUrl: 'data:image/png;base64,abc' },
         placement: { page: 1, x: 0.1, y: 0.2, width: 0.3, height: 0.1 },
-        sdk: { name: 'drop-sign', version: '0.4.0' },
+        sdk: { name: 'drop-sign', version: '0.1.0' },
       },
     });
 
@@ -885,7 +892,7 @@ describe('widget artifact ingest', () => {
         metadata: { source: 'pricing_page' },
         signature: { mimeType: 'image/png', dataUrl: 'data:image/png;base64,abc' },
         placement: { page: 1, x: 0.1, y: 0.2, width: 0.3, height: 0.1 },
-        sdk: { name: 'drop-sign', version: '0.4.0' },
+        sdk: { name: 'drop-sign', version: '0.1.0' },
       },
     });
 
@@ -934,7 +941,7 @@ describe('widget artifact ingest', () => {
         metadata: {},
         signature: { mimeType: 'image/png', dataUrl: 'data:image/png;base64,abc' },
         placement: { page: 1, x: 0.1, y: 0.2, width: 0.3, height: 0.1 },
-        sdk: { name: 'drop-sign', version: '0.4.0' },
+        sdk: { name: 'drop-sign', version: '0.1.0' },
       },
     });
 
@@ -984,7 +991,7 @@ describe('widget artifact ingest', () => {
         metadata: {},
         signature: { mimeType: 'image/png', dataUrl: 'data:image/png;base64,abc' },
         placement: { page: 1, x: 0.1, y: 0.2, width: 0.3, height: 0.1 },
-        sdk: { name: 'drop-sign', version: '0.4.0' },
+        sdk: { name: 'drop-sign', version: '0.1.0' },
       },
     });
 
@@ -1034,7 +1041,7 @@ describe('widget artifact ingest', () => {
         metadata: {},
         signature: { mimeType: 'image/png', dataUrl: 'data:image/png;base64,abc' },
         placement: { page: 1, x: 0.1, y: 0.2, width: 0.3, height: 0.1 },
-        sdk: { name: 'drop-sign', version: '0.4.0' },
+        sdk: { name: 'drop-sign', version: '0.1.0' },
       },
     });
 
@@ -1344,7 +1351,7 @@ Create `/Users/minjun/Documents/dropsign-cloud/apps/widget/package.json`:
   },
   "dependencies": {
     "@dropsign/contracts": "workspace:*",
-    "drop-sign": "^0.4.0"
+    "drop-sign": "^0.1.0"
   },
   "devDependencies": {
     "@vitejs/plugin-legacy": "^5.4.3",
@@ -1887,7 +1894,7 @@ describe('createWidgetApiClient', () => {
         metadata: { source: 'pricing_page' },
         signature: { mimeType: 'image/png', dataUrl: 'data:image/png;base64,abc' },
         placement: { page: 1, x: 0.1, y: 0.2, width: 0.3, height: 0.1 },
-        sdk: { name: 'drop-sign', version: '0.4.0' },
+        sdk: { name: 'drop-sign', version: '0.1.0' },
       },
     });
 
@@ -2385,7 +2392,7 @@ export async function bootWidget(input: {
           placement: result.placement,
           sdk: {
             name: 'drop-sign',
-            version: '0.4.0',
+            version: '0.1.0',
           },
         },
       };

@@ -6,7 +6,7 @@
 
 **Architecture:** Public signing is implemented as an unauthenticated route in the cloud web app backed by API routes that validate signer tokens server-side before exposing any document context. Token validation, routing gates, required field validation, artifact persistence, audit events, completion state updates, and download-link policy live in shared server modules so the page and API use the same rules. The page uses the published DropSign SDK only for field capture/placement and treats all browser-submitted values as untrusted until the completion API revalidates them.
 
-**Tech Stack:** TypeScript, Next.js App Router in `apps/web`, Prisma with PostgreSQL, Vitest for server/domain tests, Playwright for end-to-end tests, `@dropsign/sdk` for signature capture, Node `crypto` for token hashing and timing-safe comparisons.
+**Tech Stack:** TypeScript, Next.js App Router in `apps/web`, Prisma with PostgreSQL, Vitest for server/domain tests, Playwright for end-to-end tests, `drop-sign` for signature capture, Node `crypto` for token hashing and timing-safe comparisons.
 
 ---
 
@@ -50,7 +50,7 @@
 - Create `/Users/minjun/Documents/dropsign-cloud/apps/web/app/api/public/signing/[token]/route.test.ts`: route contract tests for validation API.
 - Create `/Users/minjun/Documents/dropsign-cloud/apps/web/app/api/public/signing/[token]/complete/route.test.ts`: route contract tests for completion API.
 - Create `/Users/minjun/Documents/dropsign-cloud/apps/web/e2e/public-link-signing.spec.ts`: Playwright tests for open link, required field completion, expired token, revoked token, waiting signer, completed state, and allowed download link.
-- Modify `/Users/minjun/Documents/dropsign-cloud/apps/web/package.json`: add `@dropsign/sdk` and the public signing test scripts.
+- Modify `/Users/minjun/Documents/dropsign-cloud/apps/web/package.json`: add `drop-sign` and the public signing test scripts.
 
 ## Public Contracts
 
@@ -202,7 +202,7 @@ Expected: FAIL with output containing `expected '...' to contain 'tokenHash     
 
 - [ ] **Step 3: Add Prisma schema fields**
 
-Modify `/Users/minjun/Documents/dropsign-cloud/packages/db/prisma/schema.prisma` so these definitions exist. Keep the Phase 04 `Document` identity and storage fields unchanged: `title`, `sourceObjectKey`, and `completedObjectKey`.
+Modify `/Users/minjun/Documents/dropsign-cloud/packages/db/prisma/schema.prisma` so these definitions exist. Preserve existing fields, relations, indexes, and enum values from Phases 01-04 unless this task explicitly names a migration. Keep the Phase 04 `Document` identity and storage fields unchanged: `title`, `sourceObjectKey`, and `completedObjectKey`.
 
 ```prisma
 enum SigningRequestStatus {
@@ -2313,7 +2313,7 @@ Modify `/Users/minjun/Documents/dropsign-cloud/apps/web/package.json` so `depend
 ```json
 {
   "dependencies": {
-    "@dropsign/sdk": "^1.0.0"
+    "drop-sign": "^0.1.0"
   }
 }
 ```
@@ -2426,7 +2426,7 @@ Create `/Users/minjun/Documents/dropsign-cloud/apps/web/app/sign/[token]/PublicS
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { DropSign } from '@dropsign/sdk';
+import { DropSign } from 'drop-sign';
 import type {
   PublicSigningCompletionFieldValue,
   PublicSigningCompletionResponse,
@@ -3054,7 +3054,7 @@ pnpm --filter @dropsign/web typecheck
 
 Expected outcomes:
 
-- `pnpm install` exits `0` and updates the lockfile only if `@dropsign/sdk` was newly added.
+- `pnpm install` exits `0` and updates the lockfile only if `drop-sign` was newly added.
 - `prisma validate` exits `0` with schema-valid output.
 - `prisma generate` exits `0` and regenerates Prisma client files.
 - DB tests report the public signing schema assertions passed.
@@ -3080,7 +3080,7 @@ Expected outcomes:
 - Signer page in `apps/web`: Task 7 creates `/sign/[token]` page and client component.
 - Token validation states: Task 3 covers invalid, expired, revoked, waiting, and completed states.
 - Required field completion: Task 4 validates required fields server-side; Task 7 disables submit until required client values exist.
-- SDK integration: Task 7 uses `@dropsign/sdk` for signature and initials capture.
+- SDK integration: Task 7 uses `drop-sign` for signature and initials capture.
 - Signer completion API: Task 6 creates `POST /api/public/signing/[token]/complete`.
 - Completed state and project-controlled download link: Tasks 3, 4, 5, and 6 expose download links only when `Project.allowSignerDownloads` is true and completed storage exists.
 - E2E tests: Task 8 covers successful signing, expired token, revoked token, waiting state, required field gating, and download link visibility.

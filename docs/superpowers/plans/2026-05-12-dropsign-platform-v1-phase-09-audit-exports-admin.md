@@ -152,7 +152,7 @@ export function isSupportAuditEvent(type: AuditEventType): boolean {
 
 - [ ] **Step 4: Extend Prisma audit model**
 
-Modify `/Users/minjun/Documents/dropsign-cloud/packages/db/prisma/schema.prisma` so `AuditEvent` has this shape:
+Modify `/Users/minjun/Documents/dropsign-cloud/packages/db/prisma/schema.prisma` so `AuditEvent` supports this normalized shape. Do not drop Phase 01-08 audit fields blindly; either preserve them or include an explicit migration plus code updates for every previous audit writer that used `eventType`, `message`, `memberId`, or earlier enum values:
 
 ```prisma
 model AuditEvent {
@@ -229,7 +229,7 @@ Create `/Users/minjun/Documents/dropsign-cloud/apps/api/test/audit-routes.test.t
 
 ```ts
 import { describe, expect, it, vi } from 'vitest';
-import { buildApiApp } from '../src/app';
+import { buildApiApp } from '../src/app.js';
 
 describe('audit routes', () => {
   it('lists tenant-scoped audit events newest first', async () => {
@@ -352,7 +352,7 @@ Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/modules/audit/audit-
 
 ```ts
 import type { FastifyInstance } from 'fastify';
-import { listAuditEvents } from './audit-service';
+import { listAuditEvents } from './audit-service.js';
 
 export async function registerAuditRoutes(app: FastifyInstance): Promise<void> {
   app.get('/v1/audit-events', async (request, reply) => {
@@ -377,10 +377,10 @@ export async function registerAuditRoutes(app: FastifyInstance): Promise<void> {
 
 - [ ] **Step 5: Register audit routes**
 
-Modify `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts`:
+Modify `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts` by appending these registrations to the existing `buildApiApp` implementation and preserving all earlier route registrations:
 
 ```ts
-import { registerAuditRoutes } from './modules/audit/audit-routes';
+import { registerAuditRoutes } from './modules/audit/audit-routes.js';
 
 export async function buildApiApp(options: BuildApiAppOptions = {}) {
   const app = Fastify({ logger: options.logger ?? false });
@@ -426,7 +426,7 @@ Create `/Users/minjun/Documents/dropsign-cloud/apps/worker/test/export-workspace
 
 ```ts
 import { describe, expect, it, vi } from 'vitest';
-import { runExportWorkspaceJob } from '../src/jobs/export-workspace';
+import { runExportWorkspaceJob } from '../src/jobs/export-workspace.js';
 
 describe('runExportWorkspaceJob', () => {
   it('exports every tenant-scoped workspace record needed for legal portability', async () => {
@@ -713,7 +713,7 @@ Create `/Users/minjun/Documents/dropsign-cloud/apps/api/test/export-routes.test.
 
 ```ts
 import { describe, expect, it, vi } from 'vitest';
-import { buildApiApp } from '../src/app';
+import { buildApiApp } from '../src/app.js';
 
 describe('export routes', () => {
   it('creates tenant-scoped export requests for the authenticated workspace member', async () => {
@@ -883,11 +883,11 @@ export async function registerExportRoutes(app: FastifyInstance): Promise<void> 
 
 - [ ] **Step 4: Register export routes**
 
-Modify `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts`:
+Modify `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts` by appending these registrations to the existing `buildApiApp` implementation and preserving all earlier route registrations:
 
 ```ts
-import { registerAuditRoutes } from './modules/audit/audit-routes';
-import { registerExportRoutes } from './modules/exports/export-routes';
+import { registerAuditRoutes } from './modules/audit/audit-routes.js';
+import { registerExportRoutes } from './modules/exports/export-routes.js';
 
 export async function buildApiApp(options: BuildApiAppOptions = {}) {
   const app = Fastify({ logger: options.logger ?? false });
@@ -1038,7 +1038,7 @@ Create `/Users/minjun/Documents/dropsign-cloud/apps/worker/test/apply-retention.
 
 ```ts
 import { describe, expect, it, vi } from 'vitest';
-import { runApplyRetentionJob } from '../src/jobs/apply-retention';
+import { runApplyRetentionJob } from '../src/jobs/apply-retention.js';
 
 describe('runApplyRetentionJob', () => {
   it('deletes expired completed exports and masks expired audit metadata by workspace policy', async () => {
@@ -1174,7 +1174,7 @@ Create `/Users/minjun/Documents/dropsign-cloud/apps/api/test/operations-routes.t
 
 ```ts
 import { describe, expect, it, vi } from 'vitest';
-import { buildApiApp } from '../src/app';
+import { buildApiApp } from '../src/app.js';
 
 describe('operations routes', () => {
   it('lists failed jobs for the authenticated workspace', async () => {
@@ -1224,12 +1224,12 @@ export async function registerOperationsRoutes(app: FastifyInstance): Promise<vo
 }
 ```
 
-Modify `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts`:
+Modify `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts` by appending these registrations to the existing `buildApiApp` implementation and preserving all earlier route registrations:
 
 ```ts
-import { registerAuditRoutes } from './modules/audit/audit-routes';
-import { registerExportRoutes } from './modules/exports/export-routes';
-import { registerOperationsRoutes } from './modules/operations/operations-routes';
+import { registerAuditRoutes } from './modules/audit/audit-routes.js';
+import { registerExportRoutes } from './modules/exports/export-routes.js';
+import { registerOperationsRoutes } from './modules/operations/operations-routes.js';
 
 export async function buildApiApp(options: BuildApiAppOptions = {}) {
   const app = Fastify({ logger: options.logger ?? false });
@@ -1281,7 +1281,7 @@ Create `/Users/minjun/Documents/dropsign-cloud/apps/api/test/admin-routes.test.t
 
 ```ts
 import { describe, expect, it, vi } from 'vitest';
-import { buildApiApp } from '../src/app';
+import { buildApiApp } from '../src/app.js';
 
 describe('admin routes', () => {
   it('allows support-admin to view workspace diagnostics and logs access', async () => {
@@ -1410,13 +1410,13 @@ export async function registerAdminRoutes(app: FastifyInstance): Promise<void> {
 
 - [ ] **Step 4: Register admin routes**
 
-Modify `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts`:
+Modify `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts` by appending these registrations to the existing `buildApiApp` implementation and preserving all earlier route registrations:
 
 ```ts
-import { registerAuditRoutes } from './modules/audit/audit-routes';
-import { registerAdminRoutes } from './modules/admin/admin-routes';
-import { registerExportRoutes } from './modules/exports/export-routes';
-import { registerOperationsRoutes } from './modules/operations/operations-routes';
+import { registerAuditRoutes } from './modules/audit/audit-routes.js';
+import { registerAdminRoutes } from './modules/admin/admin-routes.js';
+import { registerExportRoutes } from './modules/exports/export-routes.js';
+import { registerOperationsRoutes } from './modules/operations/operations-routes.js';
 
 export async function buildApiApp(options: BuildApiAppOptions = {}) {
   const app = Fastify({ logger: options.logger ?? false });

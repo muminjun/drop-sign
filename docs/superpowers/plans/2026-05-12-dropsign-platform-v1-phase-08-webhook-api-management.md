@@ -155,7 +155,7 @@ Create `/Users/minjun/Documents/dropsign-cloud/apps/api/test/api-key-routes.test
 
 ```ts
 import { describe, expect, it, vi } from 'vitest';
-import { buildApiApp } from '../src/app';
+import { buildApiApp } from '../src/app.js';
 
 describe('api key routes', () => {
   it('creates an API key, stores only the hash, and returns the raw key once', async () => {
@@ -271,7 +271,7 @@ Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/modules/api-keys/api
 ```ts
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
-import { createProjectApiKey } from './api-key-service';
+import { createProjectApiKey } from './api-key-service.js';
 
 const createApiKeyBody = z.object({
   name: z.string().min(1),
@@ -298,12 +298,12 @@ export async function registerApiKeyRoutes(app: FastifyInstance): Promise<void> 
 
 - [ ] **Step 6: Register the routes**
 
-Modify `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts`:
+Modify `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts` by appending these registrations to the existing `buildApiApp` implementation and preserving all earlier route registrations:
 
 ```ts
 import Fastify from 'fastify';
 import sensible from '@fastify/sensible';
-import { registerApiKeyRoutes } from './modules/api-keys/api-key-routes';
+import { registerApiKeyRoutes } from './modules/api-keys/api-key-routes.js';
 
 export async function buildApiApp(deps: { db: unknown }) {
   const app = Fastify();
@@ -352,7 +352,7 @@ Create `/Users/minjun/Documents/dropsign-cloud/apps/api/test/webhook-endpoint-ro
 
 ```ts
 import { describe, expect, it, vi } from 'vitest';
-import { buildApiApp } from '../src/app';
+import { buildApiApp } from '../src/app.js';
 
 describe('webhook endpoint routes', () => {
   it('creates endpoint with supported event subscriptions only', async () => {
@@ -505,7 +505,7 @@ Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/modules/webhooks/web
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { CUSTOMER_WEBHOOK_EVENTS } from '@dropsign/domain/webhooks';
-import { createWebhookEndpoint } from './webhook-service';
+import { createWebhookEndpoint } from './webhook-service.js';
 
 const createEndpointBody = z.object({
   url: z.string().url(),
@@ -537,13 +537,13 @@ export async function registerWebhookRoutes(app: FastifyInstance): Promise<void>
 
 - [ ] **Step 6: Register webhook routes**
 
-Modify `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts`:
+Modify `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts` by appending these registrations to the existing `buildApiApp` implementation and preserving all earlier route registrations:
 
 ```ts
 import Fastify from 'fastify';
 import sensible from '@fastify/sensible';
-import { registerApiKeyRoutes } from './modules/api-keys/api-key-routes';
-import { registerWebhookRoutes } from './modules/webhooks/webhook-routes';
+import { registerApiKeyRoutes } from './modules/api-keys/api-key-routes.js';
+import { registerWebhookRoutes } from './modules/webhooks/webhook-routes.js';
 
 export async function buildApiApp(deps: { db: unknown }) {
   const app = Fastify();
@@ -762,7 +762,7 @@ Create `/Users/minjun/Documents/dropsign-cloud/apps/worker/test/deliver-webhook.
 
 ```ts
 import { describe, expect, it, vi } from 'vitest';
-import { runDeliverWebhookJob } from '../src/jobs/deliver-webhook';
+import { runDeliverWebhookJob } from '../src/jobs/deliver-webhook.js';
 
 describe('runDeliverWebhookJob', () => {
   it('sends signed webhook payload and records successful delivery', async () => {
@@ -1121,7 +1121,7 @@ Create `/Users/minjun/Documents/dropsign-cloud/apps/api/test/webhook-delivery-ro
 
 ```ts
 import { describe, expect, it, vi } from 'vitest';
-import { buildApiApp } from '../src/app';
+import { buildApiApp } from '../src/app.js';
 
 describe('webhook delivery routes', () => {
   it('lists webhook deliveries for a project', async () => {
@@ -1275,11 +1275,11 @@ Modify `/Users/minjun/Documents/dropsign-cloud/apps/api/src/modules/webhooks/web
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { CUSTOMER_WEBHOOK_EVENTS } from '@dropsign/domain/webhooks';
-import { createWebhookEndpoint } from './webhook-service';
+import { createWebhookEndpoint } from './webhook-service.js';
 import {
   listWebhookDeliveries,
   resendWebhookDelivery,
-} from './webhook-delivery-service';
+} from './webhook-delivery-service.js';
 
 const createEndpointBody = z.object({
   url: z.string().url(),
@@ -1340,13 +1340,13 @@ export async function registerWebhookRoutes(app: FastifyInstance): Promise<void>
 
 - [ ] **Step 4: Register webhook queue dependency in app**
 
-Modify `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts`:
+Modify `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts` by appending these registrations to the existing `buildApiApp` implementation and preserving all earlier route registrations:
 
 ```ts
 import Fastify from 'fastify';
 import sensible from '@fastify/sensible';
-import { registerApiKeyRoutes } from './modules/api-keys/api-key-routes';
-import { registerWebhookRoutes } from './modules/webhooks/webhook-routes';
+import { registerApiKeyRoutes } from './modules/api-keys/api-key-routes.js';
+import { registerWebhookRoutes } from './modules/webhooks/webhook-routes.js';
 
 export async function buildApiApp(deps: { db: unknown; queues: { webhooks: unknown } }) {
   const app = Fastify();

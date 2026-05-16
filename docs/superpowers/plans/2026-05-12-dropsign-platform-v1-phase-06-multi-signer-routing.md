@@ -21,8 +21,8 @@ Create:
 - `/Users/minjun/Documents/dropsign-cloud/apps/api/src/signing/requestCompletion.test.ts`
 - `/Users/minjun/Documents/dropsign-cloud/apps/api/src/routes/publicSigning.test.ts`
 - `/Users/minjun/Documents/dropsign-cloud/apps/api/src/routes/signingRequests.test.ts`
-- `/Users/minjun/Documents/dropsign-cloud/apps/dashboard/src/features/signing-request/SignerSetup.tsx`
-- `/Users/minjun/Documents/dropsign-cloud/apps/dashboard/src/features/signing-request/SignerSetup.test.tsx`
+- `/Users/minjun/Documents/dropsign-cloud/apps/web/src/features/signing-request/SignerSetup.tsx`
+- `/Users/minjun/Documents/dropsign-cloud/apps/web/src/features/signing-request/SignerSetup.test.tsx`
 - `/Users/minjun/Documents/dropsign-cloud/apps/web/app/sign/[token]/WaitingForTurn.tsx`
 - `/Users/minjun/Documents/dropsign-cloud/apps/web/app/sign/[token]/WaitingForTurn.test.tsx`
 - `/Users/minjun/Documents/dropsign-cloud/apps/e2e/tests/multi-signer-routing.spec.ts`
@@ -34,8 +34,8 @@ Modify:
 - `/Users/minjun/Documents/dropsign-cloud/apps/api/src/routes/signingRequests.ts`
 - `/Users/minjun/Documents/dropsign-cloud/apps/api/src/routes/signatureArtifacts.ts`
 - `/Users/minjun/Documents/dropsign-cloud/apps/api/src/signing/types.ts`
-- `/Users/minjun/Documents/dropsign-cloud/apps/dashboard/src/features/signing-request/CreateSigningRequestForm.tsx`
-- `/Users/minjun/Documents/dropsign-cloud/apps/dashboard/src/features/signing-request/CreateSigningRequestForm.test.tsx`
+- `/Users/minjun/Documents/dropsign-cloud/apps/web/src/features/signing-request/CreateSigningRequestForm.tsx`
+- `/Users/minjun/Documents/dropsign-cloud/apps/web/src/features/signing-request/CreateSigningRequestForm.test.tsx`
 - `/Users/minjun/Documents/dropsign-cloud/apps/web/app/sign/[token]/page.tsx`
 - `/Users/minjun/Documents/dropsign-cloud/apps/web/app/sign/[token]/page.test.tsx`
 - `/Users/minjun/Documents/dropsign-cloud/packages/api-client/src/signingRequests.ts`
@@ -247,7 +247,7 @@ Expected: FAIL with one of these concrete failures: Prisma reports `Unknown argu
 
 - [ ] **Step 3: Add Prisma schema fields and migration**
 
-In `/Users/minjun/Documents/dropsign-cloud/packages/db/prisma/schema.prisma`, update the routing-related models and enums to include these exact fields:
+In `/Users/minjun/Documents/dropsign-cloud/packages/db/prisma/schema.prisma`, update the routing-related models and enums to include these exact fields. Preserve existing Phase 01-05 fields, relations, indexes, and enum values; this task extends the signing model rather than replacing it:
 
 ```prisma
 enum RoutingMode {
@@ -1409,14 +1409,14 @@ Expected: commit succeeds with API client changes.
 
 **Files:**
 
-- Create: `/Users/minjun/Documents/dropsign-cloud/apps/dashboard/src/features/signing-request/SignerSetup.tsx`
-- Create: `/Users/minjun/Documents/dropsign-cloud/apps/dashboard/src/features/signing-request/SignerSetup.test.tsx`
-- Modify: `/Users/minjun/Documents/dropsign-cloud/apps/dashboard/src/features/signing-request/CreateSigningRequestForm.tsx`
-- Modify: `/Users/minjun/Documents/dropsign-cloud/apps/dashboard/src/features/signing-request/CreateSigningRequestForm.test.tsx`
+- Create: `/Users/minjun/Documents/dropsign-cloud/apps/web/src/features/signing-request/SignerSetup.tsx`
+- Create: `/Users/minjun/Documents/dropsign-cloud/apps/web/src/features/signing-request/SignerSetup.test.tsx`
+- Modify: `/Users/minjun/Documents/dropsign-cloud/apps/web/src/features/signing-request/CreateSigningRequestForm.tsx`
+- Modify: `/Users/minjun/Documents/dropsign-cloud/apps/web/src/features/signing-request/CreateSigningRequestForm.test.tsx`
 
 - [ ] **Step 1: Write failing component tests for signer setup**
 
-Create `/Users/minjun/Documents/dropsign-cloud/apps/dashboard/src/features/signing-request/SignerSetup.test.tsx`:
+Create `/Users/minjun/Documents/dropsign-cloud/apps/web/src/features/signing-request/SignerSetup.test.tsx`:
 
 ```tsx
 import { fireEvent, render, screen } from '@testing-library/react';
@@ -1509,7 +1509,7 @@ Expected: FAIL with `Cannot find module './SignerSetup'`.
 
 - [ ] **Step 3: Implement the SignerSetup component**
 
-Create `/Users/minjun/Documents/dropsign-cloud/apps/dashboard/src/features/signing-request/SignerSetup.tsx`:
+Create `/Users/minjun/Documents/dropsign-cloud/apps/web/src/features/signing-request/SignerSetup.tsx`:
 
 ```tsx
 'use client';
@@ -1657,7 +1657,7 @@ Expected: PASS for rendering and adding signers.
 
 - [ ] **Step 5: Write failing form integration test**
 
-Add this test to `/Users/minjun/Documents/dropsign-cloud/apps/dashboard/src/features/signing-request/CreateSigningRequestForm.test.tsx`:
+Add this test to `/Users/minjun/Documents/dropsign-cloud/apps/web/src/features/signing-request/CreateSigningRequestForm.test.tsx`:
 
 ```tsx
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
@@ -1727,7 +1727,7 @@ Expected: FAIL because the form does not render signer routing controls or does 
 
 - [ ] **Step 7: Wire SignerSetup into CreateSigningRequestForm**
 
-In `/Users/minjun/Documents/dropsign-cloud/apps/dashboard/src/features/signing-request/CreateSigningRequestForm.tsx`, hold signer setup state and send it on submit:
+In `/Users/minjun/Documents/dropsign-cloud/apps/web/src/features/signing-request/CreateSigningRequestForm.tsx`, hold signer setup state and send it on submit:
 
 ```tsx
 'use client';
@@ -1793,7 +1793,7 @@ Run:
 
 ```bash
 cd /Users/minjun/Documents/dropsign-cloud
-git add apps/dashboard/src/features/signing-request/SignerSetup.tsx apps/dashboard/src/features/signing-request/SignerSetup.test.tsx apps/dashboard/src/features/signing-request/CreateSigningRequestForm.tsx apps/dashboard/src/features/signing-request/CreateSigningRequestForm.test.tsx
+git add apps/web/src/features/signing-request/SignerSetup.tsx apps/web/src/features/signing-request/SignerSetup.test.tsx apps/web/src/features/signing-request/CreateSigningRequestForm.tsx apps/web/src/features/signing-request/CreateSigningRequestForm.test.tsx
 git commit -m "feat: add dashboard signer routing setup"
 ```
 
@@ -2196,10 +2196,10 @@ Expected: commit succeeds with E2E coverage changes.
   `/Users/minjun/Documents/dropsign-cloud/apps/api/src/signing/types.ts`,
   `/Users/minjun/Documents/dropsign-cloud/packages/api-client/src/signingRequests.ts`,
   `/Users/minjun/Documents/dropsign-cloud/packages/api-client/src/signingRequests.test.ts`,
-  `/Users/minjun/Documents/dropsign-cloud/apps/dashboard/src/features/signing-request/SignerSetup.tsx`,
-  `/Users/minjun/Documents/dropsign-cloud/apps/dashboard/src/features/signing-request/SignerSetup.test.tsx`,
-  `/Users/minjun/Documents/dropsign-cloud/apps/dashboard/src/features/signing-request/CreateSigningRequestForm.tsx`,
-  `/Users/minjun/Documents/dropsign-cloud/apps/dashboard/src/features/signing-request/CreateSigningRequestForm.test.tsx`,
+  `/Users/minjun/Documents/dropsign-cloud/apps/web/src/features/signing-request/SignerSetup.tsx`,
+  `/Users/minjun/Documents/dropsign-cloud/apps/web/src/features/signing-request/SignerSetup.test.tsx`,
+  `/Users/minjun/Documents/dropsign-cloud/apps/web/src/features/signing-request/CreateSigningRequestForm.tsx`,
+  `/Users/minjun/Documents/dropsign-cloud/apps/web/src/features/signing-request/CreateSigningRequestForm.test.tsx`,
   `/Users/minjun/Documents/dropsign-cloud/apps/web/app/sign/[token]/WaitingForTurn.tsx`,
   `/Users/minjun/Documents/dropsign-cloud/apps/web/app/sign/[token]/WaitingForTurn.test.tsx`,
   `/Users/minjun/Documents/dropsign-cloud/apps/web/app/sign/[token]/page.tsx`,

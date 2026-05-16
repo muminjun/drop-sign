@@ -257,7 +257,7 @@ export interface EmailProvider {
 Create `/Users/minjun/Documents/dropsign-cloud/packages/email/src/fake-provider.ts`:
 
 ```ts
-import type { EmailMessage, EmailProvider, EmailSendResult } from './types';
+import type { EmailMessage, EmailProvider, EmailSendResult } from './types.js';
 
 export class FakeEmailProvider implements EmailProvider {
   readonly sent: EmailMessage[] = [];
@@ -316,10 +316,10 @@ function escapeAttribute(value: string): string {
 Create `/Users/minjun/Documents/dropsign-cloud/packages/email/src/index.ts`:
 
 ```ts
-export type { EmailMessage, EmailProvider, EmailSendResult } from './types';
-export { FakeEmailProvider } from './fake-provider';
-export { renderSigningInvitation } from './templates';
-export type { SigningInvitationInput } from './templates';
+export type { EmailMessage, EmailProvider, EmailSendResult } from './types.js';
+export { FakeEmailProvider } from './fake-provider.js';
+export { renderSigningInvitation } from './templates.js';
+export type { SigningInvitationInput } from './templates.js';
 ```
 
 - [ ] **Step 7: Run the package test**
@@ -360,7 +360,7 @@ Create `/Users/minjun/Documents/dropsign-cloud/apps/worker/test/send-email.test.
 ```ts
 import { describe, expect, it, vi } from 'vitest';
 import { FakeEmailProvider } from '@dropsign/email';
-import { runSendEmailJob } from '../src/jobs/send-email';
+import { runSendEmailJob } from '../src/jobs/send-email.js';
 
 describe('runSendEmailJob', () => {
   it('marks queued delivery as sent after provider success', async () => {
@@ -586,9 +586,9 @@ export function createEmailProvider(): EmailProvider {
 Modify `/Users/minjun/Documents/dropsign-cloud/apps/worker/src/index.ts`:
 
 ```ts
-export { createEmailProvider } from './email-provider';
-export { runSendEmailJob } from './jobs/send-email';
-export type { SendEmailJobInput } from './jobs/send-email';
+export { createEmailProvider } from './email-provider.js';
+export { runSendEmailJob } from './jobs/send-email.js';
+export type { SendEmailJobInput } from './jobs/send-email.js';
 ```
 
 - [ ] **Step 6: Run the worker test**
@@ -628,7 +628,7 @@ Create `/Users/minjun/Documents/dropsign-cloud/apps/api/test/email-routes.test.t
 
 ```ts
 import { describe, expect, it, vi } from 'vitest';
-import { buildApiApp } from '../src/app';
+import { buildApiApp } from '../src/app.js';
 
 describe('email routes', () => {
   it('queues a signing reminder for a signer in the active workspace', async () => {
@@ -868,7 +868,7 @@ import {
   listEmailDeliveries,
   queueSigningReminder,
   resendFailedEmailDelivery,
-} from './email-service';
+} from './email-service.js';
 
 export async function registerEmailRoutes(app: FastifyInstance): Promise<void> {
   app.get('/v1/signing-requests/:requestId/email-deliveries', async (request, reply) => {
@@ -926,12 +926,12 @@ export async function registerEmailRoutes(app: FastifyInstance): Promise<void> {
 
 - [ ] **Step 5: Register routes in the app**
 
-Modify `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts`:
+Modify `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts` by appending these registrations to the existing `buildApiApp` implementation and preserving all earlier route registrations:
 
 ```ts
 import Fastify from 'fastify';
 import sensible from '@fastify/sensible';
-import { registerEmailRoutes } from './modules/email/email-routes';
+import { registerEmailRoutes } from './modules/email/email-routes.js';
 
 export async function buildApiApp(deps: { db: unknown; queues: { email: unknown } }) {
   const app = Fastify();
@@ -1427,7 +1427,7 @@ Create `/Users/minjun/Documents/dropsign-cloud/apps/worker/test/schedule-email-r
 
 ```ts
 import { describe, expect, it, vi } from 'vitest';
-import { runScheduleEmailRemindersJob } from '../src/jobs/schedule-email-reminders';
+import { runScheduleEmailRemindersJob } from '../src/jobs/schedule-email-reminders.js';
 
 describe('runScheduleEmailRemindersJob', () => {
   it('creates reminder deliveries for signers past the reminder interval', async () => {

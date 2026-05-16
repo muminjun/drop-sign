@@ -104,12 +104,19 @@ pnpm lint
 pnpm typecheck
 pnpm test
 pnpm build
+pnpm e2e
 ```
 
 Expected final result after each phase: all commands pass, plus phase-specific Playwright or worker tests.
 
 ## Cross-Phase Contract Rules
 
+- API route wiring is standardized as `apps/api/src/app.ts` exporting `buildApiApp(...)` for tests and dependency injection. `apps/api/src/server.ts` is only the runtime `listen` wrapper, and `apps/api/src/index.ts` may re-export public app types.
+- Later phases must append route/plugin registration to the existing `buildApiApp` path. Do not replace `apps/api/src/app.ts` with a snippet that drops routes from earlier phases.
+- Shared packages used in later phases are bootstrapped in Phase 01 with manifests, tsconfigs, and empty exports. Later phases add source files to those packages instead of creating incompatible package boundaries.
+- Under `moduleResolution: "NodeNext"`, local relative TypeScript imports must use emitted JavaScript extensions such as `./foo.js` and `../modules/foo.js`. Package imports remain extensionless.
+- Prisma schema changes are cumulative. Preserve existing fields, relations, indexes, and enum values unless a phase explicitly includes a migration and code updates for renaming or removing them.
+- The browser SDK dependency name is `drop-sign` for this plan set. Do not use `@dropsign/sdk` unless a separate package rename/publish phase has already landed.
 - Public project keys are not secrets. Server API keys are secrets and must be stored hashed.
 - Browser-provided identity values are hints only. They never authorize signer, request, or document binding.
 - Any widget flow that binds to an existing signer, request, or document requires a backend-minted `WidgetSession`.
@@ -120,7 +127,7 @@ Expected final result after each phase: all commands pass, plus phase-specific P
 
 ## Execution Checklist
 
-- [ ] **Step 1: Confirm working tree before implementation**
+- [x] **Step 1: Confirm working tree before implementation**
 
 Run:
 
@@ -131,11 +138,11 @@ git status --short
 
 Expected: only user-approved plan/doc changes are present. Do not revert unrelated changes such as `tsup.config.ts`.
 
-- [ ] **Step 2: Create or enter isolated implementation workspace**
+- [x] **Step 2: Create or enter isolated implementation workspace**
 
 Use `superpowers:using-git-worktrees` if implementing inside an existing repo. If creating the sibling cloud repo, request approval to write `/Users/minjun/Documents/dropsign-cloud`.
 
-- [ ] **Step 3: Execute Phase 01**
+- [x] **Step 3: Execute Phase 01**
 
 Open:
 
@@ -145,7 +152,7 @@ less /Users/minjun/Documents/drop-sign/docs/superpowers/plans/2026-05-12-dropsig
 
 Expected: cloud foundation lands with auth, workspace, project, base schema, and tests.
 
-- [ ] **Step 4: Execute Phase 02**
+- [x] **Step 4: Execute Phase 02**
 
 Open:
 
@@ -155,7 +162,7 @@ less /Users/minjun/Documents/drop-sign/docs/superpowers/plans/2026-05-12-dropsig
 
 Expected: installable widget flow lands with config fetch, safe runtime context, and artifact ingest.
 
-- [ ] **Step 5: Execute Phase 03**
+- [x] **Step 5: Execute Phase 03**
 
 Open:
 
@@ -172,7 +179,7 @@ pnpm lint && pnpm typecheck && pnpm test && pnpm build
 
 Expected: dashboard shell, workspace/project settings, auth-protected navigation, and dashboard tests land green and committed.
 
-- [ ] **Step 6: Execute Phase 04**
+- [x] **Step 6: Execute Phase 04**
 
 Open:
 
@@ -189,7 +196,7 @@ pnpm lint && pnpm typecheck && pnpm test && pnpm build
 
 Expected: document upload, template/field editing, PDF generation/storage, and related tests land green and committed.
 
-- [ ] **Step 7: Execute Phase 05**
+- [x] **Step 7: Execute Phase 05**
 
 Open:
 
@@ -206,7 +213,7 @@ pnpm lint && pnpm typecheck && pnpm test && pnpm build
 
 Expected: public signing links, signer verification, signature capture, completion flow, and tests land green and committed.
 
-- [ ] **Step 8: Execute Phase 06**
+- [x] **Step 8: Execute Phase 06**
 
 Open:
 
@@ -223,7 +230,7 @@ pnpm lint && pnpm typecheck && pnpm test && pnpm build
 
 Expected: ordered and parallel multi-signer routing, recipient state transitions, reminder integration points, and tests land green and committed.
 
-- [ ] **Step 9: Execute Phase 07**
+- [x] **Step 9: Execute Phase 07**
 
 Open:
 
@@ -240,7 +247,7 @@ pnpm lint && pnpm typecheck && pnpm test && pnpm build
 
 Expected: email delivery adapter, notification templates, reminder scheduling, delivery logs, and tests land green and committed.
 
-- [ ] **Step 10: Execute Phase 08**
+- [x] **Step 10: Execute Phase 08**
 
 Open:
 
@@ -257,7 +264,7 @@ pnpm lint && pnpm typecheck && pnpm test && pnpm build
 
 Expected: API key management, webhook endpoint CRUD, HMAC delivery/retry logs, and tests land green and committed.
 
-- [ ] **Step 11: Execute Phase 09**
+- [x] **Step 11: Execute Phase 09**
 
 Open:
 
@@ -274,7 +281,7 @@ pnpm lint && pnpm typecheck && pnpm test && pnpm build
 
 Expected: audit timelines, complete workspace exports, export request/download UI, retention jobs, failed job visibility, support-admin RBAC, and tests land green and committed.
 
-- [ ] **Step 12: Execute Phase 10**
+- [x] **Step 12: Execute Phase 10**
 
 Open:
 
@@ -291,7 +298,7 @@ pnpm lint && pnpm typecheck && pnpm test && pnpm build
 
 Expected: billing plans, usage metering, quota enforcement, subscription state handling, and tests land green and committed.
 
-- [ ] **Step 13: Final full-platform verification**
+- [x] **Step 13: Final full-platform verification**
 
 Run:
 
@@ -302,11 +309,13 @@ pnpm typecheck
 pnpm test
 pnpm build
 pnpm e2e
+pnpm --filter @dropsign/widget test:browser
+pnpm --filter @dropsign/e2e test
 ```
 
 Expected: all checks pass. Playwright covers widget install, dashboard setup, template creation, public signing, multi-signer routing, webhook delivery logs, audit export, and billing quota enforcement.
 
-- [ ] **Step 14: Commit the completed implementation**
+- [x] **Step 14: Commit the completed implementation**
 
 Run:
 
