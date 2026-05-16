@@ -1,8 +1,8 @@
 # DropSign
 
-Drop signatures anywhere on the web.
+Let users draw and place their signature anywhere on the web — in three clicks.
 
-DropSign is a lightweight embeddable TypeScript SDK that lets users draw a signature, place it on a page or viewport, resize it, and receive the signature image with normalized placement metadata.
+DropSign is a lightweight TypeScript SDK that handles the signature UI, drag-to-place interaction, and normalized coordinate output. You keep control of what happens with the result.
 
 [![CI](https://github.com/muminjun/drop-sign/actions/workflows/ci.yml/badge.svg)](https://github.com/muminjun/drop-sign/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/drop-sign)](https://www.npmjs.com/package/drop-sign)
@@ -10,11 +10,14 @@ DropSign is a lightweight embeddable TypeScript SDK that lets users draw a signa
 
 ---
 
-## What is DropSign?
+## How it works
 
-DropSign adds a signing trigger to a page. When activated, users draw their signature on a canvas, then drag and resize it over the viewport. Confirming returns the signature PNG data plus normalized placement metadata.
+1. **Trigger** — a button (global or custom) opens the signature canvas.
+2. **Draw** — the user signs with a mouse, trackpad, stylus, or finger.
+3. **Place** — a draggable, resizable box lets the user position the signature on the page.
+4. **Confirm** — `onComplete` fires with the signature image and normalized placement coordinates.
 
-This is a **signature placement SDK**, not a legal e-signature platform or final document renderer. Use the returned signature image and placement data in your own PDF, document, or persistence pipeline.
+This is a **signature placement SDK**, not a legal e-signature platform. Use the returned data in your own PDF rendering, document storage, or signing pipeline.
 
 ---
 
@@ -37,15 +40,12 @@ const widget = DropSign.init({
   target: '#contract-area',
   onComplete(result) {
     console.log(result.signatureDataUrl); // data:image/png;base64,...
-    console.log(result.signatureBlob);    // signature PNG only
-    console.log(result.placement);        // normalized position and size
+    console.log(result.signatureBlob);    // Blob for upload
+    console.log(result.placement);        // normalized x, y, width, height
   },
 });
-```
 
-Call `widget.destroy()` when the host page, route, or component unmounts:
-
-```ts
+// Clean up when the component or page unmounts:
 widget.destroy();
 ```
 
@@ -53,48 +53,32 @@ widget.destroy();
 
 ## Trigger modes
 
-### Global trigger
+### Global trigger (default)
 
-When no `trigger` option is provided, DropSign creates a fixed button in the browser viewport.
+DropSign renders a fixed button in the viewport corner. No extra HTML needed.
 
 ```ts
 DropSign.init({
-  target: '#contract',
   trigger: {
     type: 'global',
-    position: 'bottom-right',
+    position: 'bottom-right', // 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left'
     label: 'Sign',
   },
-  onComplete(result) {
-    console.log(result.placement);
-  },
+  onComplete(result) { /* ... */ },
 });
 ```
-
-`position` supports `'bottom-right'`, `'bottom-left'`, `'top-right'`, and `'top-left'`.
 
 ### Custom trigger
 
-Attach the signing flow to your own existing element. DropSign only adds a click listener. It does not create or remove the element.
-
-```ts
-DropSign.init({
-  target: '#contract',
-  trigger: {
-    type: 'custom',
-    element: '#my-sign-button',
-  },
-});
-```
-
-You can also pass an `HTMLElement` or a CSS attribute selector:
+Use your own button or element. DropSign attaches a click listener and leaves the DOM untouched.
 
 ```ts
 DropSign.init({
   trigger: {
     type: 'custom',
-    element: '[data-dropsign-trigger]',
+    element: '#my-sign-button', // CSS selector, HTMLElement, or attribute selector
   },
+  onComplete(result) { /* ... */ },
 });
 ```
 
@@ -102,36 +86,33 @@ DropSign.init({
 
 ## Placement model
 
-`placement` is normalized against the `target` element when `target` is provided. If `target` is omitted, placement is normalized against the viewport.
+The `placement` field contains normalized coordinates relative to `target` (or the viewport when `target` is omitted).
 
 ```ts
 interface NormalizedPlacement {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
+  x: number;      // left edge as a fraction of target width
+  y: number;      // top edge as a fraction of target height
+  width: number;  // signature width as a fraction of target width
+  height: number; // signature height as a fraction of target height
 }
 ```
 
-- `x` and `y` are the top-left position.
-- `width` and `height` are the placed signature size.
-- Values can be outside `0..1` when the signature is placed outside the target.
-- `width` and `height` are always positive.
+Values outside `0..1` mean the signature was placed beyond the target boundary. `width` and `height` are always positive.
 
-Example conversion for a PDF page:
+**PDF example:**
 
 ```ts
-const pdfX = result.placement.x * pageWidth;
-const pdfY = result.placement.y * pageHeight;
-const pdfWidth = result.placement.width * pageWidth;
+const pdfX      = result.placement.x      * pageWidth;
+const pdfY      = result.placement.y      * pageHeight;
+const pdfWidth  = result.placement.width  * pageWidth;
 const pdfHeight = result.placement.height * pageHeight;
 ```
 
 ---
 
-## Signature style options
+## Signature style
 
-Configure the pen used in the signature canvas. Stroke thickness varies naturally with drawing velocity via `minWidth` and `maxWidth`.
+Customize pen color and stroke width. Thickness varies naturally with drawing velocity.
 
 ```ts
 DropSign.init({
@@ -146,9 +127,9 @@ DropSign.init({
 
 ---
 
-## Messages / localization
+## Localization
 
-Override labels shown in the SDK UI:
+Every label in the SDK UI is overridable:
 
 ```ts
 DropSign.init({
@@ -166,7 +147,7 @@ DropSign.init({
 });
 ```
 
-Default messages:
+**Defaults:**
 
 | Key | Default |
 |---|---|
@@ -182,117 +163,80 @@ Default messages:
 
 ---
 
-## Mobile / touch
+## Mobile and touch
 
-DropSign includes mobile and touch behavior out of the box:
+DropSign works on touch screens out of the box:
 
-- Signature canvas uses `touch-action: none` for reliable touch drawing.
-- The placement box and resize handles use Pointer Events.
-- Resize handles are larger on coarse-pointer devices.
-- The signature modal is responsive on small viewports.
-- SDK-created buttons use touch-friendly minimum hit areas.
+- Signature canvas uses `touch-action: none` for reliable stylus and finger drawing.
+- Placement box and resize handles use Pointer Events API.
+- Resize handles are larger on coarse-pointer (touch) devices.
+- Modal layout adapts to small viewports.
+- All SDK-created interactive elements meet touch-friendly minimum hit areas.
 
 ---
 
-## API Reference
+## API reference
 
 ### `DropSign.init(options)`
 
 | Option | Type | Default | Description |
 |---|---|---|---|
-| `target` | `string \| HTMLElement` | viewport | Coordinate normalization reference |
-| `trigger` | `DropSignTrigger` | global bottom-right | Trigger configuration |
-| `messages` | `DropSignMessages` | English | UI label overrides |
-| `signature` | `DropSignSignatureOptions` | default pen settings | Pen color and width options |
-| `onComplete` | `(result: DropSignResult) => void \| Promise<void>` | - | Called after placement is confirmed |
-| `onCancel` | `() => void` | - | Called when signing or placement is cancelled |
-| `onError` | `(error: unknown) => void` | - | Called on recoverable SDK errors |
-
-### Error handling
-
-DropSign reports recoverable errors through `onError` without throwing to the host app:
-
-- If `target` is a selector and no matching element is found, `onError` is called and
-  `DropSign.init()` returns a no-op widget.
-- If `trigger.type` is `custom` and `element` does not resolve to an `HTMLElement`,
-  `onError` is called and `DropSign.init()` returns a no-op widget.
-- If converting the signature data URL to `signatureBlob` fails, `onError` is called.
+| `target` | `string \| HTMLElement` | viewport | Element to normalize placement coordinates against |
+| `trigger` | `DropSignTrigger` | global, bottom-right | How and where the signing flow is activated |
+| `messages` | `DropSignMessages` | English | Label overrides for all SDK UI copy |
+| `signature` | `DropSignSignatureOptions` | default pen | Pen color, min/max width, velocity weight |
+| `onComplete` | `(result: DropSignResult) => void \| Promise<void>` | — | Called when the user confirms placement |
+| `onCancel` | `() => void` | — | Called when the user cancels signing or placement |
+| `onError` | `(error: unknown) => void` | — | Called on recoverable SDK errors instead of throwing |
 
 ### `DropSignTrigger`
 
 ```ts
 type DropSignTrigger =
-  | {
-      type: 'global';
-      position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left';
-      label?: string;
-    }
-  | {
-      type: 'custom';
-      element: string | HTMLElement;
-    };
+  | { type: 'global'; position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left'; label?: string }
+  | { type: 'custom'; element: string | HTMLElement };
 ```
 
 ### `DropSignResult`
 
 | Field | Type | Description |
 |---|---|---|
-| `signatureDataUrl` | `string` | Data URL of the signature PNG |
-| `signatureBlob` | `Blob` | Signature PNG only |
-| `placement` | `NormalizedPlacement` | Normalized position and size metadata |
+| `signatureDataUrl` | `string` | `data:image/png;base64,...` of the drawn signature |
+| `signatureBlob` | `Blob` | PNG Blob, ready for `FormData` upload |
+| `placement` | `NormalizedPlacement` | Position and size as fractions of the target |
 
 ### `DropSignWidget`
 
 | Method | Description |
 |---|---|
-| `destroy()` | Removes SDK-created DOM nodes and event listeners. Custom trigger elements are not removed. |
+| `destroy()` | Removes all SDK-created DOM and event listeners. Does not remove custom trigger elements. |
 
----
+### Error handling
 
-## Future: data attribute API
+Errors are routed to `onError` rather than thrown, so the host page stays stable:
 
-A future version may support selecting targets, triggers, and fields by data attributes:
-
-```html
-<div data-dropsign-target>
-  <button data-dropsign-trigger>Sign</button>
-  <span data-dropsign-field="signature">Signature</span>
-  <span data-dropsign-field="date">Date</span>
-</div>
-```
-
-The current `custom` trigger already supports selector strings:
-
-```ts
-DropSign.init({
-  trigger: { type: 'custom', element: '[data-dropsign-trigger]' },
-});
-```
+- `target` selector matches nothing → `onError`, returns no-op widget.
+- `trigger.element` doesn't resolve to an `HTMLElement` → `onError`, returns no-op widget.
+- `signatureBlob` conversion fails → `onError`, `result.signatureBlob` is omitted.
 
 ---
 
 ## Limitations
 
-- DropSign does not generate final signed PDFs or documents.
-- Final rendering, storage, and server-side persistence are the host application's responsibility.
-- PDF signing is not included.
-- DropSign is not legal e-signature compliance software.
-- Trackpad drawing requires pressing while moving.
-- Browser pointer and canvas behavior can vary by device.
+- Does not generate PDFs or apply signatures to documents server-side.
+- Not legal e-signature compliance software.
+- Trackpad drawing requires pressing while moving (no hover-only strokes).
+- Final document rendering and persistence are the host app's responsibility.
 
 ---
 
 ## Roadmap
 
-- PDF mode
-- Multiple signatures per document
-- Text, date, and initial fields
-- Audit metadata
-- React wrapper
-- Vue wrapper
-- Upload adapter
-- Field snapping with `data-dropsign-field`
-- Optional trackpad freehand mode
+- Multiple signatures per page
+- Text, date, and initials fields
+- React and Vue wrappers
+- `data-dropsign-field` attribute API for declarative field binding
+- Optional freehand trackpad mode
 
 ---
 
