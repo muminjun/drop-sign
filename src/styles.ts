@@ -130,6 +130,18 @@ export const STYLES = `
   .ds-btn-use:hover {
     background: #1e293b;
   }
+  .ds-btn-use:disabled {
+    background: #94a3b8;
+    color: #f8fafc;
+    cursor: not-allowed;
+  }
+
+  .ds-empty-hint {
+    margin: -8px 0 0;
+    color: #64748b;
+    font-size: 12px;
+    font-family: system-ui, -apple-system, sans-serif;
+  }
 
   .ds-placement-overlay {
     position: fixed;

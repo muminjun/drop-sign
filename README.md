@@ -192,6 +192,7 @@ DropSign.init({
 | `delete` | `'Delete'` |
 | `signingTitle` | `'Draw your signature'` |
 | `signingDescription` | `'Use your mouse, trackpad, Apple Pencil, or finger.'` |
+| `emptySignatureHint` | `'Draw a signature to continue.'` |
 
 ---
 

@@ -15,6 +15,21 @@ export function createSignaturePadModal(
   let backdrop: HTMLElement | null = null;
   let pad: SignaturePad | null = null;
 
+  const FALLBACK_CANVAS_WIDTH = 480;
+  const FALLBACK_CANVAS_HEIGHT = 200;
+  let resizeHandler: (() => void) | null = null;
+
+  function resizeCanvas(canvas: HTMLCanvasElement, currentPad: SignaturePad | null): void {
+    const ratio = Math.max(window.devicePixelRatio || 1, 1);
+    const rect = canvas.getBoundingClientRect();
+    const displayWidth = rect.width || FALLBACK_CANVAS_WIDTH;
+    const displayHeight = rect.height || FALLBACK_CANVAS_HEIGHT;
+    canvas.width = Math.round(displayWidth * ratio);
+    canvas.height = Math.round(displayHeight * ratio);
+    canvas.getContext('2d')?.scale(ratio, ratio);
+    currentPad?.clear();
+  }
+
   function open() {
     backdrop = document.createElement('div');
     backdrop.className = 'ds-modal-backdrop';
@@ -54,8 +69,22 @@ export function createSignaturePadModal(
     useBtn.textContent = messages.useSignature;
     useBtn.type = 'button';
 
+    const emptyHint = document.createElement('p');
+    emptyHint.className = 'ds-empty-hint';
+    emptyHint.textContent = messages.emptySignatureHint;
+
+    let hasSignature = false;
+
+    function setHasSignature(next: boolean): void {
+      hasSignature = next;
+      useBtn.disabled = !hasSignature;
+      emptyHint.hidden = hasSignature;
+    }
+
+    setHasSignature(false);
+
     actions.append(clearBtn, cancelBtn, useBtn);
-    modal.append(title, description, canvas, actions);
+    modal.append(title, description, canvas, emptyHint, actions);
     backdrop.appendChild(modal);
     document.body.appendChild(backdrop);
 
@@ -67,7 +96,27 @@ export function createSignaturePadModal(
       velocityFilterWeight: signatureOptions.velocityFilterWeight,
     });
 
-    clearBtn.addEventListener('click', () => pad?.clear());
+    resizeCanvas(canvas, pad);
+
+    pad.addEventListener('beginStroke', () => {
+      emptyHint.hidden = true;
+    });
+
+    pad.addEventListener('endStroke', () => {
+      setHasSignature(Boolean(pad && !pad.isEmpty()));
+    });
+
+    resizeHandler = () => {
+      if (!pad || !pad.isEmpty()) return;
+      resizeCanvas(canvas, pad);
+      setHasSignature(false);
+    };
+    window.addEventListener('resize', resizeHandler);
+
+    clearBtn.addEventListener('click', () => {
+      pad?.clear();
+      setHasSignature(false);
+    });
 
     cancelBtn.addEventListener('click', () => {
       destroy();
@@ -90,6 +139,10 @@ export function createSignaturePadModal(
   }
 
   function destroy() {
+    if (resizeHandler) {
+      window.removeEventListener('resize', resizeHandler);
+      resizeHandler = null;
+    }
     pad?.off();
     pad = null;
     backdrop?.remove();

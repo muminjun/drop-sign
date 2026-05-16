@@ -9,6 +9,7 @@ export const DEFAULT_MESSAGES: Required<DropSignMessages> = {
   delete: 'Delete',
   signingTitle: 'Draw your signature',
   signingDescription: 'Use your mouse, trackpad, Apple Pencil, or finger.',
+  emptySignatureHint: 'Draw a signature to continue.',
 };
 
 export function mergeMessages(user?: DropSignMessages): Required<DropSignMessages> {

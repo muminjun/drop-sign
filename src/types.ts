@@ -20,6 +20,7 @@ export interface DropSignMessages {
   delete?: string;
   signingTitle?: string;
   signingDescription?: string;
+  emptySignatureHint?: string;
 }
 
 export interface DropSignSignatureOptions {
