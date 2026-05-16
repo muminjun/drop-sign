@@ -1,6 +1,6 @@
 # DropSign Platform v1 Phase 10 Billing Plans And Usage Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Add billing plans, subscriptions, invoices, usage records, quota enforcement, and Stripe-compatible billing webhooks.
 
@@ -27,7 +27,7 @@ Do not move these implementation paths back into the SDK repo during execution.
 - Create: `/Users/minjun/Documents/dropsign-cloud/packages/domain/src/billing.ts`
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/test/billing-domain.test.ts`
 
-- [ ] **Step 1: Write the failing billing domain test**
+- [x] **Step 1: Write the failing billing domain test**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/test/billing-domain.test.ts`:
 
@@ -72,7 +72,7 @@ describe('billing domain', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test and verify it fails**
+- [x] **Step 2: Run the test and verify it fails**
 
 Run:
 
@@ -83,7 +83,7 @@ pnpm vitest run apps/api/test/billing-domain.test.ts
 
 Expected: FAIL with module resolution error for `@dropsign/domain/billing`.
 
-- [ ] **Step 3: Implement billing domain**
+- [x] **Step 3: Implement billing domain**
 
 Create `/Users/minjun/Documents/dropsign-cloud/packages/domain/src/billing.ts`:
 
@@ -158,7 +158,7 @@ export function usageLimitExceededCode(dimension: UsageDimension): string {
 }
 ```
 
-- [ ] **Step 4: Run the domain test**
+- [x] **Step 4: Run the domain test**
 
 Run:
 
@@ -169,7 +169,7 @@ pnpm vitest run apps/api/test/billing-domain.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 Run:
 
@@ -187,7 +187,7 @@ Expected: commit succeeds.
 - Modify: `/Users/minjun/Documents/dropsign-cloud/packages/db/prisma/schema.prisma`
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/test/usage-schema.test.ts`
 
-- [ ] **Step 1: Write the failing schema smoke test**
+- [x] **Step 1: Write the failing schema smoke test**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/test/usage-schema.test.ts`:
 
@@ -202,7 +202,7 @@ describe('billing schema contract', () => {
 });
 ```
 
-- [ ] **Step 2: Run the smoke test and verify billing persistence is still absent**
+- [x] **Step 2: Run the smoke test and verify billing persistence is still absent**
 
 Run:
 
@@ -214,7 +214,7 @@ pnpm vitest run apps/api/test/usage-schema.test.ts
 
 Expected: Prisma validation and the smoke test pass against the previous schema, but billing persistence is still incomplete because `Subscription`, `UsageRecord`, `BillingWebhookEvent`, `Invoice`, and `PaymentMethodState` are not present in `packages/db/prisma/schema.prisma`.
 
-- [ ] **Step 3: Add Prisma models**
+- [x] **Step 3: Add Prisma models**
 
 In `/Users/minjun/Documents/dropsign-cloud/packages/db/prisma/schema.prisma`, keep the existing fields from previous phases and update these existing model blocks to include the listed billing relations:
 
@@ -339,7 +339,7 @@ model PaymentMethodState {
 }
 ```
 
-- [ ] **Step 4: Run Prisma generation and schema smoke test**
+- [x] **Step 4: Run Prisma generation and schema smoke test**
 
 Run:
 
@@ -351,7 +351,7 @@ pnpm vitest run apps/api/test/usage-schema.test.ts
 
 Expected: Prisma generation succeeds and test passes.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 Run:
 
@@ -371,7 +371,7 @@ Expected: commit succeeds.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/test/quota-service.test.ts`
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/test/quota-plugin.test.ts`
 
-- [ ] **Step 1: Write the failing quota service test**
+- [x] **Step 1: Write the failing quota service test**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/test/quota-service.test.ts`:
 
@@ -446,7 +446,7 @@ describe('usage service', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test and verify it fails**
+- [x] **Step 2: Run the test and verify it fails**
 
 Run:
 
@@ -457,7 +457,7 @@ pnpm vitest run apps/api/test/quota-service.test.ts
 
 Expected: FAIL because `usage-service` is missing.
 
-- [ ] **Step 3: Implement usage service**
+- [x] **Step 3: Implement usage service**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/modules/billing/usage-service.ts`:
 
@@ -568,7 +568,7 @@ function limitForDimension(
 }
 ```
 
-- [ ] **Step 4: Add quota plugin**
+- [x] **Step 4: Add quota plugin**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/modules/billing/quota-plugin.ts`:
 
@@ -590,7 +590,7 @@ export async function registerQuotaErrorHandler(app: FastifyInstance): Promise<v
 }
 ```
 
-- [ ] **Step 5: Run quota tests**
+- [x] **Step 5: Run quota tests**
 
 Run:
 
@@ -601,7 +601,7 @@ pnpm vitest run apps/api/test/quota-service.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 6: Write the failing quota plugin HTTP test**
+- [x] **Step 6: Write the failing quota plugin HTTP test**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/test/quota-plugin.test.ts`:
 
@@ -631,7 +631,7 @@ describe('quota plugin', () => {
 });
 ```
 
-- [ ] **Step 7: Run quota plugin test**
+- [x] **Step 7: Run quota plugin test**
 
 Run:
 
@@ -642,7 +642,7 @@ pnpm vitest run apps/api/test/quota-plugin.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 Run:
 
@@ -664,7 +664,7 @@ Expected: commit succeeds.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/test/billing-webhook-routes.test.ts`
 - Modify: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts`
 
-- [ ] **Step 1: Write the failing webhook route test**
+- [x] **Step 1: Write the failing webhook route test**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/test/billing-webhook-routes.test.ts`:
 
@@ -751,7 +751,7 @@ describe('billing webhook routes', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test and verify it fails**
+- [x] **Step 2: Run the test and verify it fails**
 
 Run:
 
@@ -762,7 +762,7 @@ pnpm vitest run apps/api/test/billing-webhook-routes.test.ts
 
 Expected: FAIL because billing webhook routes are missing.
 
-- [ ] **Step 3: Add billing package types**
+- [x] **Step 3: Add billing package types**
 
 Create `/Users/minjun/Documents/dropsign-cloud/packages/billing/src/types.ts`:
 
@@ -835,7 +835,7 @@ export type { BillingProvider, BillingSubscriptionEvent } from './types.js';
 export { StripeCompatibleBillingProvider } from './stripe-compatible-provider.js';
 ```
 
-- [ ] **Step 4: Implement billing webhook route**
+- [x] **Step 4: Implement billing webhook route**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/modules/billing/billing-webhook-routes.ts`:
 
@@ -898,7 +898,7 @@ export async function registerBillingWebhookRoutes(app: FastifyInstance): Promis
 }
 ```
 
-- [ ] **Step 5: Register billing webhook routes**
+- [x] **Step 5: Register billing webhook routes**
 
 Modify `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts` to include this route-registration shape while preserving all earlier route registrations:
 
@@ -927,7 +927,7 @@ export async function buildApiApp(deps: { db: unknown; queues?: { email?: unknow
 }
 ```
 
-- [ ] **Step 6: Run billing webhook test**
+- [x] **Step 6: Run billing webhook test**
 
 Run:
 
@@ -938,7 +938,7 @@ pnpm vitest run apps/api/test/billing-webhook-routes.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 Run:
 
@@ -958,7 +958,7 @@ Expected: commit succeeds.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/test/billing-summary-routes.test.ts`
 - Modify: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts`
 
-- [ ] **Step 1: Write the failing billing summary route test**
+- [x] **Step 1: Write the failing billing summary route test**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/test/billing-summary-routes.test.ts`:
 
@@ -1014,7 +1014,7 @@ describe('billing summary routes', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test and verify it fails**
+- [x] **Step 2: Run the test and verify it fails**
 
 Run:
 
@@ -1025,7 +1025,7 @@ pnpm vitest run apps/api/test/billing-summary-routes.test.ts
 
 Expected: FAIL because `/v1/billing/summary` is missing.
 
-- [ ] **Step 3: Implement billing summary service**
+- [x] **Step 3: Implement billing summary service**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/modules/billing/billing-summary-service.ts`:
 
@@ -1086,7 +1086,7 @@ export async function getBillingSummary(input: { db: BillingSummaryDb; workspace
 }
 ```
 
-- [ ] **Step 4: Implement billing summary route**
+- [x] **Step 4: Implement billing summary route**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/modules/billing/billing-summary-routes.ts`:
 
@@ -1105,7 +1105,7 @@ export async function registerBillingSummaryRoutes(app: FastifyInstance): Promis
 }
 ```
 
-- [ ] **Step 5: Run billing summary route test**
+- [x] **Step 5: Run billing summary route test**
 
 Run:
 
@@ -1116,7 +1116,7 @@ pnpm vitest run apps/api/test/billing-summary-routes.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 Run:
 
@@ -1136,7 +1136,7 @@ Expected: commit succeeds.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/web/tests/billing-summary.test.tsx`
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/web/app/(dashboard)/settings/billing/page.tsx`
 
-- [ ] **Step 1: Write the failing billing UI test**
+- [x] **Step 1: Write the failing billing UI test**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/tests/billing-summary.test.tsx`:
 
@@ -1171,7 +1171,7 @@ describe('BillingSummary', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test and verify it fails**
+- [x] **Step 2: Run the test and verify it fails**
 
 Run:
 
@@ -1182,7 +1182,7 @@ pnpm vitest run apps/web/tests/billing-summary.test.tsx
 
 Expected: FAIL because billing UI components are missing.
 
-- [ ] **Step 3: Add usage meter**
+- [x] **Step 3: Add usage meter**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/components/billing/usage-meter.tsx`:
 
@@ -1209,7 +1209,7 @@ export function UsageMeter({
 }
 ```
 
-- [ ] **Step 4: Add billing summary**
+- [x] **Step 4: Add billing summary**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/components/billing/billing-summary.tsx`:
 
@@ -1285,7 +1285,7 @@ function formatMoney(amountDueCents: number, currency: string): string {
 }
 ```
 
-- [ ] **Step 5: Add billing page**
+- [x] **Step 5: Add billing page**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/app/(dashboard)/settings/billing/page.tsx`:
 
@@ -1306,7 +1306,7 @@ export default async function BillingPage() {
 }
 ```
 
-- [ ] **Step 6: Run billing UI test**
+- [x] **Step 6: Run billing UI test**
 
 Run:
 
@@ -1317,7 +1317,7 @@ pnpm vitest run apps/web/tests/billing-summary.test.tsx
 
 Expected: PASS.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 Run:
 
@@ -1331,7 +1331,7 @@ Expected: commit succeeds.
 
 ## Phase Verification
 
-- [ ] **Step 1: Run focused tests**
+- [x] **Step 1: Run focused tests**
 
 Run:
 
@@ -1342,7 +1342,7 @@ pnpm vitest run apps/api/test/billing-domain.test.ts apps/api/test/usage-schema.
 
 Expected: all focused tests pass.
 
-- [ ] **Step 2: Run workspace checks**
+- [x] **Step 2: Run workspace checks**
 
 Run:
 
@@ -1356,7 +1356,7 @@ pnpm build
 
 Expected: all commands pass.
 
-- [ ] **Step 3: Confirm quota API behavior**
+- [x] **Step 3: Confirm quota API behavior**
 
 Run:
 

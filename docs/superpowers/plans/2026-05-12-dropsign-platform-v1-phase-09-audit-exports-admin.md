@@ -1,6 +1,6 @@
 # DropSign Platform v1 Phase 09 Audit Exports And Admin Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Add append-only audit timelines, workspace exports, retention controls, failed job visibility, and an internal admin support console.
 
@@ -17,7 +17,7 @@
 - Create: `/Users/minjun/Documents/dropsign-cloud/packages/domain/src/audit.ts`
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/test/audit-domain.test.ts`
 
-- [ ] **Step 1: Write the failing audit domain test**
+- [x] **Step 1: Write the failing audit domain test**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/test/audit-domain.test.ts`:
 
@@ -73,7 +73,7 @@ describe('audit domain', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test and verify it fails**
+- [x] **Step 2: Run the test and verify it fails**
 
 Run:
 
@@ -84,7 +84,7 @@ pnpm vitest run apps/api/test/audit-domain.test.ts
 
 Expected: FAIL with a module resolution error for `@dropsign/domain/audit`.
 
-- [ ] **Step 3: Add audit domain module**
+- [x] **Step 3: Add audit domain module**
 
 Create `/Users/minjun/Documents/dropsign-cloud/packages/domain/src/audit.ts`:
 
@@ -150,7 +150,7 @@ export function isSupportAuditEvent(type: AuditEventType): boolean {
 }
 ```
 
-- [ ] **Step 4: Extend Prisma audit model**
+- [x] **Step 4: Extend Prisma audit model**
 
 Modify `/Users/minjun/Documents/dropsign-cloud/packages/db/prisma/schema.prisma` so `AuditEvent` supports this normalized shape. Do not drop Phase 01-08 audit fields blindly; either preserve them or include an explicit migration plus code updates for every previous audit writer that used `eventType`, `message`, `memberId`, or earlier enum values:
 
@@ -191,7 +191,7 @@ model Project {
 }
 ```
 
-- [ ] **Step 5: Run the test**
+- [x] **Step 5: Run the test**
 
 Run:
 
@@ -203,7 +203,7 @@ pnpm vitest run apps/api/test/audit-domain.test.ts
 
 Expected: Prisma generation succeeds and the audit domain test passes.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 Run:
 
@@ -223,7 +223,7 @@ Expected: commit succeeds.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/test/audit-routes.test.ts`
 - Modify: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts`
 
-- [ ] **Step 1: Write the failing API test**
+- [x] **Step 1: Write the failing API test**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/test/audit-routes.test.ts`:
 
@@ -287,7 +287,7 @@ describe('audit routes', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test and verify it fails**
+- [x] **Step 2: Run the test and verify it fails**
 
 Run:
 
@@ -298,7 +298,7 @@ pnpm vitest run apps/api/test/audit-routes.test.ts
 
 Expected: FAIL because `/v1/audit-events` is missing.
 
-- [ ] **Step 3: Implement audit service**
+- [x] **Step 3: Implement audit service**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/modules/audit/audit-service.ts`:
 
@@ -346,7 +346,7 @@ export async function listAuditEvents(input: {
 }
 ```
 
-- [ ] **Step 4: Implement audit routes**
+- [x] **Step 4: Implement audit routes**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/modules/audit/audit-routes.ts`:
 
@@ -375,7 +375,7 @@ export async function registerAuditRoutes(app: FastifyInstance): Promise<void> {
 }
 ```
 
-- [ ] **Step 5: Register audit routes**
+- [x] **Step 5: Register audit routes**
 
 Modify `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts` by appending these registrations to the existing `buildApiApp` implementation and preserving all earlier route registrations:
 
@@ -390,7 +390,7 @@ export async function buildApiApp(options: BuildApiAppOptions = {}) {
 }
 ```
 
-- [ ] **Step 6: Run the API test**
+- [x] **Step 6: Run the API test**
 
 Run:
 
@@ -401,7 +401,7 @@ pnpm vitest run apps/api/test/audit-routes.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 Run:
 
@@ -420,7 +420,7 @@ Expected: commit succeeds.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/worker/test/export-workspace.test.ts`
 - Modify: `/Users/minjun/Documents/dropsign-cloud/packages/db/prisma/schema.prisma`
 
-- [ ] **Step 1: Write the failing export test**
+- [x] **Step 1: Write the failing export test**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/worker/test/export-workspace.test.ts`:
 
@@ -514,7 +514,7 @@ describe('runExportWorkspaceJob', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test and verify it fails**
+- [x] **Step 2: Run the test and verify it fails**
 
 Run:
 
@@ -525,7 +525,7 @@ pnpm vitest run apps/worker/test/export-workspace.test.ts
 
 Expected: FAIL because `runExportWorkspaceJob` is missing.
 
-- [ ] **Step 3: Add export artifact schema**
+- [x] **Step 3: Add export artifact schema**
 
 Add this model to `/Users/minjun/Documents/dropsign-cloud/packages/db/prisma/schema.prisma`:
 
@@ -557,7 +557,7 @@ model Workspace {
 }
 ```
 
-- [ ] **Step 4: Implement export job**
+- [x] **Step 4: Implement export job**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/worker/src/jobs/export-workspace.ts`:
 
@@ -673,7 +673,7 @@ export async function runExportWorkspaceJob(input: {
 }
 ```
 
-- [ ] **Step 5: Run the export test**
+- [x] **Step 5: Run the export test**
 
 Run:
 
@@ -685,7 +685,7 @@ pnpm vitest run apps/worker/test/export-workspace.test.ts
 
 Expected: Prisma generation succeeds and test passes.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 Run:
 
@@ -707,7 +707,7 @@ Expected: commit succeeds.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/web/tests/export-list.test.tsx`
 - Modify: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts`
 
-- [ ] **Step 1: Write the failing export API test**
+- [x] **Step 1: Write the failing export API test**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/test/export-routes.test.ts`:
 
@@ -818,7 +818,7 @@ describe('export routes', () => {
 });
 ```
 
-- [ ] **Step 2: Run the export API test and verify it fails**
+- [x] **Step 2: Run the export API test and verify it fails**
 
 Run:
 
@@ -829,7 +829,7 @@ pnpm vitest run apps/api/test/export-routes.test.ts
 
 Expected: FAIL because `/v1/exports` routes are missing.
 
-- [ ] **Step 3: Implement export API routes**
+- [x] **Step 3: Implement export API routes**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/modules/exports/export-routes.ts`:
 
@@ -881,7 +881,7 @@ export async function registerExportRoutes(app: FastifyInstance): Promise<void> 
 }
 ```
 
-- [ ] **Step 4: Register export routes**
+- [x] **Step 4: Register export routes**
 
 Modify `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts` by appending these registrations to the existing `buildApiApp` implementation and preserving all earlier route registrations:
 
@@ -898,7 +898,7 @@ export async function buildApiApp(options: BuildApiAppOptions = {}) {
 }
 ```
 
-- [ ] **Step 5: Add export dashboard UI test**
+- [x] **Step 5: Add export dashboard UI test**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/tests/export-list.test.tsx`:
 
@@ -933,7 +933,7 @@ describe('ExportList', () => {
 });
 ```
 
-- [ ] **Step 6: Implement export dashboard UI**
+- [x] **Step 6: Implement export dashboard UI**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/components/settings/export-list.tsx`:
 
@@ -999,7 +999,7 @@ export default async function WorkspaceExportsPage() {
 }
 ```
 
-- [ ] **Step 7: Run export API and UI tests**
+- [x] **Step 7: Run export API and UI tests**
 
 Run:
 
@@ -1010,7 +1010,7 @@ pnpm vitest run apps/api/test/export-routes.test.ts apps/web/tests/export-list.t
 
 Expected: PASS.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 Run:
 
@@ -1032,7 +1032,7 @@ Expected: commit succeeds.
 - Modify: `/Users/minjun/Documents/dropsign-cloud/packages/db/prisma/schema.prisma`
 - Modify: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts`
 
-- [ ] **Step 1: Write the failing retention worker test**
+- [x] **Step 1: Write the failing retention worker test**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/worker/test/apply-retention.test.ts`:
 
@@ -1077,7 +1077,7 @@ describe('runApplyRetentionJob', () => {
 });
 ```
 
-- [ ] **Step 2: Add retention and failed job schema**
+- [x] **Step 2: Add retention and failed job schema**
 
 Add these models to `/Users/minjun/Documents/dropsign-cloud/packages/db/prisma/schema.prisma`:
 
@@ -1122,7 +1122,7 @@ model Workspace {
 }
 ```
 
-- [ ] **Step 3: Implement retention worker job**
+- [x] **Step 3: Implement retention worker job**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/worker/src/jobs/apply-retention.ts`:
 
@@ -1168,7 +1168,7 @@ export async function runApplyRetentionJob({ db, now }: { db: RetentionDb; now: 
 }
 ```
 
-- [ ] **Step 4: Write failed job API test**
+- [x] **Step 4: Write failed job API test**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/test/operations-routes.test.ts`:
 
@@ -1205,7 +1205,7 @@ describe('operations routes', () => {
 });
 ```
 
-- [ ] **Step 5: Implement failed job API route and registration**
+- [x] **Step 5: Implement failed job API route and registration**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/modules/operations/operations-routes.ts`:
 
@@ -1241,7 +1241,7 @@ export async function buildApiApp(options: BuildApiAppOptions = {}) {
 }
 ```
 
-- [ ] **Step 6: Run retention and failed job tests**
+- [x] **Step 6: Run retention and failed job tests**
 
 Run:
 
@@ -1253,7 +1253,7 @@ pnpm vitest run apps/worker/test/apply-retention.test.ts apps/api/test/operation
 
 Expected: Prisma generation succeeds and both tests pass.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 Run:
 
@@ -1275,7 +1275,7 @@ Expected: commit succeeds.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/web/tests/support-workspace-summary.test.tsx`
 - Modify: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts`
 
-- [ ] **Step 1: Write the failing admin API test**
+- [x] **Step 1: Write the failing admin API test**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/test/admin-routes.test.ts`:
 
@@ -1355,7 +1355,7 @@ describe('admin routes', () => {
 });
 ```
 
-- [ ] **Step 2: Run the admin API test and verify it fails**
+- [x] **Step 2: Run the admin API test and verify it fails**
 
 Run:
 
@@ -1366,7 +1366,7 @@ pnpm vitest run apps/api/test/admin-routes.test.ts
 
 Expected: FAIL because admin routes are missing.
 
-- [ ] **Step 3: Implement admin routes**
+- [x] **Step 3: Implement admin routes**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/modules/admin/admin-routes.ts`:
 
@@ -1408,7 +1408,7 @@ export async function registerAdminRoutes(app: FastifyInstance): Promise<void> {
 }
 ```
 
-- [ ] **Step 4: Register admin routes**
+- [x] **Step 4: Register admin routes**
 
 Modify `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts` by appending these registrations to the existing `buildApiApp` implementation and preserving all earlier route registrations:
 
@@ -1429,7 +1429,7 @@ export async function buildApiApp(options: BuildApiAppOptions = {}) {
 }
 ```
 
-- [ ] **Step 5: Write the failing admin UI test**
+- [x] **Step 5: Write the failing admin UI test**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/tests/support-workspace-summary.test.tsx`:
 
@@ -1455,7 +1455,7 @@ describe('SupportWorkspaceSummary', () => {
 });
 ```
 
-- [ ] **Step 6: Implement admin UI component and page**
+- [x] **Step 6: Implement admin UI component and page**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/components/admin/support-workspace-summary.tsx`:
 
@@ -1506,7 +1506,7 @@ export default async function SupportWorkspacePage({
 }
 ```
 
-- [ ] **Step 7: Run admin tests**
+- [x] **Step 7: Run admin tests**
 
 Run:
 
@@ -1517,7 +1517,7 @@ pnpm vitest run apps/api/test/admin-routes.test.ts apps/web/tests/support-worksp
 
 Expected: PASS.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 Run:
 
@@ -1531,7 +1531,7 @@ Expected: commit succeeds.
 
 ## Phase Verification
 
-- [ ] **Step 1: Run focused tests**
+- [x] **Step 1: Run focused tests**
 
 Run:
 
@@ -1542,7 +1542,7 @@ pnpm vitest run apps/api/test/audit-domain.test.ts apps/api/test/audit-routes.te
 
 Expected: all focused tests pass.
 
-- [ ] **Step 2: Run workspace checks**
+- [x] **Step 2: Run workspace checks**
 
 Run:
 
@@ -1556,7 +1556,7 @@ pnpm build
 
 Expected: all commands pass.
 
-- [ ] **Step 3: Confirm support access is audited**
+- [x] **Step 3: Confirm support access is audited**
 
 Run:
 

@@ -1,6 +1,6 @@
 # DropSign Platform v1 Phase 08 Webhook And API Management Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Add secure API key management, webhook endpoint configuration, signed webhook delivery, retry logs, and manual resend without emitting recursive failure webhooks.
 
@@ -16,7 +16,7 @@
 - Modify: `/Users/minjun/Documents/dropsign-cloud/packages/db/prisma/schema.prisma`
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/test/webhook-schema.test.ts`
 
-- [ ] **Step 1: Write the failing schema test**
+- [x] **Step 1: Write the failing schema test**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/test/webhook-schema.test.ts`:
 
@@ -32,7 +32,7 @@ describe('webhook schema contract', () => {
 });
 ```
 
-- [ ] **Step 2: Add Prisma schema models before endpoint code**
+- [x] **Step 2: Add Prisma schema models before endpoint code**
 
 Modify `/Users/minjun/Documents/dropsign-cloud/packages/db/prisma/schema.prisma`:
 
@@ -115,7 +115,7 @@ model Project {
 }
 ```
 
-- [ ] **Step 3: Generate migration and Prisma client**
+- [x] **Step 3: Generate migration and Prisma client**
 
 Run:
 
@@ -128,7 +128,7 @@ pnpm vitest run apps/api/test/webhook-schema.test.ts
 
 Expected: migration is created, Prisma client generation succeeds, and the schema contract test passes.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 Run:
 
@@ -149,7 +149,7 @@ Expected: commit succeeds.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/test/api-key-routes.test.ts`
 - Modify: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts`
 
-- [ ] **Step 1: Write the failing API key test**
+- [x] **Step 1: Write the failing API key test**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/test/api-key-routes.test.ts`:
 
@@ -193,7 +193,7 @@ describe('api key routes', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test and verify it fails**
+- [x] **Step 2: Run the test and verify it fails**
 
 Run:
 
@@ -204,7 +204,7 @@ pnpm vitest run apps/api/test/api-key-routes.test.ts
 
 Expected: FAIL because API key routes are missing.
 
-- [ ] **Step 3: Implement API key utilities**
+- [x] **Step 3: Implement API key utilities**
 
 Create `/Users/minjun/Documents/dropsign-cloud/packages/domain/src/api-keys.ts`:
 
@@ -224,7 +224,7 @@ export function apiKeyPrefix(rawKey: string): string {
 }
 ```
 
-- [ ] **Step 4: Implement API key service**
+- [x] **Step 4: Implement API key service**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/modules/api-keys/api-key-service.ts`:
 
@@ -264,7 +264,7 @@ export async function createProjectApiKey(input: {
 }
 ```
 
-- [ ] **Step 5: Implement API key routes**
+- [x] **Step 5: Implement API key routes**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/modules/api-keys/api-key-routes.ts`:
 
@@ -296,7 +296,7 @@ export async function registerApiKeyRoutes(app: FastifyInstance): Promise<void> 
 }
 ```
 
-- [ ] **Step 6: Register the routes**
+- [x] **Step 6: Register the routes**
 
 Modify `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts` by appending these registrations to the existing `buildApiApp` implementation and preserving all earlier route registrations:
 
@@ -314,7 +314,7 @@ export async function buildApiApp(deps: { db: unknown }) {
 }
 ```
 
-- [ ] **Step 7: Run the API key test**
+- [x] **Step 7: Run the API key test**
 
 Run:
 
@@ -325,7 +325,7 @@ pnpm vitest run apps/api/test/api-key-routes.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 Run:
 
@@ -346,7 +346,7 @@ Expected: commit succeeds.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/test/webhook-endpoint-routes.test.ts`
 - Modify: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts`
 
-- [ ] **Step 1: Write the failing endpoint route test**
+- [x] **Step 1: Write the failing endpoint route test**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/test/webhook-endpoint-routes.test.ts`:
 
@@ -414,7 +414,7 @@ describe('webhook endpoint routes', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test and verify it fails**
+- [x] **Step 2: Run the test and verify it fails**
 
 Run:
 
@@ -425,7 +425,7 @@ pnpm vitest run apps/api/test/webhook-endpoint-routes.test.ts
 
 Expected: FAIL because webhook routes are missing.
 
-- [ ] **Step 3: Add webhook domain constants**
+- [x] **Step 3: Add webhook domain constants**
 
 Create `/Users/minjun/Documents/dropsign-cloud/packages/domain/src/webhooks.ts`:
 
@@ -454,7 +454,7 @@ export function isCustomerWebhookEvent(value: string): value is CustomerWebhookE
 }
 ```
 
-- [ ] **Step 4: Add webhook service**
+- [x] **Step 4: Add webhook service**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/modules/webhooks/webhook-service.ts`:
 
@@ -497,7 +497,7 @@ export async function createWebhookEndpoint(input: {
 }
 ```
 
-- [ ] **Step 5: Add webhook routes**
+- [x] **Step 5: Add webhook routes**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/modules/webhooks/webhook-routes.ts`:
 
@@ -535,7 +535,7 @@ export async function registerWebhookRoutes(app: FastifyInstance): Promise<void>
 }
 ```
 
-- [ ] **Step 6: Register webhook routes**
+- [x] **Step 6: Register webhook routes**
 
 Modify `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts` by appending these registrations to the existing `buildApiApp` implementation and preserving all earlier route registrations:
 
@@ -555,7 +555,7 @@ export async function buildApiApp(deps: { db: unknown }) {
 }
 ```
 
-- [ ] **Step 7: Run endpoint route tests**
+- [x] **Step 7: Run endpoint route tests**
 
 Run:
 
@@ -566,7 +566,7 @@ pnpm vitest run apps/api/test/webhook-endpoint-routes.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 Run:
 
@@ -584,7 +584,7 @@ Expected: commit succeeds.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/modules/webhooks/webhook-event-service.ts`
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/test/webhook-event-service.test.ts`
 
-- [ ] **Step 1: Write failing event expansion tests**
+- [x] **Step 1: Write failing event expansion tests**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/test/webhook-event-service.test.ts`:
 
@@ -665,7 +665,7 @@ describe('enqueueWebhookEvent', () => {
 });
 ```
 
-- [ ] **Step 2: Implement idempotent event expansion**
+- [x] **Step 2: Implement idempotent event expansion**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/modules/webhooks/webhook-event-service.ts`:
 
@@ -727,7 +727,7 @@ export async function enqueueWebhookEvent(input: {
 }
 ```
 
-- [ ] **Step 3: Run event expansion tests**
+- [x] **Step 3: Run event expansion tests**
 
 Run:
 
@@ -738,7 +738,7 @@ pnpm vitest run apps/api/test/webhook-event-service.test.ts
 
 Expected: PASS and duplicate `eventId` replay uses the `@@unique([eventId, endpointId])` delivery key instead of inserting duplicate rows.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 Run:
 
@@ -756,7 +756,7 @@ Expected: commit succeeds.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/worker/src/jobs/deliver-webhook.ts`
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/worker/test/deliver-webhook.test.ts`
 
-- [ ] **Step 1: Write the failing worker test**
+- [x] **Step 1: Write the failing worker test**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/worker/test/deliver-webhook.test.ts`:
 
@@ -933,7 +933,7 @@ describe('runDeliverWebhookJob', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test and verify it fails**
+- [x] **Step 2: Run the test and verify it fails**
 
 Run:
 
@@ -944,7 +944,7 @@ pnpm vitest run apps/worker/test/deliver-webhook.test.ts
 
 Expected: FAIL because `runDeliverWebhookJob` is missing.
 
-- [ ] **Step 3: Implement delivery worker**
+- [x] **Step 3: Implement delivery worker**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/worker/src/jobs/deliver-webhook.ts`:
 
@@ -1084,7 +1084,7 @@ async function recordWebhookFailure(input: {
 }
 ```
 
-- [ ] **Step 4: Run delivery tests**
+- [x] **Step 4: Run delivery tests**
 
 Run:
 
@@ -1095,7 +1095,7 @@ pnpm vitest run apps/worker/test/deliver-webhook.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 Run:
 
@@ -1115,7 +1115,7 @@ Expected: commit succeeds.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/test/webhook-delivery-routes.test.ts`
 - Modify: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts`
 
-- [ ] **Step 1: Write failing delivery route tests**
+- [x] **Step 1: Write failing delivery route tests**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/test/webhook-delivery-routes.test.ts`:
 
@@ -1198,7 +1198,7 @@ describe('webhook delivery routes', () => {
 });
 ```
 
-- [ ] **Step 2: Implement delivery service**
+- [x] **Step 2: Implement delivery service**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/modules/webhooks/webhook-delivery-service.ts`:
 
@@ -1267,7 +1267,7 @@ export async function resendWebhookDelivery(input: {
 }
 ```
 
-- [ ] **Step 3: Add routes**
+- [x] **Step 3: Add routes**
 
 Modify `/Users/minjun/Documents/dropsign-cloud/apps/api/src/modules/webhooks/webhook-routes.ts`:
 
@@ -1338,7 +1338,7 @@ export async function registerWebhookRoutes(app: FastifyInstance): Promise<void>
 }
 ```
 
-- [ ] **Step 4: Register webhook queue dependency in app**
+- [x] **Step 4: Register webhook queue dependency in app**
 
 Modify `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts` by appending these registrations to the existing `buildApiApp` implementation and preserving all earlier route registrations:
 
@@ -1359,7 +1359,7 @@ export async function buildApiApp(deps: { db: unknown; queues: { webhooks: unkno
 }
 ```
 
-- [ ] **Step 5: Run route tests**
+- [x] **Step 5: Run route tests**
 
 Run:
 
@@ -1370,7 +1370,7 @@ pnpm vitest run apps/api/test/webhook-delivery-routes.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 Run:
 
@@ -1390,7 +1390,7 @@ Expected: commit succeeds.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/web/tests/webhook-delivery-log.test.tsx`
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/web/app/(dashboard)/projects/[projectId]/webhooks/page.tsx`
 
-- [ ] **Step 1: Write failing delivery log test**
+- [x] **Step 1: Write failing delivery log test**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/tests/webhook-delivery-log.test.tsx`:
 
@@ -1423,7 +1423,7 @@ describe('WebhookDeliveryLog', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test and verify it fails**
+- [x] **Step 2: Run the test and verify it fails**
 
 Run:
 
@@ -1434,7 +1434,7 @@ pnpm vitest run apps/web/tests/webhook-delivery-log.test.tsx
 
 Expected: FAIL because the component is missing.
 
-- [ ] **Step 3: Implement delivery log component**
+- [x] **Step 3: Implement delivery log component**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/components/webhook-delivery-log.tsx`:
 
@@ -1485,7 +1485,7 @@ export function WebhookDeliveryLog({
 }
 ```
 
-- [ ] **Step 4: Implement endpoint form**
+- [x] **Step 4: Implement endpoint form**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/components/webhook-endpoint-form.tsx`:
 
@@ -1525,7 +1525,7 @@ export function WebhookEndpointForm({
 }
 ```
 
-- [ ] **Step 5: Add dashboard page**
+- [x] **Step 5: Add dashboard page**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/app/(dashboard)/projects/[projectId]/webhooks/page.tsx`:
 
@@ -1561,7 +1561,7 @@ export default async function ProjectWebhooksPage({
 }
 ```
 
-- [ ] **Step 6: Run dashboard webhook tests**
+- [x] **Step 6: Run dashboard webhook tests**
 
 Run:
 
@@ -1572,7 +1572,7 @@ pnpm vitest run apps/web/tests/webhook-delivery-log.test.tsx
 
 Expected: PASS.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 Run:
 
@@ -1586,7 +1586,7 @@ Expected: commit succeeds.
 
 ## Phase Verification
 
-- [ ] **Step 1: Run focused tests**
+- [x] **Step 1: Run focused tests**
 
 Run:
 
@@ -1597,7 +1597,7 @@ pnpm vitest run apps/api/test/webhook-schema.test.ts apps/api/test/api-key-route
 
 Expected: all focused tests pass.
 
-- [ ] **Step 2: Run workspace checks**
+- [x] **Step 2: Run workspace checks**
 
 Run:
 
@@ -1611,7 +1611,7 @@ pnpm build
 
 Expected: all commands pass.
 
-- [ ] **Step 3: Confirm non-recursive webhook failure behavior**
+- [x] **Step 3: Confirm non-recursive webhook failure behavior**
 
 Run:
 

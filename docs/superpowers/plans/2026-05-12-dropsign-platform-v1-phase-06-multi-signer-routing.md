@@ -1,6 +1,6 @@
 # Multi-Signer Routing Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Add DropSign Cloud v1 multi-signer routing so signing requests support `parallel` and `sequential` routing, signer roles and ordering, assigned-field enforcement, route gating, completion rules, dashboard signer setup, public waiting state, and API/E2E coverage.
 
@@ -114,7 +114,7 @@ export const routingErrors = {
 - Modify: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/signing/types.ts`
 - Test: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/routes/signingRequests.test.ts`
 
-- [ ] **Step 1: Write the failing API contract test**
+- [x] **Step 1: Write the failing API contract test**
 
 Add this test to `/Users/minjun/Documents/dropsign-cloud/apps/api/src/routes/signingRequests.test.ts`:
 
@@ -234,7 +234,7 @@ describe('POST /v1/signing-requests multi-signer routing', () => {
 });
 ```
 
-- [ ] **Step 2: Run the failing test**
+- [x] **Step 2: Run the failing test**
 
 Run:
 
@@ -245,7 +245,7 @@ pnpm --filter @dropsign/api test -- signingRequests.test.ts
 
 Expected: FAIL with one of these concrete failures: Prisma reports `Unknown argument routingMode`, the response body lacks `routingMode`, or signers do not include `routingOrder` and `status`.
 
-- [ ] **Step 3: Add Prisma schema fields and migration**
+- [x] **Step 3: Add Prisma schema fields and migration**
 
 In `/Users/minjun/Documents/dropsign-cloud/packages/db/prisma/schema.prisma`, update the routing-related models and enums to include these exact fields. Preserve existing Phase 01-05 fields, relations, indexes, and enum values; this task extends the signing model rather than replacing it:
 
@@ -376,7 +376,7 @@ export interface SignerInput {
 }
 ```
 
-- [ ] **Step 4: Update request creation to set initial signer statuses**
+- [x] **Step 4: Update request creation to set initial signer statuses**
 
 In `/Users/minjun/Documents/dropsign-cloud/apps/api/src/routes/signingRequests.ts`, parse the new payload and create signers with these initial statuses:
 
@@ -449,7 +449,7 @@ signingRequestsRouter.post('/v1/signing-requests', requireWorkspaceMember, async
 });
 ```
 
-- [ ] **Step 5: Run the passing test**
+- [x] **Step 5: Run the passing test**
 
 Run:
 
@@ -460,7 +460,7 @@ pnpm --filter @dropsign/api test -- signingRequests.test.ts
 
 Expected: PASS for both `POST /v1/signing-requests multi-signer routing` tests.
 
-- [ ] **Step 6: Commit Task 1**
+- [x] **Step 6: Commit Task 1**
 
 Run:
 
@@ -481,7 +481,7 @@ Expected: commit succeeds with the five listed paths staged.
 - Modify: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/routes/publicSigning.ts`
 - Test: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/routes/publicSigning.test.ts`
 
-- [ ] **Step 1: Write failing domain tests**
+- [x] **Step 1: Write failing domain tests**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/signing/routing.test.ts`:
 
@@ -524,7 +524,7 @@ describe('nextSequentialStatuses', () => {
 });
 ```
 
-- [ ] **Step 2: Run the failing domain test**
+- [x] **Step 2: Run the failing domain test**
 
 Run:
 
@@ -535,7 +535,7 @@ pnpm --filter @dropsign/api test -- routing.test.ts
 
 Expected: FAIL with `Cannot find module './routing'`.
 
-- [ ] **Step 3: Implement routing service**
+- [x] **Step 3: Implement routing service**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/signing/routing.ts`:
 
@@ -616,7 +616,7 @@ export function nextSequentialStatuses(input: {
 }
 ```
 
-- [ ] **Step 4: Run the passing domain test**
+- [x] **Step 4: Run the passing domain test**
 
 Run:
 
@@ -627,7 +627,7 @@ pnpm --filter @dropsign/api test -- routing.test.ts
 
 Expected: PASS for all three routing service assertions.
 
-- [ ] **Step 5: Write the failing public signing session test**
+- [x] **Step 5: Write the failing public signing session test**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/routes/publicSigning.test.ts`:
 
@@ -704,7 +704,7 @@ describe('GET /api/public/signing/:token route gating', () => {
 });
 ```
 
-- [ ] **Step 6: Run the failing public session test**
+- [x] **Step 6: Run the failing public session test**
 
 Run:
 
@@ -715,7 +715,7 @@ pnpm --filter @dropsign/api test -- publicSigning.test.ts
 
 Expected: FAIL because `canSign`, `waitingFor`, or `assignedFields` are not returned.
 
-- [ ] **Step 7: Use routing service in public session endpoint**
+- [x] **Step 7: Use routing service in public session endpoint**
 
 In `/Users/minjun/Documents/dropsign-cloud/apps/api/src/routes/publicSigning.ts`, return route-aware public sessions:
 
@@ -775,7 +775,7 @@ publicSigningRouter.get('/api/public/signing/:token', async (req, res) => {
 });
 ```
 
-- [ ] **Step 8: Run routing and public session tests**
+- [x] **Step 8: Run routing and public session tests**
 
 Run:
 
@@ -786,7 +786,7 @@ pnpm --filter @dropsign/api test -- routing.test.ts publicSigning.test.ts
 
 Expected: PASS for route gating domain tests and public signing session route gating tests.
 
-- [ ] **Step 9: Commit Task 2**
+- [x] **Step 9: Commit Task 2**
 
 Run:
 
@@ -807,7 +807,7 @@ Expected: commit succeeds with route service and public session changes.
 - Modify: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/routes/signatureArtifacts.ts`
 - Test: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/routes/publicSigning.test.ts`
 
-- [ ] **Step 1: Write failing completion rule tests**
+- [x] **Step 1: Write failing completion rule tests**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/signing/requestCompletion.test.ts`:
 
@@ -929,7 +929,7 @@ describe('evaluateRequestCompletion', () => {
 });
 ```
 
-- [ ] **Step 2: Run the failing completion tests**
+- [x] **Step 2: Run the failing completion tests**
 
 Run:
 
@@ -940,7 +940,7 @@ pnpm --filter @dropsign/api test -- requestCompletion.test.ts
 
 Expected: FAIL with `Cannot find module './requestCompletion'`.
 
-- [ ] **Step 3: Implement completion and assignment service**
+- [x] **Step 3: Implement completion and assignment service**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/signing/requestCompletion.ts`:
 
@@ -1003,7 +1003,7 @@ export function evaluateRequestCompletion(input: {
 }
 ```
 
-- [ ] **Step 4: Run the passing completion tests**
+- [x] **Step 4: Run the passing completion tests**
 
 Run:
 
@@ -1014,7 +1014,7 @@ pnpm --filter @dropsign/api test -- requestCompletion.test.ts
 
 Expected: PASS for all eight completion and assignment assertions.
 
-- [ ] **Step 5: Write failing artifact submission API tests**
+- [x] **Step 5: Write failing artifact submission API tests**
 
 Append these tests to `/Users/minjun/Documents/dropsign-cloud/apps/api/src/routes/publicSigning.test.ts`:
 
@@ -1103,7 +1103,7 @@ describe('POST /api/public/signing/:token/complete assigned fields', () => {
 });
 ```
 
-- [ ] **Step 6: Run the failing artifact submission tests**
+- [x] **Step 6: Run the failing artifact submission tests**
 
 Run:
 
@@ -1114,7 +1114,7 @@ pnpm --filter @dropsign/api test -- publicSigning.test.ts
 
 Expected: FAIL because the complete endpoint does not reject blocked signers, does not enforce assigned fields, or does not advance the next signer.
 
-- [ ] **Step 7: Enforce routing and field assignment in artifact completion**
+- [x] **Step 7: Enforce routing and field assignment in artifact completion**
 
 In `/Users/minjun/Documents/dropsign-cloud/apps/api/src/routes/signatureArtifacts.ts`, implement the public completion route with these checks:
 
@@ -1224,7 +1224,7 @@ signatureArtifactsRouter.post('/api/public/signing/:token/complete', async (req,
 });
 ```
 
-- [ ] **Step 8: Run the assignment and completion tests**
+- [x] **Step 8: Run the assignment and completion tests**
 
 Run:
 
@@ -1235,7 +1235,7 @@ pnpm --filter @dropsign/api test -- requestCompletion.test.ts publicSigning.test
 
 Expected: PASS for completion rules, blocked route rejection, assigned-field rejection, and next signer activation.
 
-- [ ] **Step 9: Commit Task 3**
+- [x] **Step 9: Commit Task 3**
 
 Run:
 
@@ -1254,7 +1254,7 @@ Expected: commit succeeds with completion service and artifact route changes.
 - Modify: `/Users/minjun/Documents/dropsign-cloud/packages/api-client/src/signingRequests.ts`
 - Modify: `/Users/minjun/Documents/dropsign-cloud/packages/api-client/src/signingRequests.test.ts`
 
-- [ ] **Step 1: Write the failing API client test**
+- [x] **Step 1: Write the failing API client test**
 
 Add this test to `/Users/minjun/Documents/dropsign-cloud/packages/api-client/src/signingRequests.test.ts`:
 
@@ -1326,7 +1326,7 @@ describe('createSigningRequest routing payload', () => {
 });
 ```
 
-- [ ] **Step 2: Run the failing API client test**
+- [x] **Step 2: Run the failing API client test**
 
 Run:
 
@@ -1337,7 +1337,7 @@ pnpm --filter @dropsign/api-client test -- signingRequests.test.ts
 
 Expected: FAIL because `routingMode`, `routingOrder`, `role`, or `required` are missing from the posted body.
 
-- [ ] **Step 3: Implement typed API client payload**
+- [x] **Step 3: Implement typed API client payload**
 
 In `/Users/minjun/Documents/dropsign-cloud/packages/api-client/src/signingRequests.ts`, export these types and function shape:
 
@@ -1382,7 +1382,7 @@ export async function createSigningRequest(options: {
 }
 ```
 
-- [ ] **Step 4: Run the passing API client test**
+- [x] **Step 4: Run the passing API client test**
 
 Run:
 
@@ -1393,7 +1393,7 @@ pnpm --filter @dropsign/api-client test -- signingRequests.test.ts
 
 Expected: PASS for the routing payload test.
 
-- [ ] **Step 5: Commit Task 4**
+- [x] **Step 5: Commit Task 4**
 
 Run:
 
@@ -1414,7 +1414,7 @@ Expected: commit succeeds with API client changes.
 - Modify: `/Users/minjun/Documents/dropsign-cloud/apps/web/src/features/signing-request/CreateSigningRequestForm.tsx`
 - Modify: `/Users/minjun/Documents/dropsign-cloud/apps/web/src/features/signing-request/CreateSigningRequestForm.test.tsx`
 
-- [ ] **Step 1: Write failing component tests for signer setup**
+- [x] **Step 1: Write failing component tests for signer setup**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/src/features/signing-request/SignerSetup.test.tsx`:
 
@@ -1496,7 +1496,7 @@ describe('SignerSetup', () => {
 });
 ```
 
-- [ ] **Step 2: Run the failing component tests**
+- [x] **Step 2: Run the failing component tests**
 
 Run:
 
@@ -1507,7 +1507,7 @@ pnpm --filter @dropsign/dashboard test -- SignerSetup.test.tsx
 
 Expected: FAIL with `Cannot find module './SignerSetup'`.
 
-- [ ] **Step 3: Implement the SignerSetup component**
+- [x] **Step 3: Implement the SignerSetup component**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/src/features/signing-request/SignerSetup.tsx`:
 
@@ -1644,7 +1644,7 @@ export function SignerSetup({ value, onChange }: SignerSetupProps) {
 }
 ```
 
-- [ ] **Step 4: Run the passing component tests**
+- [x] **Step 4: Run the passing component tests**
 
 Run:
 
@@ -1655,7 +1655,7 @@ pnpm --filter @dropsign/dashboard test -- SignerSetup.test.tsx
 
 Expected: PASS for rendering and adding signers.
 
-- [ ] **Step 5: Write failing form integration test**
+- [x] **Step 5: Write failing form integration test**
 
 Add this test to `/Users/minjun/Documents/dropsign-cloud/apps/web/src/features/signing-request/CreateSigningRequestForm.test.tsx`:
 
@@ -1714,7 +1714,7 @@ describe('CreateSigningRequestForm multi-signer routing', () => {
 });
 ```
 
-- [ ] **Step 6: Run the failing form integration test**
+- [x] **Step 6: Run the failing form integration test**
 
 Run:
 
@@ -1725,7 +1725,7 @@ pnpm --filter @dropsign/dashboard test -- CreateSigningRequestForm.test.tsx
 
 Expected: FAIL because the form does not render signer routing controls or does not submit routing fields.
 
-- [ ] **Step 7: Wire SignerSetup into CreateSigningRequestForm**
+- [x] **Step 7: Wire SignerSetup into CreateSigningRequestForm**
 
 In `/Users/minjun/Documents/dropsign-cloud/apps/web/src/features/signing-request/CreateSigningRequestForm.tsx`, hold signer setup state and send it on submit:
 
@@ -1776,7 +1776,7 @@ export function CreateSigningRequestForm({
 }
 ```
 
-- [ ] **Step 8: Run dashboard tests**
+- [x] **Step 8: Run dashboard tests**
 
 Run:
 
@@ -1787,7 +1787,7 @@ pnpm --filter @dropsign/dashboard test -- SignerSetup.test.tsx CreateSigningRequ
 
 Expected: PASS for signer setup rendering, adding signers, and form submission payload.
 
-- [ ] **Step 9: Commit Task 5**
+- [x] **Step 9: Commit Task 5**
 
 Run:
 
@@ -1808,7 +1808,7 @@ Expected: commit succeeds with dashboard signer setup changes.
 - Modify: `/Users/minjun/Documents/dropsign-cloud/apps/web/app/sign/[token]/page.tsx`
 - Modify: `/Users/minjun/Documents/dropsign-cloud/apps/web/app/sign/[token]/page.test.tsx`
 
-- [ ] **Step 1: Write failing WaitingForTurn component test**
+- [x] **Step 1: Write failing WaitingForTurn component test**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/app/sign/[token]/WaitingForTurn.test.tsx`:
 
@@ -1839,7 +1839,7 @@ describe('WaitingForTurn', () => {
 });
 ```
 
-- [ ] **Step 2: Run the failing waiting component test**
+- [x] **Step 2: Run the failing waiting component test**
 
 Run:
 
@@ -1850,7 +1850,7 @@ pnpm --filter @dropsign/web test -- WaitingForTurn.test.tsx
 
 Expected: FAIL with `Cannot find module './WaitingForTurn'`.
 
-- [ ] **Step 3: Implement WaitingForTurn**
+- [x] **Step 3: Implement WaitingForTurn**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/app/sign/[token]/WaitingForTurn.tsx`:
 
@@ -1885,7 +1885,7 @@ export function WaitingForTurn({ signerName, waitingFor }: WaitingForTurnProps) 
 }
 ```
 
-- [ ] **Step 4: Run the passing waiting component test**
+- [x] **Step 4: Run the passing waiting component test**
 
 Run:
 
@@ -1896,7 +1896,7 @@ pnpm --filter @dropsign/web test -- WaitingForTurn.test.tsx
 
 Expected: PASS for waiting state content.
 
-- [ ] **Step 5: Write failing public page test**
+- [x] **Step 5: Write failing public page test**
 
 Add this test to `/Users/minjun/Documents/dropsign-cloud/apps/web/app/sign/[token]/page.test.tsx`:
 
@@ -1929,7 +1929,7 @@ describe('SignPage waiting state', () => {
 });
 ```
 
-- [ ] **Step 6: Run the failing public page test**
+- [x] **Step 6: Run the failing public page test**
 
 Run:
 
@@ -1940,7 +1940,7 @@ pnpm --filter @dropsign/web test -- page.test.tsx
 
 Expected: FAIL because the page does not branch on `canSign === false`.
 
-- [ ] **Step 7: Render waiting state in sign page**
+- [x] **Step 7: Render waiting state in sign page**
 
 In `/Users/minjun/Documents/dropsign-cloud/apps/web/app/sign/[token]/page.tsx`, branch before rendering document fields:
 
@@ -1973,7 +1973,7 @@ export default async function SignPage({
 }
 ```
 
-- [ ] **Step 8: Run public signing tests**
+- [x] **Step 8: Run public signing tests**
 
 Run:
 
@@ -1984,7 +1984,7 @@ pnpm --filter @dropsign/web test -- WaitingForTurn.test.tsx page.test.tsx
 
 Expected: PASS for waiting component and sign page waiting branch.
 
-- [ ] **Step 9: Commit Task 6**
+- [x] **Step 9: Commit Task 6**
 
 Run:
 
@@ -2002,7 +2002,7 @@ Expected: commit succeeds with public signing waiting state changes.
 
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/e2e/tests/multi-signer-routing.spec.ts`
 
-- [ ] **Step 1: Write failing Playwright tests**
+- [x] **Step 1: Write failing Playwright tests**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/e2e/tests/multi-signer-routing.spec.ts`:
 
@@ -2103,7 +2103,7 @@ test.describe('multi-signer routing', () => {
 });
 ```
 
-- [ ] **Step 2: Run the failing E2E tests**
+- [x] **Step 2: Run the failing E2E tests**
 
 Run:
 
@@ -2114,7 +2114,7 @@ pnpm --filter @dropsign/e2e test -- multi-signer-routing.spec.ts
 
 Expected: FAIL if support factories do not accept `routingMode`, `signers`, and `fields`, or if public signing still exposes blocked signers.
 
-- [ ] **Step 3: Update E2E support API helpers with routing payloads**
+- [x] **Step 3: Update E2E support API helpers with routing payloads**
 
 In `/Users/minjun/Documents/dropsign-cloud/apps/e2e/support/api.ts`, replace the request factory helper signature with fields and returned signer tokens:
 
@@ -2154,7 +2154,7 @@ export async function createSigningRequest(
 }
 ```
 
-- [ ] **Step 4: Run the passing E2E tests**
+- [x] **Step 4: Run the passing E2E tests**
 
 Run:
 
@@ -2165,7 +2165,7 @@ pnpm --filter @dropsign/e2e test -- multi-signer-routing.spec.ts
 
 Expected: PASS for sequential waiting, sequential activation after first signer completion, parallel immediate access, and role-scoped fields.
 
-- [ ] **Step 5: Commit Task 7**
+- [x] **Step 5: Commit Task 7**
 
 Run:
 
@@ -2207,7 +2207,7 @@ Expected: commit succeeds with E2E coverage changes.
   `/Users/minjun/Documents/dropsign-cloud/apps/e2e/tests/multi-signer-routing.spec.ts`,
   `/Users/minjun/Documents/dropsign-cloud/apps/e2e/support/api.ts`.
 
-- [ ] **Step 1: Run API verification**
+- [x] **Step 1: Run API verification**
 
 Run:
 
@@ -2220,7 +2220,7 @@ pnpm --filter @dropsign/api test -- routing.test.ts requestCompletion.test.ts si
 
 Expected: `lint` exits 0, `typecheck` exits 0, and Vitest prints PASS for `routing.test.ts`, `requestCompletion.test.ts`, `signingRequests.test.ts`, and `publicSigning.test.ts`.
 
-- [ ] **Step 2: Run frontend and client verification**
+- [x] **Step 2: Run frontend and client verification**
 
 Run:
 
@@ -2233,7 +2233,7 @@ pnpm --filter @dropsign/web test -- WaitingForTurn.test.tsx page.test.tsx
 
 Expected: each command exits 0. Vitest prints PASS for `signingRequests.test.ts`, `SignerSetup.test.tsx`, `CreateSigningRequestForm.test.tsx`, `WaitingForTurn.test.tsx`, and `page.test.tsx`.
 
-- [ ] **Step 3: Run E2E verification**
+- [x] **Step 3: Run E2E verification**
 
 Run:
 
@@ -2244,7 +2244,7 @@ pnpm --filter @dropsign/e2e test -- multi-signer-routing.spec.ts
 
 Expected: Playwright exits 0 and prints `2 passed` for sequential route gating and parallel signer access.
 
-- [ ] **Step 4: Run full repo verification**
+- [x] **Step 4: Run full repo verification**
 
 Run:
 
@@ -2258,7 +2258,7 @@ pnpm build
 
 Expected: `pnpm lint` exits 0, `pnpm typecheck` exits 0, `pnpm test` exits 0 with no failing suites, and `pnpm build` exits 0 with successful package builds. A nonzero exit from any command fails this phase and must be fixed before opening a PR.
 
-- [ ] **Step 5: Confirm commit boundaries**
+- [x] **Step 5: Confirm commit boundaries**
 
 Run:
 
@@ -2282,6 +2282,6 @@ test: cover multi-signer routing end to end
 
 ## Self-Review Checklist
 
-- [ ] Spec coverage: `SigningRequest.routingMode` supports `parallel` and `sequential`; `Signer` has `role`, `routingOrder`, `required`, and `status`; fields are role-assigned; route gating blocks out-of-turn sequential signers; request completion requires every required signer and every required assigned field; dashboard captures signer setup; public signing shows waiting state; API and E2E tests cover the behavior.
-- [ ] Placeholder scan: every task names concrete files, commands, expected outcomes, and test contents.
-- [ ] Type consistency: `RoutingMode`, `SignerStatus`, `SignerInput`, public session response fields, route error codes, and test payload shapes use the same names across API, client, dashboard, public signing, and E2E tasks.
+- [x] Spec coverage: `SigningRequest.routingMode` supports `parallel` and `sequential`; `Signer` has `role`, `routingOrder`, `required`, and `status`; fields are role-assigned; route gating blocks out-of-turn sequential signers; request completion requires every required signer and every required assigned field; dashboard captures signer setup; public signing shows waiting state; API and E2E tests cover the behavior.
+- [x] Placeholder scan: every task names concrete files, commands, expected outcomes, and test contents.
+- [x] Type consistency: `RoutingMode`, `SignerStatus`, `SignerInput`, public session response fields, route error codes, and test payload shapes use the same names across API, client, dashboard, public signing, and E2E tasks.

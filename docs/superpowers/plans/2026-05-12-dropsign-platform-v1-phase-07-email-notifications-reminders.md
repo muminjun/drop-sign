@@ -1,6 +1,6 @@
 # DropSign Platform v1 Phase 07 Email Notifications And Reminders Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Add invitation, reminder, completion, and failure notification email workflows backed by worker jobs and dashboard resend controls.
 
@@ -17,7 +17,7 @@
 - Create: `/Users/minjun/Documents/dropsign-cloud/packages/domain/src/email.ts`
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/test/email-delivery-schema.test.ts`
 
-- [ ] **Step 1: Write the failing schema/domain test**
+- [x] **Step 1: Write the failing schema/domain test**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/test/email-delivery-schema.test.ts`:
 
@@ -52,7 +52,7 @@ describe('email delivery domain', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test and verify it fails**
+- [x] **Step 2: Run the test and verify it fails**
 
 Run:
 
@@ -63,7 +63,7 @@ pnpm vitest run apps/api/test/email-delivery-schema.test.ts
 
 Expected: FAIL with a module resolution error for `@dropsign/domain/email`.
 
-- [ ] **Step 3: Add the domain constants**
+- [x] **Step 3: Add the domain constants**
 
 Create `/Users/minjun/Documents/dropsign-cloud/packages/domain/src/email.ts`:
 
@@ -86,7 +86,7 @@ export function isTerminalEmailStatus(status: EmailDeliveryStatus): boolean {
 }
 ```
 
-- [ ] **Step 4: Extend the Prisma schema**
+- [x] **Step 4: Extend the Prisma schema**
 
 Add these enums and model to `/Users/minjun/Documents/dropsign-cloud/packages/db/prisma/schema.prisma`:
 
@@ -145,7 +145,7 @@ model Project {
 }
 ```
 
-- [ ] **Step 5: Generate Prisma client and run the test**
+- [x] **Step 5: Generate Prisma client and run the test**
 
 Run:
 
@@ -157,7 +157,7 @@ pnpm vitest run apps/api/test/email-delivery-schema.test.ts
 
 Expected: PASS for the email domain test and successful Prisma generation.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 Run:
 
@@ -178,7 +178,7 @@ Expected: commit succeeds with the domain model and schema changes.
 - Create: `/Users/minjun/Documents/dropsign-cloud/packages/email/src/index.ts`
 - Create: `/Users/minjun/Documents/dropsign-cloud/packages/email/test/fake-provider.test.ts`
 
-- [ ] **Step 1: Write the failing provider test**
+- [x] **Step 1: Write the failing provider test**
 
 Create `/Users/minjun/Documents/dropsign-cloud/packages/email/test/fake-provider.test.ts`:
 
@@ -219,7 +219,7 @@ describe('FakeEmailProvider', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test and verify it fails**
+- [x] **Step 2: Run the test and verify it fails**
 
 Run:
 
@@ -230,7 +230,7 @@ pnpm vitest run packages/email/test/fake-provider.test.ts
 
 Expected: FAIL because `packages/email/src/index.ts` does not exist.
 
-- [ ] **Step 3: Add package types**
+- [x] **Step 3: Add package types**
 
 Create `/Users/minjun/Documents/dropsign-cloud/packages/email/src/types.ts`:
 
@@ -252,7 +252,7 @@ export interface EmailProvider {
 }
 ```
 
-- [ ] **Step 4: Add fake provider**
+- [x] **Step 4: Add fake provider**
 
 Create `/Users/minjun/Documents/dropsign-cloud/packages/email/src/fake-provider.ts`:
 
@@ -269,7 +269,7 @@ export class FakeEmailProvider implements EmailProvider {
 }
 ```
 
-- [ ] **Step 5: Add templates**
+- [x] **Step 5: Add templates**
 
 Create `/Users/minjun/Documents/dropsign-cloud/packages/email/src/templates.ts`:
 
@@ -311,7 +311,7 @@ function escapeAttribute(value: string): string {
 }
 ```
 
-- [ ] **Step 6: Export the package API**
+- [x] **Step 6: Export the package API**
 
 Create `/Users/minjun/Documents/dropsign-cloud/packages/email/src/index.ts`:
 
@@ -322,7 +322,7 @@ export { renderSigningInvitation } from './templates.js';
 export type { SigningInvitationInput } from './templates.js';
 ```
 
-- [ ] **Step 7: Run the package test**
+- [x] **Step 7: Run the package test**
 
 Run:
 
@@ -333,7 +333,7 @@ pnpm vitest run packages/email/test/fake-provider.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 Run:
 
@@ -353,7 +353,7 @@ Expected: commit succeeds with package code and tests.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/worker/test/send-email.test.ts`
 - Modify: `/Users/minjun/Documents/dropsign-cloud/apps/worker/src/index.ts`
 
-- [ ] **Step 1: Write the failing worker test**
+- [x] **Step 1: Write the failing worker test**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/worker/test/send-email.test.ts`:
 
@@ -477,7 +477,7 @@ describe('runSendEmailJob', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test and verify it fails**
+- [x] **Step 2: Run the test and verify it fails**
 
 Run:
 
@@ -488,7 +488,7 @@ pnpm vitest run apps/worker/test/send-email.test.ts
 
 Expected: FAIL because `runSendEmailJob` is missing.
 
-- [ ] **Step 3: Implement email job**
+- [x] **Step 3: Implement email job**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/worker/src/jobs/send-email.ts`:
 
@@ -568,7 +568,7 @@ export async function runSendEmailJob(input: SendEmailJobInput): Promise<void> {
 }
 ```
 
-- [ ] **Step 4: Add provider factory**
+- [x] **Step 4: Add provider factory**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/worker/src/email-provider.ts`:
 
@@ -581,7 +581,7 @@ export function createEmailProvider(): EmailProvider {
 }
 ```
 
-- [ ] **Step 5: Export worker job**
+- [x] **Step 5: Export worker job**
 
 Modify `/Users/minjun/Documents/dropsign-cloud/apps/worker/src/index.ts`:
 
@@ -591,7 +591,7 @@ export { runSendEmailJob } from './jobs/send-email.js';
 export type { SendEmailJobInput } from './jobs/send-email.js';
 ```
 
-- [ ] **Step 6: Run the worker test**
+- [x] **Step 6: Run the worker test**
 
 Run:
 
@@ -602,7 +602,7 @@ pnpm vitest run apps/worker/test/send-email.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 Run:
 
@@ -622,7 +622,7 @@ Expected: commit succeeds.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/test/email-routes.test.ts`
 - Modify: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts`
 
-- [ ] **Step 1: Write the failing API test**
+- [x] **Step 1: Write the failing API test**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/test/email-routes.test.ts`:
 
@@ -747,7 +747,7 @@ describe('email routes', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test and verify it fails**
+- [x] **Step 2: Run the test and verify it fails**
 
 Run:
 
@@ -758,7 +758,7 @@ pnpm vitest run apps/api/test/email-routes.test.ts
 
 Expected: FAIL because the reminder route is not registered.
 
-- [ ] **Step 3: Add email service**
+- [x] **Step 3: Add email service**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/modules/email/email-service.ts`:
 
@@ -858,7 +858,7 @@ export async function resendFailedEmailDelivery(input: EmailServiceInput & {
 }
 ```
 
-- [ ] **Step 4: Add routes**
+- [x] **Step 4: Add routes**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/modules/email/email-routes.ts`:
 
@@ -924,7 +924,7 @@ export async function registerEmailRoutes(app: FastifyInstance): Promise<void> {
 }
 ```
 
-- [ ] **Step 5: Register routes in the app**
+- [x] **Step 5: Register routes in the app**
 
 Modify `/Users/minjun/Documents/dropsign-cloud/apps/api/src/app.ts` by appending these registrations to the existing `buildApiApp` implementation and preserving all earlier route registrations:
 
@@ -943,7 +943,7 @@ export async function buildApiApp(deps: { db: unknown; queues: { email: unknown 
 }
 ```
 
-- [ ] **Step 6: Run the route test**
+- [x] **Step 6: Run the route test**
 
 Run:
 
@@ -954,7 +954,7 @@ pnpm vitest run apps/api/test/email-routes.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 Run:
 
@@ -973,7 +973,7 @@ Expected: commit succeeds.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/web/components/email-deliveries-table.tsx`
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/web/tests/email-deliveries-table.test.tsx`
 
-- [ ] **Step 1: Write the failing component test**
+- [x] **Step 1: Write the failing component test**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/tests/email-deliveries-table.test.tsx`:
 
@@ -1009,7 +1009,7 @@ describe('EmailDeliveriesTable', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test and verify it fails**
+- [x] **Step 2: Run the test and verify it fails**
 
 Run:
 
@@ -1020,7 +1020,7 @@ pnpm vitest run apps/web/tests/email-deliveries-table.test.tsx
 
 Expected: FAIL because `EmailDeliveriesTable` is missing.
 
-- [ ] **Step 3: Implement the table**
+- [x] **Step 3: Implement the table**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/components/email-deliveries-table.tsx`:
 
@@ -1073,7 +1073,7 @@ export function EmailDeliveriesTable({
 }
 ```
 
-- [ ] **Step 4: Add the dashboard page**
+- [x] **Step 4: Add the dashboard page**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/app/(dashboard)/signing-requests/[requestId]/email-deliveries/page.tsx`:
 
@@ -1109,7 +1109,7 @@ export default async function EmailDeliveriesPage({
 }
 ```
 
-- [ ] **Step 5: Run the component test**
+- [x] **Step 5: Run the component test**
 
 Run:
 
@@ -1120,7 +1120,7 @@ pnpm vitest run apps/web/tests/email-deliveries-table.test.tsx
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 Run:
 
@@ -1141,7 +1141,7 @@ Expected: commit succeeds.
 - Modify: `/Users/minjun/Documents/dropsign-cloud/apps/worker/src/jobs/schedule-email-reminders.ts`
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/worker/test/schedule-email-reminders.test.ts`
 
-- [ ] **Step 1: Write failing lifecycle enqueue tests**
+- [x] **Step 1: Write failing lifecycle enqueue tests**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/test/email-lifecycle-service.test.ts`:
 
@@ -1283,7 +1283,7 @@ describe('email lifecycle service', () => {
 });
 ```
 
-- [ ] **Step 2: Add lifecycle enqueue implementation**
+- [x] **Step 2: Add lifecycle enqueue implementation**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/modules/email/email-lifecycle-service.ts`:
 
@@ -1391,7 +1391,7 @@ export async function enqueueDocumentFailureEmail(input: {
 }
 ```
 
-- [ ] **Step 3: Wire request creation to invitation enqueueing**
+- [x] **Step 3: Wire request creation to invitation enqueueing**
 
 Modify `/Users/minjun/Documents/dropsign-cloud/apps/api/src/modules/signing-requests/signing-request-service.ts` so the create path calls `enqueueSigningInvitationEmails` immediately after the signing request and signer rows are committed:
 
@@ -1421,7 +1421,7 @@ export async function createSigningRequest(input: CreateSigningRequestInput) {
 }
 ```
 
-- [ ] **Step 4: Write failing scheduled reminder worker test**
+- [x] **Step 4: Write failing scheduled reminder worker test**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/worker/test/schedule-email-reminders.test.ts`:
 
@@ -1466,7 +1466,7 @@ describe('runScheduleEmailRemindersJob', () => {
 });
 ```
 
-- [ ] **Step 5: Implement scheduled reminder job**
+- [x] **Step 5: Implement scheduled reminder job**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/worker/src/jobs/schedule-email-reminders.ts`:
 
@@ -1525,7 +1525,7 @@ export async function runScheduleEmailRemindersJob(input: {
 }
 ```
 
-- [ ] **Step 6: Run lifecycle and scheduled reminder tests**
+- [x] **Step 6: Run lifecycle and scheduled reminder tests**
 
 Run:
 
@@ -1536,7 +1536,7 @@ pnpm vitest run apps/api/test/email-lifecycle-service.test.ts apps/worker/test/s
 
 Expected: PASS.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 Run:
 
@@ -1550,7 +1550,7 @@ Expected: commit succeeds.
 
 ## Phase Verification
 
-- [ ] **Step 1: Run unit and integration tests**
+- [x] **Step 1: Run unit and integration tests**
 
 Run:
 
@@ -1561,7 +1561,7 @@ pnpm vitest run packages/email/test/fake-provider.test.ts apps/worker/test/send-
 
 Expected: all listed tests pass.
 
-- [ ] **Step 2: Run workspace checks**
+- [x] **Step 2: Run workspace checks**
 
 Run:
 
@@ -1575,7 +1575,7 @@ pnpm build
 
 Expected: all commands pass.
 
-- [ ] **Step 3: Commit any verification fixes**
+- [x] **Step 3: Commit any verification fixes**
 
 Run:
 

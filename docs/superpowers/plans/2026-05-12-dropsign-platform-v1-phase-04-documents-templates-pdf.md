@@ -1,6 +1,6 @@
 # DropSign Platform v1 Phase 04 Document and Template System Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Build the DropSign Cloud document and template module so workspaces can upload PDFs, define reusable fields, save templates, generate hashed completed PDFs, and use the dashboard upload/template-builder flow.
 
@@ -97,7 +97,7 @@ type FieldPlacement = {
 - Modify: `/Users/minjun/Documents/dropsign-cloud/packages/contracts/src/index.ts`
 - Test command target: `/Users/minjun/Documents/dropsign-cloud/packages/contracts/src/documents.test.ts`
 
-- [ ] **Step 1: Write the failing shared contract tests**
+- [x] **Step 1: Write the failing shared contract tests**
 
 Create `/Users/minjun/Documents/dropsign-cloud/packages/contracts/src/documents.test.ts`:
 
@@ -221,7 +221,7 @@ describe('document shared contracts', () => {
 });
 ```
 
-- [ ] **Step 2: Run the failing contract tests**
+- [x] **Step 2: Run the failing contract tests**
 
 Run:
 
@@ -232,7 +232,7 @@ pnpm vitest run packages/contracts/src/documents.test.ts
 
 Expected: FAIL with an import error for `./documents`.
 
-- [ ] **Step 3: Add shared document contracts**
+- [x] **Step 3: Add shared document contracts**
 
 Create `/Users/minjun/Documents/dropsign-cloud/packages/contracts/src/documents.ts`:
 
@@ -334,7 +334,7 @@ Modify `/Users/minjun/Documents/dropsign-cloud/packages/contracts/src/index.ts`:
 export * from './documents';
 ```
 
-- [ ] **Step 4: Add Prisma models and SQL migration**
+- [x] **Step 4: Add Prisma models and SQL migration**
 
 Add these enums and models to `/Users/minjun/Documents/dropsign-cloud/packages/db/prisma/schema.prisma`. Preserve every existing Phase 01-03 model field, relation, index, and enum value; this is an additive migration unless this task explicitly says to migrate a field:
 
@@ -571,7 +571,7 @@ CREATE UNIQUE INDEX "DocumentCompletionJob_workspaceId_documentId_inputHash_key"
 CREATE INDEX "DocumentCompletionJob_workspaceId_status_createdAt_idx" ON "DocumentCompletionJob"("workspaceId", "status", "createdAt");
 ```
 
-- [ ] **Step 5: Run contracts and Prisma validation**
+- [x] **Step 5: Run contracts and Prisma validation**
 
 Run:
 
@@ -583,7 +583,7 @@ pnpm prisma validate --schema packages/db/prisma/schema.prisma
 
 Expected: PASS for Vitest and Prisma schema validation reports the schema is valid.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd /Users/minjun/Documents/dropsign-cloud
@@ -605,7 +605,7 @@ Expected: commit succeeds with only the files listed above staged.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/modules/documents/documentValidation.ts`
 - Test: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/modules/documents/documentValidation.test.ts`
 
-- [ ] **Step 1: Write failing validation and storage tests**
+- [x] **Step 1: Write failing validation and storage tests**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/modules/documents/documentValidation.test.ts`:
 
@@ -686,7 +686,7 @@ describe('document validation', () => {
 });
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run:
 
@@ -697,7 +697,7 @@ pnpm vitest run apps/api/src/modules/documents/documentValidation.test.ts
 
 Expected: FAIL with missing module errors for `documentObjects` and `documentValidation`.
 
-- [ ] **Step 3: Implement storage helpers and validation**
+- [x] **Step 3: Implement storage helpers and validation**
 
 Create `/Users/minjun/Documents/dropsign-cloud/packages/storage/src/documentObjects.ts`:
 
@@ -782,7 +782,7 @@ export async function validatePdfUpload(input: PdfUploadInput): Promise<Validate
 }
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run:
 
@@ -793,7 +793,7 @@ pnpm vitest run apps/api/src/modules/documents/documentValidation.test.ts
 
 Expected: PASS with 6 tests passing.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /Users/minjun/Documents/dropsign-cloud
@@ -814,7 +814,7 @@ Expected: commit succeeds with only storage and validation files staged.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/modules/documents/documentRoutes.test.ts`
 - Modify: `/Users/minjun/Documents/dropsign-cloud/apps/api/src/modules/routes.ts`
 
-- [ ] **Step 1: Write failing API route tests**
+- [x] **Step 1: Write failing API route tests**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/modules/documents/documentRoutes.test.ts`:
 
@@ -1086,7 +1086,7 @@ describe('document routes', () => {
 });
 ```
 
-- [ ] **Step 2: Run the route tests to verify they fail**
+- [x] **Step 2: Run the route tests to verify they fail**
 
 Run:
 
@@ -1097,7 +1097,7 @@ pnpm vitest run apps/api/src/modules/documents/documentRoutes.test.ts
 
 Expected: FAIL with missing `documentRoutes` module.
 
-- [ ] **Step 3: Implement repository helpers**
+- [x] **Step 3: Implement repository helpers**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/modules/documents/documentRepository.ts`:
 
@@ -1193,7 +1193,7 @@ export class DocumentRepository {
 }
 ```
 
-- [ ] **Step 4: Implement routes and register them**
+- [x] **Step 4: Implement routes and register them**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/api/src/modules/documents/documentRoutes.ts`:
 
@@ -1432,7 +1432,7 @@ await registerDocumentRoutes(app, {
 });
 ```
 
-- [ ] **Step 5: Run route tests**
+- [x] **Step 5: Run route tests**
 
 Run:
 
@@ -1443,7 +1443,7 @@ pnpm vitest run apps/api/src/modules/documents/documentRoutes.test.ts
 
 Expected: PASS with route tests covering upload, tenant isolation, template creation, page validation, and completed PDF enqueueing.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd /Users/minjun/Documents/dropsign-cloud
@@ -1462,7 +1462,7 @@ Expected: commit succeeds with only API route files staged.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/web/src/features/templates/templateBuilderModel.ts`
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/web/src/features/templates/templateBuilderModel.test.ts`
 
-- [ ] **Step 1: Write failing builder model tests**
+- [x] **Step 1: Write failing builder model tests**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/src/features/templates/templateBuilderModel.test.ts`:
 
@@ -1580,7 +1580,7 @@ describe('templateBuilderModel', () => {
 });
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run:
 
@@ -1591,7 +1591,7 @@ pnpm vitest run apps/web/src/features/templates/templateBuilderModel.test.ts
 
 Expected: FAIL with missing `templateBuilderModel` module.
 
-- [ ] **Step 3: Implement the builder model**
+- [x] **Step 3: Implement the builder model**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/src/features/templates/templateBuilderModel.ts`:
 
@@ -1691,7 +1691,7 @@ export function serializeTemplateBuilder(state: TemplateBuilderState): CreateTem
 }
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run:
 
@@ -1702,7 +1702,7 @@ pnpm vitest run apps/web/src/features/templates/templateBuilderModel.test.ts
 
 Expected: PASS with 3 builder model tests passing.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /Users/minjun/Documents/dropsign-cloud
@@ -1725,7 +1725,7 @@ Expected: commit succeeds with only builder model files staged.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/web/src/features/templates/TemplateBuilder.test.tsx`
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/web/e2e/documents-template-builder.spec.ts`
 
-- [ ] **Step 1: Write failing TemplateBuilder component tests**
+- [x] **Step 1: Write failing TemplateBuilder component tests**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/src/features/templates/TemplateBuilder.test.tsx`:
 
@@ -1770,7 +1770,7 @@ describe('TemplateBuilder', () => {
 });
 ```
 
-- [ ] **Step 2: Run the component test to verify it fails**
+- [x] **Step 2: Run the component test to verify it fails**
 
 Run:
 
@@ -1781,7 +1781,7 @@ pnpm vitest run apps/web/src/features/templates/TemplateBuilder.test.tsx
 
 Expected: FAIL with missing `TemplateBuilder` module.
 
-- [ ] **Step 3: Implement dashboard components and pages**
+- [x] **Step 3: Implement dashboard components and pages**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/src/features/documents/DocumentUploadForm.tsx`:
 
@@ -2102,7 +2102,7 @@ export default async function TemplateBuilderPage({ params }: { params: { templa
 }
 ```
 
-- [ ] **Step 4: Add the Playwright dashboard flow**
+- [x] **Step 4: Add the Playwright dashboard flow**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/e2e/documents-template-builder.spec.ts`:
 
@@ -2129,7 +2129,7 @@ test('operator uploads a PDF and saves a template with signature and checkbox fi
 });
 ```
 
-- [ ] **Step 5: Run component tests**
+- [x] **Step 5: Run component tests**
 
 Run:
 
@@ -2140,7 +2140,7 @@ pnpm vitest run apps/web/src/features/templates/TemplateBuilder.test.tsx
 
 Expected: PASS with the component test passing.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd /Users/minjun/Documents/dropsign-cloud
@@ -2167,7 +2167,7 @@ Expected: commit succeeds with only dashboard files staged.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/worker/test/golden/completed-contract.fields.json`
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/worker/test/golden/completed-contract.expected.json`
 
-- [ ] **Step 1: Create deterministic test fixtures**
+- [x] **Step 1: Create deterministic test fixtures**
 
 Run:
 
@@ -2303,7 +2303,7 @@ JSON
 
 Expected: fixture PDF and two golden JSON files are created. This step uses shell generation because binary PDF bytes are not practical to represent in the plan body.
 
-- [ ] **Step 2: Write failing worker golden tests**
+- [x] **Step 2: Write failing worker golden tests**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/worker/src/jobs/generateCompletedPdf.test.ts`:
 
@@ -2421,7 +2421,7 @@ describe('generateCompletedPdf', () => {
 });
 ```
 
-- [ ] **Step 3: Run worker tests to verify they fail**
+- [x] **Step 3: Run worker tests to verify they fail**
 
 Run:
 
@@ -2432,7 +2432,7 @@ pnpm vitest run apps/worker/src/jobs/generateCompletedPdf.test.ts
 
 Expected: FAIL with missing `generateCompletedPdf` module.
 
-- [ ] **Step 4: Implement the PDF worker**
+- [x] **Step 4: Implement the PDF worker**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/worker/src/jobs/generateCompletedPdf.ts`:
 
@@ -2627,7 +2627,7 @@ export const workerJobs = {
 };
 ```
 
-- [ ] **Step 5: Run worker tests to verify they pass**
+- [x] **Step 5: Run worker tests to verify they pass**
 
 Run:
 
@@ -2638,7 +2638,7 @@ pnpm vitest run apps/worker/src/jobs/generateCompletedPdf.test.ts
 
 Expected: PASS with golden PDF generation and worker persistence tests passing.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd /Users/minjun/Documents/dropsign-cloud
@@ -2658,7 +2658,7 @@ Expected: commit succeeds with only worker job and fixture files staged.
 **Files:**
 - Confirm the Git diff contains exactly the files created or modified by Tasks 1-6.
 
-- [ ] **Step 1: Run focused test suites**
+- [x] **Step 1: Run focused test suites**
 
 Run:
 
@@ -2675,7 +2675,7 @@ pnpm vitest run \
 
 Expected: PASS for all focused unit and component tests.
 
-- [ ] **Step 2: Run database validation and migration check**
+- [x] **Step 2: Run database validation and migration check**
 
 Run:
 
@@ -2690,7 +2690,7 @@ pnpm prisma migrate diff \
 
 Expected: Prisma validates the schema, and the migration diff includes the `Document`, `Template`, `Field`, and `DocumentCompletionJob` tables.
 
-- [ ] **Step 3: Run package quality checks**
+- [x] **Step 3: Run package quality checks**
 
 Run:
 
@@ -2704,7 +2704,7 @@ pnpm build
 
 Expected: all four commands exit with status `0`.
 
-- [ ] **Step 4: Run dashboard E2E flow**
+- [x] **Step 4: Run dashboard E2E flow**
 
 Run:
 
@@ -2715,7 +2715,7 @@ pnpm --filter @dropsign/web exec playwright test e2e/documents-template-builder.
 
 Expected: PASS for the upload and template builder flow.
 
-- [ ] **Step 5: Verify no out-of-scope files were changed**
+- [x] **Step 5: Verify no out-of-scope files were changed**
 
 Run:
 
@@ -2726,7 +2726,7 @@ git status --short
 
 Expected: only files listed in this plan appear. No files in `/Users/minjun/Documents/drop-sign` are modified by phase execution.
 
-- [ ] **Step 6: Final phase commit if prior task commits were squashed by the executor**
+- [x] **Step 6: Final phase commit if prior task commits were squashed by the executor**
 
 If the worker intentionally did not create per-task commits, create one phase commit:
 

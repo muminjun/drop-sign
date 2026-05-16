@@ -1,6 +1,6 @@
 # DropSign Platform v1 Phase 05 Public Link Signing Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Build the tokenized public signing app so external signers can open secure links, complete required assigned fields with the DropSign SDK, submit signatures, see terminal states, and download completed documents only when the project allows it.
 
@@ -154,7 +154,7 @@ export type PublicSigningCompletionRequest = {
 - Create: `/Users/minjun/Documents/dropsign-cloud/packages/db/prisma/migrations/20260512050000_public_link_signing/migration.sql`
 - Modify: `/Users/minjun/Documents/dropsign-cloud/packages/db/src/index.ts`
 
-- [ ] **Step 1: Write the failing schema assertion test**
+- [x] **Step 1: Write the failing schema assertion test**
 
 Create `/Users/minjun/Documents/dropsign-cloud/packages/db/src/public-link-signing-schema.test.ts`:
 
@@ -190,7 +190,7 @@ describe('public link signing schema', () => {
 });
 ```
 
-- [ ] **Step 2: Run the schema assertion test to verify it fails**
+- [x] **Step 2: Run the schema assertion test to verify it fails**
 
 Run:
 
@@ -200,7 +200,7 @@ pnpm --filter @dropsign/db test -- public-link-signing-schema.test.ts
 
 Expected: FAIL with output containing `expected '...' to contain 'tokenHash      String   @unique'`.
 
-- [ ] **Step 3: Add Prisma schema fields**
+- [x] **Step 3: Add Prisma schema fields**
 
 Modify `/Users/minjun/Documents/dropsign-cloud/packages/db/prisma/schema.prisma` so these definitions exist. Preserve existing fields, relations, indexes, and enum values from Phases 01-04 unless this task explicitly names a migration. Keep the Phase 04 `Document` identity and storage fields unchanged: `title`, `sourceObjectKey`, and `completedObjectKey`.
 
@@ -383,7 +383,7 @@ model AuditEvent {
 }
 ```
 
-- [ ] **Step 4: Add SQL migration**
+- [x] **Step 4: Add SQL migration**
 
 Create `/Users/minjun/Documents/dropsign-cloud/packages/db/prisma/migrations/20260512050000_public_link_signing/migration.sql`:
 
@@ -490,7 +490,7 @@ CREATE INDEX IF NOT EXISTS "AuditEvent_workspaceId_createdAt_idx" ON "AuditEvent
 CREATE INDEX IF NOT EXISTS "AuditEvent_requestId_createdAt_idx" ON "AuditEvent"("requestId", "createdAt");
 ```
 
-- [ ] **Step 5: Export database types**
+- [x] **Step 5: Export database types**
 
 Modify `/Users/minjun/Documents/dropsign-cloud/packages/db/src/index.ts`:
 
@@ -516,7 +516,7 @@ export {
 } from '@prisma/client';
 ```
 
-- [ ] **Step 6: Run schema tests and Prisma validation**
+- [x] **Step 6: Run schema tests and Prisma validation**
 
 Run:
 
@@ -528,7 +528,7 @@ pnpm --filter @dropsign/db prisma generate
 
 Expected: all commands exit `0`; Vitest reports `2 passed`; Prisma reports the schema is valid and client generation completed.
 
-- [ ] **Step 7: Commit database model**
+- [x] **Step 7: Commit database model**
 
 Run:
 
@@ -547,7 +547,7 @@ Expected: commit succeeds and includes only the four listed paths.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/web/lib/public-signing/types.ts`
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/web/lib/public-signing/token.test.ts`
 
-- [ ] **Step 1: Write failing token tests**
+- [x] **Step 1: Write failing token tests**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/lib/public-signing/token.test.ts`:
 
@@ -582,7 +582,7 @@ describe('public signing token helpers', () => {
 });
 ```
 
-- [ ] **Step 2: Run token tests to verify they fail**
+- [x] **Step 2: Run token tests to verify they fail**
 
 Run:
 
@@ -592,7 +592,7 @@ pnpm --filter @dropsign/web test -- lib/public-signing/token.test.ts
 
 Expected: FAIL with output containing `Cannot find module './token'`.
 
-- [ ] **Step 3: Add public signing types**
+- [x] **Step 3: Add public signing types**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/lib/public-signing/types.ts`:
 
@@ -695,7 +695,7 @@ export type PublicSigningCompletionResponse = {
 };
 ```
 
-- [ ] **Step 4: Add typed public signing errors**
+- [x] **Step 4: Add typed public signing errors**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/lib/public-signing/public-signing-errors.ts`:
 
@@ -746,7 +746,7 @@ export function fieldNotAssignedToSigner(fieldId: string): PublicSigningError {
 }
 ```
 
-- [ ] **Step 5: Add token helper implementation**
+- [x] **Step 5: Add token helper implementation**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/lib/public-signing/token.ts`:
 
@@ -779,7 +779,7 @@ export function isSigningTokenMatch(token: string, expectedHash: string): boolea
 }
 ```
 
-- [ ] **Step 6: Run token tests**
+- [x] **Step 6: Run token tests**
 
 Run:
 
@@ -789,7 +789,7 @@ pnpm --filter @dropsign/web test -- lib/public-signing/token.test.ts
 
 Expected: PASS with `4 passed`.
 
-- [ ] **Step 7: Commit token helpers**
+- [x] **Step 7: Commit token helpers**
 
 Run:
 
@@ -807,7 +807,7 @@ Expected: commit succeeds and includes only the four listed paths.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/web/lib/public-signing/get-public-signing-context.test.ts`
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/web/test/factories/public-signing.ts`
 
-- [ ] **Step 1: Create deterministic public signing test factory**
+- [x] **Step 1: Create deterministic public signing test factory**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/test/factories/public-signing.ts`:
 
@@ -1017,7 +1017,7 @@ export function publicSigningFixture(now = new Date('2026-05-12T12:00:00.000Z'))
 }
 ```
 
-- [ ] **Step 2: Write failing context loader tests**
+- [x] **Step 2: Write failing context loader tests**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/lib/public-signing/get-public-signing-context.test.ts`:
 
@@ -1195,7 +1195,7 @@ describe('getPublicSigningContext', () => {
 });
 ```
 
-- [ ] **Step 3: Run context loader tests to verify they fail**
+- [x] **Step 3: Run context loader tests to verify they fail**
 
 Run:
 
@@ -1205,7 +1205,7 @@ pnpm --filter @dropsign/web test -- lib/public-signing/get-public-signing-contex
 
 Expected: FAIL with output containing `Cannot find module './get-public-signing-context'`.
 
-- [ ] **Step 4: Implement context loader**
+- [x] **Step 4: Implement context loader**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/lib/public-signing/get-public-signing-context.ts`:
 
@@ -1350,7 +1350,7 @@ export async function getPublicSigningContext({
 }
 ```
 
-- [ ] **Step 5: Run context loader tests**
+- [x] **Step 5: Run context loader tests**
 
 Run:
 
@@ -1360,7 +1360,7 @@ pnpm --filter @dropsign/web test -- lib/public-signing/get-public-signing-contex
 
 Expected: PASS with `6 passed`.
 
-- [ ] **Step 6: Commit context loader**
+- [x] **Step 6: Commit context loader**
 
 Run:
 
@@ -1377,7 +1377,7 @@ Expected: commit succeeds and includes only the three listed paths.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/web/lib/public-signing/complete-public-signing.ts`
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/web/lib/public-signing/complete-public-signing.test.ts`
 
-- [ ] **Step 1: Write failing completion service tests**
+- [x] **Step 1: Write failing completion service tests**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/lib/public-signing/complete-public-signing.test.ts`:
 
@@ -1586,7 +1586,7 @@ describe('completePublicSigning', () => {
 });
 ```
 
-- [ ] **Step 2: Run completion tests to verify they fail**
+- [x] **Step 2: Run completion tests to verify they fail**
 
 Run:
 
@@ -1596,7 +1596,7 @@ pnpm --filter @dropsign/web test -- lib/public-signing/complete-public-signing.t
 
 Expected: FAIL with output containing `Cannot find module './complete-public-signing'`.
 
-- [ ] **Step 3: Implement completion service**
+- [x] **Step 3: Implement completion service**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/lib/public-signing/complete-public-signing.ts`:
 
@@ -1842,7 +1842,7 @@ function toFieldValueData(value: PublicSigningCompletionFieldValue, completedAt:
 }
 ```
 
-- [ ] **Step 4: Run completion service tests**
+- [x] **Step 4: Run completion service tests**
 
 Run:
 
@@ -1852,7 +1852,7 @@ pnpm --filter @dropsign/web test -- lib/public-signing/complete-public-signing.t
 
 Expected: PASS with `4 passed`.
 
-- [ ] **Step 5: Commit completion service**
+- [x] **Step 5: Commit completion service**
 
 Run:
 
@@ -1869,7 +1869,7 @@ Expected: commit succeeds and includes only the two listed paths.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/web/lib/public-signing/download-public-signing-document.ts`
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/web/lib/public-signing/download-public-signing-document.test.ts`
 
-- [ ] **Step 1: Write failing download policy tests**
+- [x] **Step 1: Write failing download policy tests**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/lib/public-signing/download-public-signing-document.test.ts`:
 
@@ -1958,7 +1958,7 @@ describe('getPublicSigningDownloadUrl', () => {
 });
 ```
 
-- [ ] **Step 2: Run download policy tests to verify they fail**
+- [x] **Step 2: Run download policy tests to verify they fail**
 
 Run:
 
@@ -1968,7 +1968,7 @@ pnpm --filter @dropsign/web test -- lib/public-signing/download-public-signing-d
 
 Expected: FAIL with output containing `Cannot find module './download-public-signing-document'`.
 
-- [ ] **Step 3: Implement download policy service**
+- [x] **Step 3: Implement download policy service**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/lib/public-signing/download-public-signing-document.ts`:
 
@@ -2015,7 +2015,7 @@ export async function getPublicSigningDownloadUrl({
 }
 ```
 
-- [ ] **Step 4: Run download policy tests**
+- [x] **Step 4: Run download policy tests**
 
 Run:
 
@@ -2025,7 +2025,7 @@ pnpm --filter @dropsign/web test -- lib/public-signing/download-public-signing-d
 
 Expected: PASS with `4 passed`.
 
-- [ ] **Step 5: Commit download policy**
+- [x] **Step 5: Commit download policy**
 
 Run:
 
@@ -2045,7 +2045,7 @@ Expected: commit succeeds and includes only the two listed paths.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/web/app/api/public/signing/[token]/route.test.ts`
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/web/app/api/public/signing/[token]/complete/route.test.ts`
 
-- [ ] **Step 1: Write failing route contract tests**
+- [x] **Step 1: Write failing route contract tests**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/app/api/public/signing/[token]/route.test.ts`:
 
@@ -2140,7 +2140,7 @@ describe('POST /api/public/signing/[token]/complete', () => {
 });
 ```
 
-- [ ] **Step 2: Run route tests to verify they fail**
+- [x] **Step 2: Run route tests to verify they fail**
 
 Run:
 
@@ -2150,7 +2150,7 @@ pnpm --filter @dropsign/web test -- app/api/public/signing
 
 Expected: FAIL with output containing `Cannot find module './route'`.
 
-- [ ] **Step 3: Implement validation route**
+- [x] **Step 3: Implement validation route**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/app/api/public/signing/[token]/route.ts`:
 
@@ -2180,7 +2180,7 @@ export async function GET(
 }
 ```
 
-- [ ] **Step 4: Implement completion route**
+- [x] **Step 4: Implement completion route**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/app/api/public/signing/[token]/complete/route.ts`:
 
@@ -2230,7 +2230,7 @@ export async function POST(
 }
 ```
 
-- [ ] **Step 5: Implement download route**
+- [x] **Step 5: Implement download route**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/app/api/public/signing/[token]/download/route.ts`:
 
@@ -2277,7 +2277,7 @@ export async function GET(
 }
 ```
 
-- [ ] **Step 6: Run route tests**
+- [x] **Step 6: Run route tests**
 
 Run:
 
@@ -2287,7 +2287,7 @@ pnpm --filter @dropsign/web test -- app/api/public/signing
 
 Expected: PASS with `2 passed`.
 
-- [ ] **Step 7: Commit API routes**
+- [x] **Step 7: Commit API routes**
 
 Run:
 
@@ -2306,7 +2306,7 @@ Expected: commit succeeds and includes only the five listed paths.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/web/app/sign/[token]/public-signing.css`
 - Modify: `/Users/minjun/Documents/dropsign-cloud/apps/web/package.json`
 
-- [ ] **Step 1: Add SDK dependency**
+- [x] **Step 1: Add SDK dependency**
 
 Modify `/Users/minjun/Documents/dropsign-cloud/apps/web/package.json` so `dependencies` includes the SDK package:
 
@@ -2320,7 +2320,7 @@ Modify `/Users/minjun/Documents/dropsign-cloud/apps/web/package.json` so `depend
 
 Keep existing dependencies unchanged.
 
-- [ ] **Step 2: Write failing page smoke test**
+- [x] **Step 2: Write failing page smoke test**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/app/sign/[token]/PublicSigningClient.test.tsx`:
 
@@ -2377,7 +2377,7 @@ describe('PublicSigningClient', () => {
 });
 ```
 
-- [ ] **Step 3: Run page smoke test to verify it fails**
+- [x] **Step 3: Run page smoke test to verify it fails**
 
 Run:
 
@@ -2387,7 +2387,7 @@ pnpm --filter @dropsign/web test -- app/sign/[token]/PublicSigningClient.test.ts
 
 Expected: FAIL with output containing `Cannot find module './PublicSigningClient'`.
 
-- [ ] **Step 4: Implement server page**
+- [x] **Step 4: Implement server page**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/app/sign/[token]/page.tsx`:
 
@@ -2418,7 +2418,7 @@ export default async function PublicSigningPage({
 }
 ```
 
-- [ ] **Step 5: Implement client page with SDK integration**
+- [x] **Step 5: Implement client page with SDK integration**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/app/sign/[token]/PublicSigningClient.tsx`:
 
@@ -2679,7 +2679,7 @@ function completedCount(
 }
 ```
 
-- [ ] **Step 6: Add public signing styles**
+- [x] **Step 6: Add public signing styles**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/app/sign/[token]/public-signing.css`:
 
@@ -2827,7 +2827,7 @@ Create `/Users/minjun/Documents/dropsign-cloud/apps/web/app/sign/[token]/public-
 }
 ```
 
-- [ ] **Step 7: Run page smoke test**
+- [x] **Step 7: Run page smoke test**
 
 Run:
 
@@ -2837,7 +2837,7 @@ pnpm --filter @dropsign/web test -- app/sign/[token]/PublicSigningClient.test.ts
 
 Expected: PASS with `2 passed`.
 
-- [ ] **Step 8: Commit public signer page**
+- [x] **Step 8: Commit public signer page**
 
 Run:
 
@@ -2854,7 +2854,7 @@ Expected: commit succeeds and includes only the five listed paths.
 - Create: `/Users/minjun/Documents/dropsign-cloud/apps/web/e2e/public-link-signing.spec.ts`
 - Modify: `/Users/minjun/Documents/dropsign-cloud/apps/web/package.json`
 
-- [ ] **Step 1: Add Playwright script**
+- [x] **Step 1: Add Playwright script**
 
 Modify `/Users/minjun/Documents/dropsign-cloud/apps/web/package.json` so `scripts` includes:
 
@@ -2868,7 +2868,7 @@ Modify `/Users/minjun/Documents/dropsign-cloud/apps/web/package.json` so `script
 
 Keep existing scripts unchanged.
 
-- [ ] **Step 2: Write E2E tests**
+- [x] **Step 2: Write E2E tests**
 
 Create `/Users/minjun/Documents/dropsign-cloud/apps/web/e2e/public-link-signing.spec.ts`:
 
@@ -2994,7 +2994,7 @@ test('sequential signer waiting state shows routing message', async ({ page }) =
 });
 ```
 
-- [ ] **Step 3: Run E2E tests after the public signing page is implemented**
+- [x] **Step 3: Run E2E tests after the public signing page is implemented**
 
 Run:
 
@@ -3004,7 +3004,7 @@ pnpm --filter @dropsign/web e2e:public-signing
 
 Expected: PASS with `4 passed`. A failure showing no request to `/api/public/signing/public_active_token` means `fetchContextOnMount` is not wired; a failure showing `Mutual NDA.pdf` on expired or revoked tests means terminal-state rendering is leaking document details.
 
-- [ ] **Step 4: Confirm client fetch-on-mount is wired for browser-visible token validation**
+- [x] **Step 4: Confirm client fetch-on-mount is wired for browser-visible token validation**
 
 Open `/Users/minjun/Documents/dropsign-cloud/apps/web/app/sign/[token]/page.tsx` and verify it passes `fetchContextOnMount` to `PublicSigningClient`. Open `/Users/minjun/Documents/dropsign-cloud/apps/web/app/sign/[token]/PublicSigningClient.tsx` and verify it contains this exact fetch call:
 
@@ -3016,7 +3016,7 @@ fetch(`/api/public/signing/${encodeURIComponent(token)}`, {
 
 Expected: the page shell loads without direct database access, and the browser calls `GET /api/public/signing/[token]` before rendering document details.
 
-- [ ] **Step 5: Run E2E tests to verify they pass**
+- [x] **Step 5: Run E2E tests to verify they pass**
 
 Run:
 
@@ -3026,7 +3026,7 @@ pnpm --filter @dropsign/web e2e:public-signing
 
 Expected: PASS with `4 passed`.
 
-- [ ] **Step 6: Commit E2E coverage**
+- [x] **Step 6: Commit E2E coverage**
 
 Run:
 
