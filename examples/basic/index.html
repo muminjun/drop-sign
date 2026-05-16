@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DropSign v0.2 Demo</title>
+    <title>DropSign v0.4 Demo</title>
     <style>
       :root {
         --slate-50: #f8fafc;
@@ -209,7 +209,7 @@
     <div class="container">
       <header>
         <h1>DropSign v0.4</h1>
-        <p class="subtitle">Viewport overlay · Global &amp; custom triggers · Normalized placement output</p>
+        <p class="subtitle">Draw a signature, place it on the viewport, and inspect normalized output</p>
       </header>
 
       <div class="mode-switcher">
@@ -248,12 +248,12 @@
         </div>
         <div class="signature-section">
           <div>
+            <div id="custom-trigger-area">
+              <button id="custom-sign-btn">Sign here</button>
+            </div>
             <div class="signature-line">Contractor Signature</div>
           </div>
           <div>
-            <div id="custom-trigger-area">
-              <button id="custom-sign-btn">✍️ Sign here</button>
-            </div>
             <div class="signature-line">Date</div>
           </div>
         </div>

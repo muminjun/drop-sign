@@ -34,7 +34,9 @@ function onComplete(result: DropSignResult) {
 
   const header = document.createElement('div');
   header.className = 'result-header';
-  header.innerHTML = '<h3>Signature captured</h3>';
+  const heading = document.createElement('h3');
+  heading.textContent = 'Signature placement captured';
+  header.appendChild(heading);
 
   const body = document.createElement('div');
   body.className = 'result-body';
